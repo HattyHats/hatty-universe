@@ -287,10 +287,15 @@
     // ────────────────────────────────────────────────────────
     function createPlanet(radius, color, position, label, url, textureUrl) {
       const geometry = new THREE.SphereGeometry(radius, 48, 48);
+
+      // emissive starts at black/0 — gets set to white + emissiveMap once
+      // the texture loads so the planet self-illuminates and looks bright.
       const material = new THREE.MeshStandardMaterial({
         color,
         roughness: 0.55,
         metalness: 0.15,
+        emissive: new THREE.Color(0x000000),
+        emissiveIntensity: 0,
       });
 
       if (textureUrl) {
@@ -300,11 +305,18 @@
             tex.colorSpace  = THREE.SRGBColorSpace;
             tex.wrapS = THREE.RepeatWrapping;
             tex.wrapT = THREE.RepeatWrapping;
-            material.map = tex;
+            material.map          = tex;
+            // Self-illuminate: emissiveMap makes the texture visible at its
+            // true colours regardless of how much light is hitting the planet.
+            // emissiveIntensity 0.7 = 70 % self-lit + 30 % from scene lights,
+            // giving bright textures while still keeping a 3-D shaded look.
+            material.emissiveMap       = tex;
+            material.emissive.set(0xffffff);
+            material.emissiveIntensity = 0.7;
             material.needsUpdate = true;
           },
           undefined,
-          () => { /* fallback to base colour on error */ }
+          () => { /* texture failed — planet shows its base colour instead */ }
         );
       }
 
@@ -344,28 +356,25 @@
       "img/privacy.jpg"
     ));
 
-    // Cardano (Step 4: was "Cardano Planet")
-    // Filename has a space → encoded as %20 in the URL path
+    // Cardano — rename file on GitHub: "cardano website.png" → "cardano-website.png"
     planets.push(createPlanet(
       9, 0xffffff, new THREE.Vector3(-90, -40, -180),
       "Cardano", "https://cardano.org/",
-      "img/cardano%20website.png"
+      "img/cardano-website.png"
     ));
 
-    // Voi (Step 4: was "Voi Planet")
-    // Filename has a space → encoded as %20 in the URL path
+    // Voi — rename file on GitHub: "voi website.png" → "voi-website.png"
     planets.push(createPlanet(
       7, 0xffffff, new THREE.Vector3(110, 20, -210),
       "Voi", "https://voi.network/",
-      "img/voi%20website.png"
+      "img/voi-website.png"
     ));
 
-    // YouTube planet (Step 2)
-    // Filename has spaces → encoded as %20 in the URL path
+    // YouTube — rename file on GitHub: "learn with hatty youtube.png" → "learn-with-hatty-youtube.png"
     planets.push(createPlanet(
       7, 0xff3333, new THREE.Vector3(130, 60, -100),
       "YouTube – HattyHats", "https://www.youtube.com/@hattyhats0",
-      "img/learn%20with%20hatty%20youtube.png"
+      "img/learn-with-hatty-youtube.png"
     ));
 
     // BULB planet (Step 2)

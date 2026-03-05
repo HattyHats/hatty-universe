@@ -1,1 +1,764 @@
-<h1>Hatty Universe</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>HattyHats – Digital Universe (Prototype)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #02030a;
+      color: #f5f5f5;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+      touch-action: none; /* prevent iOS rubber-band scroll interfering with touch controls */
+    }
+
+    body {
+      display: flex;
+      align-items: stretch;
+      justify-content: stretch;
+    }
+
+    #universe-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    canvas {
+      display: block;
+    }
+
+    /* ── HUD ──────────────────────────────────────────────── */
+    .hud {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      padding: 8px 12px;
+      background: rgba(0, 0, 0, 0.55);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 6px;
+      font-size: 12px;
+      line-height: 1.5;
+      pointer-events: none;
+      backdrop-filter: blur(6px);
+    }
+
+    .hud-title {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 4px;
+      color: #ffffff;
+    }
+
+    .hud-body {
+      color: #b0b7ff;
+    }
+
+    .hud-body strong {
+      color: #ffffff;
+      font-weight: 600;
+    }
+
+    /* ── Main site button ─────────────────────────────────── */
+    .main-site-button {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.8);
+      background: rgba(15, 23, 42, 0.9);
+      color: #e5e7eb;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      pointer-events: auto;
+      box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.9);
+      transition: background 0.15s ease, transform 0.1s ease,
+                  box-shadow 0.15s ease, border-color 0.15s ease;
+    }
+
+    .main-site-button:hover {
+      background: rgba(37, 99, 235, 0.95);
+      border-color: rgba(129, 140, 248, 1);
+      box-shadow: 0 0 18px rgba(59, 130, 246, 0.8);
+      transform: translateY(-1px);
+    }
+
+    .main-site-button:active {
+      transform: translateY(0);
+      box-shadow: 0 0 10px rgba(59, 130, 246, 0.6);
+    }
+
+    /* ── Thumbnail tooltip ────────────────────────────────── */
+    /*
+      IMPROVEMENT 1 – thumbnail tooltip
+      The tooltip is now a small card with:
+        • a 72×72 px preview image (planet's texture)
+        • the planet name below it
+      It floats 14 px above the cursor via transform.
+      The image is hidden (display:none) until a planet with a
+      texture is hovered so text-only fallback still works.
+    */
+    #hover-tooltip {
+      position: absolute;
+      pointer-events: none;
+      transform: translate(-50%, calc(-100% - 14px));
+      opacity: 0;
+      transition: opacity 0.15s ease-out;
+
+      background: rgba(10, 14, 30, 0.95);
+      border: 1px solid rgba(148, 163, 184, 0.45);
+      border-radius: 9px;
+      padding: 6px;
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.7);
+
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      min-width: 82px;
+    }
+
+    #hover-tooltip img {
+      width: 72px;
+      height: 72px;
+      object-fit: cover;
+      border-radius: 5px;
+      display: none;          /* shown only when src is set */
+    }
+
+    #hover-tooltip span {
+      display: block;
+      color: #e5e7eb;
+      font-size: 11px;
+      font-weight: 500;
+      text-align: center;
+      max-width: 120px;
+      white-space: normal;
+      line-height: 1.3;
+    }
+  </style>
+</head>
+<body>
+  <div id="universe-container">
+
+    <!--
+      STEP 3 (from previous update): "1–4 jump to a world" section
+      removed from the HUD.  Keys 1–8 still work silently.
+    -->
+    <div class="hud">
+      <div class="hud-title">HattyHats – Digital Universe v0.5</div>
+      <div class="hud-body">
+        Click inside, then use:
+        <br />
+        <strong>W / S</strong> – forward / back
+        <br />
+        <strong>A / D</strong> – left / right
+        <br />
+        Drag / swipe – look around
+        <br />
+        Pinch – zoom
+        <br /><br />
+        Hover or tap a planet to preview it,<br />click / tap to open its world.
+      </div>
+    </div>
+
+    <!-- Main site button -->
+    <button
+      class="main-site-button"
+      onclick="window.open('https://earnwithhatty.com/', '_blank')"
+    >
+      Main Site
+    </button>
+
+    <!-- Thumbnail tooltip (IMPROVEMENT 1) -->
+    <div id="hover-tooltip">
+      <img id="tooltip-thumb" src="" alt="" />
+      <span id="tooltip-label"></span>
+    </div>
+
+  </div><!-- /universe-container -->
+
+  <!-- Three.js from CDN (module build) -->
+  <script type="module">
+    import * as THREE from "https://unpkg.com/three@0.160.0/build/three.module.js";
+
+    // ── DOM refs ────────────────────────────────────────────
+    const container   = document.getElementById("universe-container");
+    const tooltip     = document.getElementById("hover-tooltip");
+    const tooltipThumb = document.getElementById("tooltip-thumb");
+    const tooltipLabel = document.getElementById("tooltip-label");
+
+    // ── Scene ───────────────────────────────────────────────
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x02030a);
+
+    // ── Camera ──────────────────────────────────────────────
+    const camera = new THREE.PerspectiveCamera(
+      75,
+      window.innerWidth / window.innerHeight,
+      0.1,
+      2000
+    );
+    camera.position.set(0, 0, 50);
+
+    // ── Renderer (Step 1 improvements kept) ─────────────────
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.outputColorSpace  = THREE.SRGBColorSpace;
+    renderer.toneMapping       = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.1;
+    container.appendChild(renderer.domElement);
+
+    // ── Lighting (Step 1 improvements kept) ─────────────────
+    const ambientLight = new THREE.AmbientLight(0x1a1a2e, 1.2);
+    scene.add(ambientLight);
+
+    const mainLight = new THREE.PointLight(0xfff8e7, 3.5, 0, 1.5);
+    mainLight.position.set(0, 0, 0);
+    scene.add(mainLight);
+
+    const rimLight = new THREE.DirectionalLight(0x3355ff, 0.6);
+    rimLight.position.set(-150, 200, 100);
+    scene.add(rimLight);
+
+    // ────────────────────────────────────────────────────────
+    // IMPROVEMENT 5 – Twinkling starfield
+    //   Two PointsMaterial references are stored in starMaterials[].
+    //   Each frame their opacity is driven by independent slow sine
+    //   waves so the field appears to gently breathe:
+    //     • small stars (0): period ≈ 7.9 s,  amplitude ±0.17
+    //     • large stars (1): period ≈ 12.6 s, amplitude ±0.10
+    // ────────────────────────────────────────────────────────
+    const starMaterials = [];
+
+    function createStarfield() {
+      const TOTAL      = 4000;
+      const LARGE_FRAC = 0.20;
+      const smallCount = Math.floor(TOTAL * (1 - LARGE_FRAC));
+      const largeCount = TOTAL - smallCount;
+
+      function makeStars(count, size, color, baseOpacity) {
+        const geometry  = new THREE.BufferGeometry();
+        const positions = new Float32Array(count * 3);
+        for (let i = 0; i < count; i++) {
+          positions[i * 3 + 0] = (Math.random() - 0.5) * 2000;
+          positions[i * 3 + 1] = (Math.random() - 0.5) * 2000;
+          positions[i * 3 + 2] = (Math.random() - 0.5) * 2000;
+        }
+        geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+        const material = new THREE.PointsMaterial({
+          color,
+          size,
+          sizeAttenuation: true,
+          transparent: true,
+          opacity: baseOpacity,
+        });
+        scene.add(new THREE.Points(geometry, material));
+        starMaterials.push({ mat: material, base: baseOpacity });
+      }
+
+      // cool blue-white small background stars
+      makeStars(smallCount, 0.9, 0xe8ecff, 0.82);
+      // warm ivory large foreground bright stars
+      makeStars(largeCount, 2.2, 0xfff5e0, 0.88);
+    }
+
+    createStarfield();
+
+    // ── Texture loader ──────────────────────────────────────
+    const textureLoader = new THREE.TextureLoader();
+
+    // ────────────────────────────────────────────────────────
+    // Planet factory
+    //   IMPROVEMENT 1: stores textureUrl in userData.thumbnailUrl
+    //   so the hover tooltip can display it as a preview image.
+    // ────────────────────────────────────────────────────────
+    function createPlanet(radius, color, position, label, url, textureUrl) {
+      const geometry = new THREE.SphereGeometry(radius, 48, 48);
+      const material = new THREE.MeshStandardMaterial({
+        color,
+        roughness: 0.55,
+        metalness: 0.15,
+      });
+
+      if (textureUrl) {
+        textureLoader.load(
+          textureUrl,
+          (tex) => {
+            tex.colorSpace  = THREE.SRGBColorSpace;
+            tex.wrapS = THREE.RepeatWrapping;
+            tex.wrapT = THREE.RepeatWrapping;
+            material.map = tex;
+            material.needsUpdate = true;
+          },
+          undefined,
+          () => { /* fallback to base colour on error */ }
+        );
+      }
+
+      const mesh = new THREE.Mesh(geometry, material);
+      mesh.position.copy(position);
+      mesh.userData.label        = label;
+      mesh.userData.radius       = radius;
+      mesh.userData.url          = url;
+      mesh.userData.thumbnailUrl = textureUrl || null; // IMPROVEMENT 1
+      scene.add(mesh);
+      return mesh;
+    }
+
+    // ── All planets ─────────────────────────────────────────
+    const planets = [];
+
+    // NOTE: "Learn With Hatty" still uses the imgbb URL — no local image was
+    // uploaded for it yet. Add one to img/ and update this path when ready.
+    planets.push(createPlanet(
+      8, 0xffffff, new THREE.Vector3(40, 0, -30),
+      "Learn With Hatty", "https://earnwithhatty.com/",
+      "https://i.ibb.co/LhB2ncPR/Learn-with-hatty-2-1.png"
+    ));
+    planets.push(createPlanet(
+      5, 0xffffff, new THREE.Vector3(-60, 10, -80),
+      "Hatty Tools", "https://earn-with-hatty-tools.netlify.app/",
+      "img/tools.png"
+    ));
+    planets.push(createPlanet(
+      10, 0xffffff, new THREE.Vector3(0, -30, -120),
+      "Learn Cardano", "https://learn-cardano.netlify.app/",
+      "img/cardano-ada-logo.png"
+    ));
+    planets.push(createPlanet(
+      3, 0xffffff, new THREE.Vector3(70, 40, -150),
+      "Privacy Gadgets", "https://privacy-gadgets-hub.netlify.app/",
+      "img/privacy.jpg"
+    ));
+
+    // Cardano (Step 4: was "Cardano Planet")
+    // Filename has a space → encoded as %20 in the URL path
+    planets.push(createPlanet(
+      9, 0xffffff, new THREE.Vector3(-90, -40, -180),
+      "Cardano", "https://cardano.org/",
+      "img/cardano%20website.png"
+    ));
+
+    // Voi (Step 4: was "Voi Planet")
+    // Filename has a space → encoded as %20 in the URL path
+    planets.push(createPlanet(
+      7, 0xffffff, new THREE.Vector3(110, 20, -210),
+      "Voi", "https://voi.network/",
+      "img/voi%20website.png"
+    ));
+
+    // YouTube planet (Step 2)
+    // Filename has spaces → encoded as %20 in the URL path
+    planets.push(createPlanet(
+      7, 0xff3333, new THREE.Vector3(130, 60, -100),
+      "YouTube – HattyHats", "https://www.youtube.com/@hattyhats0",
+      "img/learn%20with%20hatty%20youtube.png"
+    ));
+
+    // BULB planet (Step 2)
+    planets.push(createPlanet(
+      6, 0xf5a623, new THREE.Vector3(-40, 70, -60),
+      "BULB – HattyHats",
+      "https://www.bulbapp.io/u/7E8fsJ3Wy1onNm8SPtvypAuvzw5rMnumAC6UEChFdTVY/hattyhats",
+      "img/bulb.png"
+    ));
+
+    // ────────────────────────────────────────────────────────
+    // WASD + mouse-look state
+    // ────────────────────────────────────────────────────────
+    const keys = {
+      KeyW: false, KeyA: false, KeyS: false, KeyD: false,
+      Digit1: false, Digit2: false, Digit3: false, Digit4: false,
+      Digit5: false, Digit6: false, Digit7: false, Digit8: false,
+    };
+
+    let isMouseDown     = false;
+    let previousMouseX  = 0;
+    let previousMouseY  = 0;
+    let yaw   = 0;
+    let pitch = 0;
+
+    const moveSpeed = 40;
+    const lookSpeed = 0.0025;
+    const MAX_PITCH  = Math.PI / 2 - 0.1; // module-level so both mouse & touch use it
+
+    window.addEventListener("keydown", (e) => {
+      if (e.code in keys) {
+        keys[e.code] = true;
+        flyTarget = null; // cancel fly-to when user takes manual control
+      }
+    });
+    window.addEventListener("keyup", (e) => {
+      if (e.code in keys) keys[e.code] = false;
+    });
+
+    renderer.domElement.addEventListener("mousedown", (e) => {
+      isMouseDown    = true;
+      previousMouseX = e.clientX;
+      previousMouseY = e.clientY;
+      flyTarget = null; // cancel fly-to on manual mouse drag
+    });
+    window.addEventListener("mouseup", () => { isMouseDown = false; });
+
+    window.addEventListener("mousemove", (e) => {
+      if (!isMouseDown) return;
+      const dx = e.clientX - previousMouseX;
+      const dy = e.clientY - previousMouseY;
+      previousMouseX = e.clientX;
+      previousMouseY = e.clientY;
+      yaw   -= dx * lookSpeed;
+      pitch -= dy * lookSpeed;
+      pitch  = Math.max(-MAX_PITCH, Math.min(MAX_PITCH, pitch));
+    });
+
+    function updateCameraRotation() {
+      const q = new THREE.Quaternion();
+      q.setFromEuler(new THREE.Euler(pitch, yaw, 0, "YXZ"));
+      camera.quaternion.copy(q);
+    }
+
+    function updateCameraPosition(delta) {
+      const dir = new THREE.Vector3();
+      if (keys.KeyW) dir.z -= 1;
+      if (keys.KeyS) dir.z += 1;
+      if (keys.KeyA) dir.x -= 1;
+      if (keys.KeyD) dir.x += 1;
+      if (dir.lengthSq() > 0) {
+        dir.normalize().applyQuaternion(camera.quaternion)
+           .multiplyScalar(moveSpeed * delta);
+        camera.position.add(dir);
+      }
+    }
+
+    // ────────────────────────────────────────────────────────
+    // IMPROVEMENT 4 – Pinch-to-zoom + single-touch look-around
+    //
+    //   Single finger drag → yaw/pitch (same as mouse drag).
+    //   Two finger pinch   → move camera along its forward axis.
+    //   Short tap (< 200 ms, < 10 px drift) → treated as a click
+    //     so planet links open on mobile too.
+    //
+    //   e.preventDefault() is called with { passive: false } to stop
+    //   the browser's default pan/zoom from fighting with our controls.
+    // ────────────────────────────────────────────────────────
+    let lastPinchDistance = null;
+    let touchStartPos  = null;
+    let touchStartTime = 0;
+    const TAP_MAX_DIST = 10;  // px
+    const TAP_MAX_TIME = 200; // ms
+
+    renderer.domElement.addEventListener("touchstart", (e) => {
+      e.preventDefault();
+      flyTarget = null; // cancel fly-to on manual touch
+
+      if (e.touches.length === 1) {
+        isMouseDown    = true;
+        previousMouseX = e.touches[0].clientX;
+        previousMouseY = e.touches[0].clientY;
+        touchStartPos  = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        touchStartTime = Date.now();
+      } else if (e.touches.length === 2) {
+        isMouseDown = false;
+        lastPinchDistance = Math.hypot(
+          e.touches[1].clientX - e.touches[0].clientX,
+          e.touches[1].clientY - e.touches[0].clientY
+        );
+      }
+    }, { passive: false });
+
+    renderer.domElement.addEventListener("touchmove", (e) => {
+      e.preventDefault();
+
+      if (e.touches.length === 1 && isMouseDown) {
+        // Single-finger look
+        const dx = e.touches[0].clientX - previousMouseX;
+        const dy = e.touches[0].clientY - previousMouseY;
+        previousMouseX = e.touches[0].clientX;
+        previousMouseY = e.touches[0].clientY;
+        yaw   -= dx * lookSpeed;
+        pitch -= dy * lookSpeed;
+        pitch  = Math.max(-MAX_PITCH, Math.min(MAX_PITCH, pitch));
+
+      } else if (e.touches.length === 2 && lastPinchDistance !== null) {
+        // Two-finger pinch → zoom
+        const newDist = Math.hypot(
+          e.touches[1].clientX - e.touches[0].clientX,
+          e.touches[1].clientY - e.touches[0].clientY
+        );
+        const delta = newDist - lastPinchDistance;
+        lastPinchDistance = newDist;
+
+        // Move forward (positive delta = fingers apart = zoom in)
+        const forward = new THREE.Vector3(0, 0, -1)
+          .applyQuaternion(camera.quaternion);
+        camera.position.addScaledVector(forward, delta * 0.6);
+      }
+    }, { passive: false });
+
+    renderer.domElement.addEventListener("touchend", (e) => {
+      if (e.touches.length < 2) lastPinchDistance = null;
+
+      if (e.touches.length === 0) {
+        isMouseDown = false;
+
+        // Tap-to-click detection
+        if (touchStartPos && e.changedTouches.length > 0) {
+          const cx   = e.changedTouches[0].clientX;
+          const cy   = e.changedTouches[0].clientY;
+          const dist = Math.hypot(cx - touchStartPos.x, cy - touchStartPos.y);
+          if (dist < TAP_MAX_DIST && Date.now() - touchStartTime < TAP_MAX_TIME) {
+            onClick({ clientX: cx, clientY: cy });
+          }
+        }
+        touchStartPos = null;
+
+      } else if (e.touches.length === 1) {
+        // Went from pinch back to single finger — resume look-around
+        isMouseDown    = true;
+        previousMouseX = e.touches[0].clientX;
+        previousMouseY = e.touches[0].clientY;
+      }
+    }, { passive: false });
+
+    // ────────────────────────────────────────────────────────
+    // IMPROVEMENT 2 – Smooth lerp/tween camera fly-to
+    //
+    //   moveCameraNearPlanet() no longer teleports.  Instead it sets
+    //   flyTarget = { position, yaw, pitch, planet }.
+    //
+    //   Each frame, updateCameraFly() lerps the camera toward the
+    //   target at FLY_ALPHA ≈ 8 % per frame (≈ 0.5 s to 95 % at 60 fps).
+    //
+    //   lerpAngle() wraps angle differences into [-π, π] before lerping
+    //   so the camera always turns the short way around.
+    //
+    //   The fly is cancelled automatically when the user:
+    //     • holds W/A/S/D
+    //     • starts a mouse drag
+    //     • touches the screen
+    // ────────────────────────────────────────────────────────
+    let flyTarget = null;        // { position, yaw, pitch, planet }
+    const FLY_ALPHA = 0.08;      // lerp weight per frame
+
+    function lerpAngle(a, b, t) {
+      // Shortest-path angle lerp — wraps delta into [-π, π]
+      let diff = b - a;
+      while (diff >  Math.PI) diff -= 2 * Math.PI;
+      while (diff < -Math.PI) diff += 2 * Math.PI;
+      return a + diff * t;
+    }
+
+    function moveCameraNearPlanet(planet) {
+      // Don't re-trigger if already tracking this planet
+      if (flyTarget && flyTarget.planet === planet) return;
+
+      const offsetDist = planet.userData.radius * 4;
+      const dir = new THREE.Vector3()
+        .subVectors(camera.position, planet.position)
+        .normalize();
+      if (dir.lengthSq() === 0) dir.set(0, 0, 1);
+
+      const targetPos = new THREE.Vector3()
+        .copy(planet.position)
+        .add(dir.multiplyScalar(offsetDist));
+
+      // Compute the yaw/pitch that faces the planet from targetPos
+      const v = new THREE.Vector3()
+        .subVectors(planet.position, targetPos)
+        .normalize();
+      const targetYaw   = Math.atan2(v.x, -v.z);
+      const targetPitch = Math.asin(Math.max(-1, Math.min(1, v.y)));
+
+      flyTarget = { position: targetPos, yaw: targetYaw, pitch: targetPitch, planet };
+    }
+
+    function updateCameraFly() {
+      if (!flyTarget) return;
+
+      const posDist   = camera.position.distanceTo(flyTarget.position);
+      const yawDiff   = Math.abs(yaw   - flyTarget.yaw);
+      const pitchDiff = Math.abs(pitch - flyTarget.pitch);
+
+      // Snap and clear once close enough
+      if (posDist < 0.4 && yawDiff < 0.008 && pitchDiff < 0.008) {
+        camera.position.copy(flyTarget.position);
+        yaw   = flyTarget.yaw;
+        pitch = flyTarget.pitch;
+        flyTarget = null;
+        return;
+      }
+
+      camera.position.lerp(flyTarget.position, FLY_ALPHA);
+      yaw   = lerpAngle(yaw,   flyTarget.yaw,   FLY_ALPHA);
+      pitch = THREE.MathUtils.lerp(pitch, flyTarget.pitch, FLY_ALPHA);
+    }
+
+    // Snap-to-planet keyboard shortcuts (1–8, silent in HUD)
+    function handlePlanetShortcuts() {
+      if (keys.Digit1) moveCameraNearPlanet(planets[0]);
+      if (keys.Digit2) moveCameraNearPlanet(planets[1]);
+      if (keys.Digit3) moveCameraNearPlanet(planets[2]);
+      if (keys.Digit4) moveCameraNearPlanet(planets[3]);
+      if (keys.Digit5) moveCameraNearPlanet(planets[4]);
+      if (keys.Digit6) moveCameraNearPlanet(planets[5]);
+      if (keys.Digit7) moveCameraNearPlanet(planets[6]);
+      if (keys.Digit8) moveCameraNearPlanet(planets[7]);
+    }
+
+    // ────────────────────────────────────────────────────────
+    // Hover + click detection (raycaster + thumbnail tooltip)
+    //
+    // IMPROVEMENT 1: On hover, the tooltip card shows:
+    //   • a 72×72 px preview image pulled from userData.thumbnailUrl
+    //   • the planet's label text below the image
+    // ────────────────────────────────────────────────────────
+    const raycaster = new THREE.Raycaster();
+    const mouse     = new THREE.Vector2();
+
+    let hoveredPlanet  = null;
+    let lastMouseEvent = null;
+
+    function updateMouseFromEvent(event) {
+      const rect = renderer.domElement.getBoundingClientRect();
+      mouse.set(
+        ((event.clientX - rect.left)  / rect.width)  * 2 - 1,
+        -((event.clientY - rect.top) / rect.height) * 2 + 1
+      );
+      lastMouseEvent = event;
+    }
+
+    function updateTooltipPosition(event) {
+      if (!event || !hoveredPlanet) return;
+      tooltip.style.left = `${event.clientX}px`;
+      tooltip.style.top  = `${event.clientY}px`;
+    }
+
+    function showTooltip(planet) {
+      // IMPROVEMENT 1 – thumbnail card
+      if (planet.userData.thumbnailUrl) {
+        tooltipThumb.src          = planet.userData.thumbnailUrl;
+        tooltipThumb.style.display = "block";
+      } else {
+        tooltipThumb.src          = "";
+        tooltipThumb.style.display = "none";
+      }
+      tooltipLabel.textContent = planet.userData.label || "";
+      tooltip.style.opacity    = "1";
+    }
+
+    function hideTooltip() {
+      tooltip.style.opacity = "0";
+    }
+
+    function handleHover() {
+      raycaster.setFromCamera(mouse, camera);
+      const hits = raycaster.intersectObjects(planets, false);
+
+      if (hits.length > 0) {
+        const planet = hits[0].object;
+
+        if (hoveredPlanet !== planet) {
+          // Restore previous planet colour
+          if (hoveredPlanet?.userData.originalColor) {
+            hoveredPlanet.material.color.copy(hoveredPlanet.userData.originalColor);
+          }
+          hoveredPlanet = planet;
+
+          if (!planet.userData.originalColor) {
+            planet.userData.originalColor = planet.material.color.clone();
+          }
+          planet.material.color.copy(
+            planet.userData.originalColor.clone().multiplyScalar(1.4)
+          );
+          container.style.cursor = "pointer";
+          showTooltip(planet);
+        }
+      } else {
+        if (hoveredPlanet?.userData.originalColor) {
+          hoveredPlanet.material.color.copy(hoveredPlanet.userData.originalColor);
+        }
+        hoveredPlanet = null;
+        container.style.cursor = "default";
+        hideTooltip();
+      }
+
+      if (lastMouseEvent) updateTooltipPosition(lastMouseEvent);
+    }
+
+    function onMouseMove(event) {
+      updateMouseFromEvent(event);
+      updateTooltipPosition(event);
+      handleHover();
+    }
+
+    function onClick(event) {
+      updateMouseFromEvent(event);
+      raycaster.setFromCamera(mouse, camera);
+      const hits = raycaster.intersectObjects(planets, false);
+      if (hits.length > 0) {
+        const url = hits[0].object.userData.url;
+        if (url) window.open(url, "_blank");
+      }
+    }
+
+    renderer.domElement.addEventListener("mousemove", onMouseMove);
+    renderer.domElement.addEventListener("click",     onClick);
+
+    // ── Resize ──────────────────────────────────────────────
+    window.addEventListener("resize", () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // ── Animation loop ──────────────────────────────────────
+    const clock = new THREE.Clock();
+
+    function animate() {
+      const delta   = clock.getDelta();
+      const elapsed = clock.elapsedTime;
+
+      // IMPROVEMENT 5 – Twinkling stars
+      //   Two sine waves with different periods and phases.
+      //   starMaterials[0] small background stars: period ≈ 7.9 s
+      //   starMaterials[1] large foreground stars:  period ≈ 12.6 s
+      if (starMaterials.length >= 2) {
+        starMaterials[0].mat.opacity = starMaterials[0].base + 0.17 * Math.sin(elapsed * 0.80);
+        starMaterials[1].mat.opacity = starMaterials[1].base + 0.10 * Math.sin(elapsed * 0.50 + 1.8);
+      }
+
+      // Planet slow self-rotation
+      planets.forEach((planet, i) => {
+        planet.rotation.y += 0.12 * delta * (i + 1);
+      });
+
+      handlePlanetShortcuts();
+
+      // IMPROVEMENT 2 – camera fly-to (runs before manual movement
+      // so WASD can still override if the user grabs the keys)
+      updateCameraFly();
+
+      updateCameraRotation();
+      updateCameraPosition(delta);
+
+      renderer.render(scene, camera);
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+  </script>
+</body>
+</html>

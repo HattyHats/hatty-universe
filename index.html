@@ -134,7 +134,7 @@
       background: rgba(2, 3, 10, 0.78);
       backdrop-filter: blur(4px);
       -webkit-backdrop-filter: blur(4px);
-      z-index: 50;
+      z-index: 200;        /* must be above the canvas (z-index: auto) */
       cursor: pointer;
       transition: opacity 0.5s ease;
     }
@@ -391,6 +391,8 @@
     updateSoundButton();
 
     // ── Start overlay dismissal ───────────────────────────
+    // Use document-level pointerdown so it fires no matter which
+    // element (canvas, overlay, HUD) is physically on top.
     const startOverlay = document.getElementById("start-overlay");
     let overlayDismissed = false;
 
@@ -399,13 +401,21 @@
       overlayDismissed = true;
       initAudio();
       startOverlay.classList.add("hidden");
-      // Remove after fade
-      setTimeout(() => { startOverlay.remove(); }, 550);
+      setTimeout(() => {
+        if (startOverlay.parentNode) startOverlay.parentNode.removeChild(startOverlay);
+      }, 550);
     }
 
-    startOverlay.addEventListener("click", dismissOverlay);
-    // Also dismiss on first canvas interaction
-    document.addEventListener("keydown",   dismissOverlay, { once: true });
+    // Fires on ANY click/tap anywhere — catches canvas clicks too.
+    // The sound button uses stopPropagation so it won't trigger this.
+    document.addEventListener("pointerdown", function onFirstPointer(e) {
+      if (e.target.id === "sound-btn") return;
+      document.removeEventListener("pointerdown", onFirstPointer);
+      dismissOverlay();
+    });
+
+    // Also dismiss on first keypress
+    document.addEventListener("keydown", dismissOverlay, { once: true });
 
     // ══════════════════════════════════════════════════════════
     // THREE.JS SCENE

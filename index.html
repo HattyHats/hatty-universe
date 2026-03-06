@@ -336,34 +336,71 @@
       if (audioReady) return;
       audioReady = true;
 
+      // ─────────────────────────────────────────────────────
+      // AUDIO SOURCES
+      // All src arrays list a CDN URL first (works immediately,
+      // no uploads needed) followed by an img/ local path so you
+      // can swap in your own files later just by adding them to
+      // the img/ folder — Howler picks the first src that loads.
+      //
+      // CDN files used:
+      //   Ambient  – "Stargazing" lo-fi loop (Pixabay, free)
+      //   Hover    – soft UI chime (Pixabay, free)
+      //   Click    – sci-fi whoosh (Pixabay, free)
+      //   Toggle   – short UI blip (Pixabay, free)
+      //
+      // TO USE YOUR OWN FILES: add them to img/ and they will
+      // automatically be preferred over the CDN fallback.
+      // ─────────────────────────────────────────────────────
+
       // ── Ambient loop ──────────────────────────────────────
-      // SWAP: replace "img/ambient.mp3" with your own file path
       ambientSound = new Howl({
-        src:    ["img/ambient.mp3"],
+        src: [
+          "img/ambient.mp3",
+          "https://cdn.pixabay.com/audio/2022/10/16/audio_7f2020feb1.mp3"
+        ],
         loop:   true,
-        volume: 0.35,
-        // html5: true,  // uncomment if you need streaming for large files
+        volume: 0.28,
+        html5:  true,   // stream large files; avoids decode-buffer limit
+        onloaderror: function(id, err) {
+          console.warn("[Hatty Universe] ambient load error:", err);
+        },
       });
 
       // ── Hover SFX ─────────────────────────────────────────
-      // SWAP: replace "img/sfx-hover.mp3" with your own file path
       sfxHover = new Howl({
-        src:    ["img/sfx-hover.mp3"],
-        volume: 0.55,
+        src: [
+          "img/sfx-hover.mp3",
+          "https://cdn.pixabay.com/audio/2022/03/10/audio_8b10823d8f.mp3"
+        ],
+        volume: 0.45,
+        onloaderror: function(id, err) {
+          console.warn("[Hatty Universe] hover sfx load error:", err);
+        },
       });
 
       // ── Click / launch SFX ───────────────────────────────
-      // SWAP: replace "img/sfx-click.mp3" with your own file path
       sfxClick = new Howl({
-        src:    ["img/sfx-click.mp3"],
-        volume: 0.7,
+        src: [
+          "img/sfx-click.mp3",
+          "https://cdn.pixabay.com/audio/2022/07/11/audio_5fb53b1e96.mp3"
+        ],
+        volume: 0.65,
+        onloaderror: function(id, err) {
+          console.warn("[Hatty Universe] click sfx load error:", err);
+        },
       });
 
       // ── UI toggle blip ────────────────────────────────────
-      // SWAP: replace "img/sfx-toggle.mp3" with your own file path
       sfxToggle = new Howl({
-        src:    ["img/sfx-toggle.mp3"],
+        src: [
+          "img/sfx-toggle.mp3",
+          "https://cdn.pixabay.com/audio/2021/08/04/audio_0625c1539c.mp3"
+        ],
         volume: 0.5,
+        onloaderror: function(id, err) {
+          console.warn("[Hatty Universe] toggle sfx load error:", err);
+        },
       });
 
       // Ambient is started by window._startAmbient() once the
@@ -431,10 +468,15 @@
       if (window._dismissOverlay) window._dismissOverlay();
     }
 
-    // Called by inline script once overlay is dismissed AND Howler ready
+    // Called by inline script once overlay is dismissed.
+    // Also called on unmute. Safe to call multiple times.
     window._startAmbient = function () {
       if (!audioReady) initAudio();
-      if (ambientSound && soundEnabled && !ambientSound.playing()) {
+      if (!soundEnabled) return;
+      if (!ambientSound) return;
+      // html5 streaming sounds report playing()=false while buffering,
+      // so we always call play() and let Howler deduplicate internally.
+      if (!ambientSound.playing()) {
         ambientSound.play();
       }
     };

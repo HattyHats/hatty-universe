@@ -134,7 +134,7 @@
       background: rgba(2, 3, 10, 0.78);
       backdrop-filter: blur(4px);
       -webkit-backdrop-filter: blur(4px);
-      z-index: 200;        /* must be above the canvas (z-index: auto) */
+      z-index: 9999;       /* must be above the canvas — set high to be safe */
       cursor: pointer;
       transition: opacity 0.5s ease;
     }
@@ -215,10 +215,45 @@
   <div id="universe-container">
 
     <!-- "Click to begin" overlay — dismissed on first interaction -->
-    <div id="start-overlay" role="button" aria-label="Click to enter the universe and enable audio">
-      <div class="start-ring">🚀</div>
-      <span class="start-text">Click to enter the universe</span>
+    <!-- onclick fires immediately on parse — no async wait for module -->
+    <div id="start-overlay"
+         role="button"
+         tabindex="0"
+         aria-label="Click to enter the universe"
+         onclick="window._dismissOverlay&&window._dismissOverlay()"
+         onkeydown="if(event.key==='Enter'||event.key===' '){window._dismissOverlay&&window._dismissOverlay()}">
+      <div class="start-ring">&#x1F680;</div>
+      <span class="start-text">Click anywhere to enter the universe</span>
     </div>
+
+    <!-- Inline non-module script: runs immediately, zero async delay -->
+    <script>
+    (function(){
+      var dismissed=false;
+      window._dismissOverlay=function(){
+        if(dismissed)return;
+        dismissed=true;
+        var el=document.getElementById('start-overlay');
+        if(!el)return;
+        el.style.transition='opacity 0.5s ease';
+        el.style.opacity='0';
+        el.style.pointerEvents='none';
+        setTimeout(function(){if(el.parentNode)el.parentNode.removeChild(el);},550);
+        window._overlayDismissed=true;
+        if(window._startAmbient)window._startAmbient();
+      };
+      // Belt-and-suspenders: any pointer anywhere
+      document.addEventListener('pointerdown',function h(e){
+        if(e.target&&e.target.id==='sound-btn')return;
+        document.removeEventListener('pointerdown',h);
+        window._dismissOverlay();
+      });
+      document.addEventListener('keydown',function h(){
+        document.removeEventListener('keydown',h);
+        window._dismissOverlay();
+      });
+    })();
+    </script>
 
     <!-- HUD -->
     <div class="hud">
@@ -331,10 +366,8 @@
         volume: 0.5,
       });
 
-      if (soundEnabled) {
-        ambientSound.play();
-      }
-
+      // Ambient is started by window._startAmbient() once the
+      // overlay is dismissed — not here — to respect autoplay policy.
       updateSoundButton();
     }
 
@@ -351,15 +384,12 @@
       soundEnabled = !soundEnabled;
       localStorage.setItem(SOUND_KEY, soundEnabled ? "on" : "off");
 
-      if (ambientSound) {
-        if (soundEnabled) {
-          ambientSound.play();
-          playSfx(sfxToggle);
-        } else {
-          // Play the blip briefly then mute ambient
-          if (sfxToggle) { sfxToggle.play(); }
-          ambientSound.pause();
-        }
+      if (soundEnabled) {
+        if (window._startAmbient) window._startAmbient();
+        playSfx(sfxToggle);
+      } else {
+        if (sfxToggle) sfxToggle.play();
+        if (ambientSound) ambientSound.pause();
       }
 
       updateSoundButton();
@@ -390,32 +420,27 @@
     // Update button label right away (before audio init)
     updateSoundButton();
 
-    // ── Start overlay dismissal ───────────────────────────
-    // Use document-level pointerdown so it fires no matter which
-    // element (canvas, overlay, HUD) is physically on top.
-    const startOverlay = document.getElementById("start-overlay");
-    let overlayDismissed = false;
+    // ── Start overlay / audio init ──────────────────────────
+    // The overlay is dismissed by the inline <script> which runs
+    // immediately on page parse (no async wait).  The module just
+    // needs to expose _startAmbient so ambient music begins once
+    // the overlay is clicked — even if Howler finishes loading first.
 
     function dismissOverlay() {
-      if (overlayDismissed) return;
-      overlayDismissed = true;
-      initAudio();
-      startOverlay.classList.add("hidden");
-      setTimeout(() => {
-        if (startOverlay.parentNode) startOverlay.parentNode.removeChild(startOverlay);
-      }, 550);
+      // Delegate to the inline script's implementation
+      if (window._dismissOverlay) window._dismissOverlay();
     }
 
-    // Fires on ANY click/tap anywhere — catches canvas clicks too.
-    // The sound button uses stopPropagation so it won't trigger this.
-    document.addEventListener("pointerdown", function onFirstPointer(e) {
-      if (e.target.id === "sound-btn") return;
-      document.removeEventListener("pointerdown", onFirstPointer);
-      dismissOverlay();
-    });
+    // Called by inline script once overlay is dismissed AND Howler ready
+    window._startAmbient = function () {
+      if (!audioReady) initAudio();
+      if (ambientSound && soundEnabled && !ambientSound.playing()) {
+        ambientSound.play();
+      }
+    };
 
-    // Also dismiss on first keypress
-    document.addEventListener("keydown", dismissOverlay, { once: true });
+    // If overlay was already dismissed before module loaded, init now
+    if (window._overlayDismissed) initAudio();
 
     // ══════════════════════════════════════════════════════════
     // THREE.JS SCENE

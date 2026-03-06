@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>HattyHats – Digital Universe (Prototype)</title>
+  <title>HattyHats – Digital Universe</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     * {
@@ -18,7 +18,7 @@
       background: #02030a;
       color: #f5f5f5;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
-      touch-action: none; /* prevent iOS rubber-band scroll interfering with touch controls */
+      touch-action: none;
     }
 
     body {
@@ -50,6 +50,7 @@
       line-height: 1.5;
       pointer-events: none;
       backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
     }
 
     .hud-title {
@@ -68,11 +69,18 @@
       font-weight: 600;
     }
 
-    /* ── Main site button ─────────────────────────────────── */
-    .main-site-button {
+    /* ── Top-right button cluster ─────────────────────────── */
+    .top-right-controls {
       position: absolute;
       top: 12px;
       right: 12px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    /* Shared button style */
+    .ui-button {
       padding: 6px 12px;
       border-radius: 999px;
       border: 1px solid rgba(148, 163, 184, 0.8);
@@ -85,30 +93,84 @@
       box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.9);
       transition: background 0.15s ease, transform 0.1s ease,
                   box-shadow 0.15s ease, border-color 0.15s ease;
+      white-space: nowrap;
+      user-select: none;
+      -webkit-user-select: none;
     }
 
-    .main-site-button:hover {
+    .ui-button:hover {
       background: rgba(37, 99, 235, 0.95);
       border-color: rgba(129, 140, 248, 1);
       box-shadow: 0 0 18px rgba(59, 130, 246, 0.8);
       transform: translateY(-1px);
     }
 
-    .main-site-button:active {
+    .ui-button:active {
       transform: translateY(0);
       box-shadow: 0 0 10px rgba(59, 130, 246, 0.6);
     }
 
+    /* Sound toggle specific states */
+    .sound-btn.muted {
+      border-color: rgba(148, 163, 184, 0.4);
+      color: rgba(229, 231, 235, 0.45);
+    }
+    .sound-btn.muted:hover {
+      background: rgba(100, 116, 139, 0.6);
+      border-color: rgba(148, 163, 184, 0.8);
+      color: #e5e7eb;
+      box-shadow: none;
+    }
+
+    /* ── "Click to begin" overlay ─────────────────────────── */
+    #start-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      background: rgba(2, 3, 10, 0.78);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      z-index: 50;
+      cursor: pointer;
+      transition: opacity 0.5s ease;
+    }
+
+    #start-overlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .start-ring {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      border: 2px solid rgba(176, 183, 255, 0.6);
+      box-shadow: 0 0 30px rgba(100, 130, 255, 0.4),
+                  inset 0 0 20px rgba(100, 130, 255, 0.15);
+      animation: ringPulse 2s ease-in-out infinite;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+    }
+
+    @keyframes ringPulse {
+      0%, 100% { transform: scale(1);   box-shadow: 0 0 30px rgba(100,130,255,0.4), inset 0 0 20px rgba(100,130,255,0.15); }
+      50%       { transform: scale(1.1); box-shadow: 0 0 55px rgba(100,130,255,0.7), inset 0 0 30px rgba(100,130,255,0.25); }
+    }
+
+    .start-text {
+      color: rgba(176, 183, 255, 0.9);
+      font-size: 13px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
     /* ── Thumbnail tooltip ────────────────────────────────── */
-    /*
-      IMPROVEMENT 1 – thumbnail tooltip
-      The tooltip is now a small card with:
-        • a 72×72 px preview image (planet's texture)
-        • the planet name below it
-      It floats 14 px above the cursor via transform.
-      The image is hidden (display:none) until a planet with a
-      texture is hovered so text-only fallback still works.
-    */
     #hover-tooltip {
       position: absolute;
       pointer-events: none;
@@ -134,7 +196,7 @@
       height: 72px;
       object-fit: cover;
       border-radius: 5px;
-      display: none;          /* shown only when src is set */
+      display: none;
     }
 
     #hover-tooltip span {
@@ -152,36 +214,41 @@
 <body>
   <div id="universe-container">
 
-    <!--
-      STEP 3 (from previous update): "1–4 jump to a world" section
-      removed from the HUD.  Keys 1–8 still work silently.
-    -->
+    <!-- "Click to begin" overlay — dismissed on first interaction -->
+    <div id="start-overlay" role="button" aria-label="Click to enter the universe and enable audio">
+      <div class="start-ring">🚀</div>
+      <span class="start-text">Click to enter the universe</span>
+    </div>
+
+    <!-- HUD -->
     <div class="hud">
-      <div class="hud-title">HattyHats – Digital Universe v0.5</div>
+      <div class="hud-title">HattyHats – Digital Universe v0.6</div>
       <div class="hud-body">
-        Click inside, then use:
-        <br />
-        <strong>W / S</strong> – forward / back
-        <br />
-        <strong>A / D</strong> – left / right
-        <br />
-        Drag / swipe – look around
-        <br />
-        Pinch – zoom
-        <br /><br />
+        Click inside, then use:<br />
+        <strong>W / S</strong> – forward / back<br />
+        <strong>A / D</strong> – left / right<br />
+        Drag / swipe – look around<br />
+        Pinch – zoom<br /><br />
         Hover or tap a planet to preview it,<br />click / tap to open its world.
       </div>
     </div>
 
-    <!-- Main site button -->
-    <button
-      class="main-site-button"
-      onclick="window.open('https://earnwithhatty.com/', '_blank')"
-    >
-      Main Site
-    </button>
+    <!-- Top-right button cluster -->
+    <div class="top-right-controls">
+      <!-- Sound toggle: label updated by JS -->
+      <button id="sound-btn" class="ui-button sound-btn" aria-label="Toggle sound">
+        🔊 Sound
+      </button>
+      <!-- Main site link -->
+      <button
+        class="ui-button"
+        onclick="window.open('https://earnwithhatty.com/', '_blank')"
+      >
+        Main Site
+      </button>
+    </div>
 
-    <!-- Thumbnail tooltip (IMPROVEMENT 1) -->
+    <!-- Thumbnail tooltip -->
     <div id="hover-tooltip">
       <img id="tooltip-thumb" src="" alt="" />
       <span id="tooltip-label"></span>
@@ -189,21 +256,169 @@
 
   </div><!-- /universe-container -->
 
-  <!-- Three.js from CDN (module build) -->
+  <!--
+    ══════════════════════════════════════════════════════════
+    AUDIO – Howler.js via CDN
+    Docs: https://howlerjs.com/
+
+    SWAP IN YOUR OWN FILES:
+    Place your audio files in the img/ folder (same as planet images).
+    Expected file names:
+      img/ambient.mp3        – looping ambient/lo-fi space music
+      img/sfx-hover.mp3      – short hover tone (e.g. soft chime, ~0.3 s)
+      img/sfx-click.mp3      – click/launch sound (e.g. whoosh, ~0.5 s)
+      img/sfx-toggle.mp3     – UI toggle blip (e.g. soft beep, ~0.2 s)
+
+    If you don't have custom files yet, the site degrades gracefully —
+    Howler simply won't play anything for missing files.
+    ══════════════════════════════════════════════════════════
+  -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js"
+          integrity="sha512-xi/RZRIF/S0hJ+yJJYuZ5yk6/8pCiRlEXZzoGuTj+FPqP3lMDRHPZkSFqliN9rFDHBzorlHRWwCkimines45gg=="
+          crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <!-- Three.js -->
   <script type="module">
     import * as THREE from "https://unpkg.com/three@0.160.0/build/three.module.js";
 
-    // ── DOM refs ────────────────────────────────────────────
+    // ══════════════════════════════════════════════════════════
+    // AUDIO SYSTEM
+    // ══════════════════════════════════════════════════════════
+
+    const SOUND_KEY = "hatty-universe-sound"; // localStorage key
+
+    // Read persisted preference; default = sound ON
+    let soundEnabled = localStorage.getItem(SOUND_KEY) !== "off";
+    let audioReady   = false; // true after first user interaction
+
+    // Howler sound instances — created after first interaction
+    let ambientSound = null;
+    let sfxHover     = null;
+    let sfxClick     = null;
+    let sfxToggle    = null;
+
+    function initAudio() {
+      if (audioReady) return;
+      audioReady = true;
+
+      // ── Ambient loop ──────────────────────────────────────
+      // SWAP: replace "img/ambient.mp3" with your own file path
+      ambientSound = new Howl({
+        src:    ["img/ambient.mp3"],
+        loop:   true,
+        volume: 0.35,
+        // html5: true,  // uncomment if you need streaming for large files
+      });
+
+      // ── Hover SFX ─────────────────────────────────────────
+      // SWAP: replace "img/sfx-hover.mp3" with your own file path
+      sfxHover = new Howl({
+        src:    ["img/sfx-hover.mp3"],
+        volume: 0.55,
+      });
+
+      // ── Click / launch SFX ───────────────────────────────
+      // SWAP: replace "img/sfx-click.mp3" with your own file path
+      sfxClick = new Howl({
+        src:    ["img/sfx-click.mp3"],
+        volume: 0.7,
+      });
+
+      // ── UI toggle blip ────────────────────────────────────
+      // SWAP: replace "img/sfx-toggle.mp3" with your own file path
+      sfxToggle = new Howl({
+        src:    ["img/sfx-toggle.mp3"],
+        volume: 0.5,
+      });
+
+      if (soundEnabled) {
+        ambientSound.play();
+      }
+
+      updateSoundButton();
+    }
+
+    // Play a one-shot SFX (no-op if sound off or audio not ready)
+    function playSfx(sound) {
+      if (!audioReady || !soundEnabled || !sound) return;
+      // Stop & replay so rapid repeats don't stack weirdly
+      sound.stop();
+      sound.play();
+    }
+
+    // Toggle sound on/off
+    function toggleSound() {
+      soundEnabled = !soundEnabled;
+      localStorage.setItem(SOUND_KEY, soundEnabled ? "on" : "off");
+
+      if (ambientSound) {
+        if (soundEnabled) {
+          ambientSound.play();
+          playSfx(sfxToggle);
+        } else {
+          // Play the blip briefly then mute ambient
+          if (sfxToggle) { sfxToggle.play(); }
+          ambientSound.pause();
+        }
+      }
+
+      updateSoundButton();
+    }
+
+    function updateSoundButton() {
+      const btn = document.getElementById("sound-btn");
+      if (!btn) return;
+      if (soundEnabled) {
+        btn.textContent = "🔊 Sound";
+        btn.classList.remove("muted");
+        btn.setAttribute("aria-label", "Mute sound");
+      } else {
+        btn.textContent = "🔇 Muted";
+        btn.classList.add("muted");
+        btn.setAttribute("aria-label", "Unmute sound");
+      }
+    }
+
+    // Wire the button
+    document.getElementById("sound-btn")
+      .addEventListener("click", (e) => {
+        e.stopPropagation();
+        initAudio();     // also init on first button press
+        toggleSound();
+      });
+
+    // Update button label right away (before audio init)
+    updateSoundButton();
+
+    // ── Start overlay dismissal ───────────────────────────
+    const startOverlay = document.getElementById("start-overlay");
+    let overlayDismissed = false;
+
+    function dismissOverlay() {
+      if (overlayDismissed) return;
+      overlayDismissed = true;
+      initAudio();
+      startOverlay.classList.add("hidden");
+      // Remove after fade
+      setTimeout(() => { startOverlay.remove(); }, 550);
+    }
+
+    startOverlay.addEventListener("click", dismissOverlay);
+    // Also dismiss on first canvas interaction
+    document.addEventListener("keydown",   dismissOverlay, { once: true });
+
+    // ══════════════════════════════════════════════════════════
+    // THREE.JS SCENE
+    // ══════════════════════════════════════════════════════════
+
     const container   = document.getElementById("universe-container");
     const tooltip     = document.getElementById("hover-tooltip");
     const tooltipThumb = document.getElementById("tooltip-thumb");
     const tooltipLabel = document.getElementById("tooltip-label");
 
-    // ── Scene ───────────────────────────────────────────────
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x02030a);
 
-    // ── Camera ──────────────────────────────────────────────
     const camera = new THREE.PerspectiveCamera(
       75,
       window.innerWidth / window.innerHeight,
@@ -212,7 +427,6 @@
     );
     camera.position.set(0, 0, 50);
 
-    // ── Renderer (Step 1 improvements kept) ─────────────────
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -221,26 +435,16 @@
     renderer.toneMappingExposure = 1.1;
     container.appendChild(renderer.domElement);
 
-    // ── Lighting (Step 1 improvements kept) ─────────────────
-    const ambientLight = new THREE.AmbientLight(0x1a1a2e, 1.2);
-    scene.add(ambientLight);
-
+    // ── Lighting ────────────────────────────────────────────
+    scene.add(new THREE.AmbientLight(0x1a1a2e, 1.2));
     const mainLight = new THREE.PointLight(0xfff8e7, 3.5, 0, 1.5);
     mainLight.position.set(0, 0, 0);
     scene.add(mainLight);
-
     const rimLight = new THREE.DirectionalLight(0x3355ff, 0.6);
     rimLight.position.set(-150, 200, 100);
     scene.add(rimLight);
 
-    // ────────────────────────────────────────────────────────
-    // IMPROVEMENT 5 – Twinkling starfield
-    //   Two PointsMaterial references are stored in starMaterials[].
-    //   Each frame their opacity is driven by independent slow sine
-    //   waves so the field appears to gently breathe:
-    //     • small stars (0): period ≈ 7.9 s,  amplitude ±0.17
-    //     • large stars (1): period ≈ 12.6 s, amplitude ±0.10
-    // ────────────────────────────────────────────────────────
+    // ── Twinkling starfield ──────────────────────────────────
     const starMaterials = [];
 
     function createStarfield() {
@@ -259,19 +463,13 @@
         }
         geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
         const material = new THREE.PointsMaterial({
-          color,
-          size,
-          sizeAttenuation: true,
-          transparent: true,
-          opacity: baseOpacity,
+          color, size, sizeAttenuation: true, transparent: true, opacity: baseOpacity,
         });
         scene.add(new THREE.Points(geometry, material));
         starMaterials.push({ mat: material, base: baseOpacity });
       }
 
-      // cool blue-white small background stars
       makeStars(smallCount, 0.9, 0xe8ecff, 0.82);
-      // warm ivory large foreground bright stars
       makeStars(largeCount, 2.2, 0xfff5e0, 0.88);
     }
 
@@ -280,16 +478,9 @@
     // ── Texture loader ──────────────────────────────────────
     const textureLoader = new THREE.TextureLoader();
 
-    // ────────────────────────────────────────────────────────
-    // Planet factory
-    //   IMPROVEMENT 1: stores textureUrl in userData.thumbnailUrl
-    //   so the hover tooltip can display it as a preview image.
-    // ────────────────────────────────────────────────────────
+    // ── Planet factory ──────────────────────────────────────
     function createPlanet(radius, color, position, label, url, textureUrl) {
       const geometry = new THREE.SphereGeometry(radius, 48, 48);
-
-      // emissive starts at black/0 — gets set to white + emissiveMap once
-      // the texture loads so the planet self-illuminates and looks bright.
       const material = new THREE.MeshStandardMaterial({
         color,
         roughness: 0.55,
@@ -305,18 +496,14 @@
             tex.colorSpace  = THREE.SRGBColorSpace;
             tex.wrapS = THREE.RepeatWrapping;
             tex.wrapT = THREE.RepeatWrapping;
-            material.map          = tex;
-            // Self-illuminate: emissiveMap makes the texture visible at its
-            // true colours regardless of how much light is hitting the planet.
-            // emissiveIntensity 0.7 = 70 % self-lit + 30 % from scene lights,
-            // giving bright textures while still keeping a 3-D shaded look.
-            material.emissiveMap       = tex;
+            material.map           = tex;
+            material.emissiveMap   = tex;
             material.emissive.set(0xffffff);
             material.emissiveIntensity = 0.7;
-            material.needsUpdate = true;
+            material.needsUpdate   = true;
           },
           undefined,
-          () => { /* texture failed — planet shows its base colour instead */ }
+          () => { /* texture failed — shows base colour */ }
         );
       }
 
@@ -325,16 +512,24 @@
       mesh.userData.label        = label;
       mesh.userData.radius       = radius;
       mesh.userData.url          = url;
-      mesh.userData.thumbnailUrl = textureUrl || null; // IMPROVEMENT 1
+      mesh.userData.thumbnailUrl = textureUrl || null;
       scene.add(mesh);
       return mesh;
     }
 
-    // ── All planets ─────────────────────────────────────────
+    // ══════════════════════════════════════════════════════════
+    // PLANETS ARRAY
+    // ──────────────────────────────────────────────────────────
+    // Image files all live in  img/  (same folder as before).
+    //
+    // NEW PLANETS use these files (must be in img/ on GitHub):
+    //   img/pixels.png        — Pixels world
+    //   img/the-arena.png     — The Arena world
+    //   img/cardano-quest.png — Cardano Quest world
+    // ══════════════════════════════════════════════════════════
     const planets = [];
 
-    // NOTE: "Learn With Hatty" still uses the imgbb URL — no local image was
-    // uploaded for it yet. Add one to img/ and update this path when ready.
+    // ── Existing planets (unchanged) ────────────────────────
     planets.push(createPlanet(
       8, 0xffffff, new THREE.Vector3(40, 0, -30),
       "Learn With Hatty", "https://earnwithhatty.com/",
@@ -355,29 +550,21 @@
       "Privacy Gadgets", "https://privacy-gadgets-hub.netlify.app/",
       "img/privacy.jpg"
     ));
-
-    // Cardano — rename file on GitHub: "cardano website.png" → "cardano-website.png"
     planets.push(createPlanet(
       9, 0xffffff, new THREE.Vector3(-90, -40, -180),
       "Cardano", "https://cardano.org/",
       "img/cardano-website.png"
     ));
-
-    // Voi — rename file on GitHub: "voi website.png" → "voi-website.png"
     planets.push(createPlanet(
       7, 0xffffff, new THREE.Vector3(110, 20, -210),
       "Voi", "https://voi.network/",
       "img/voi-website.png"
     ));
-
-    // YouTube — rename file on GitHub: "learn with hatty youtube.png" → "learn-with-hatty-youtube.png"
     planets.push(createPlanet(
       7, 0xff3333, new THREE.Vector3(130, 60, -100),
       "YouTube – HattyHats", "https://www.youtube.com/@hattyhats0",
       "img/learn-with-hatty-youtube.png"
     ));
-
-    // BULB planet (Step 2)
     planets.push(createPlanet(
       6, 0xf5a623, new THREE.Vector3(-40, 70, -60),
       "BULB – HattyHats",
@@ -385,13 +572,41 @@
       "img/bulb.png"
     ));
 
-    // ────────────────────────────────────────────────────────
-    // WASD + mouse-look state
-    // ────────────────────────────────────────────────────────
+    // ── NEW PLANETS ─────────────────────────────────────────
+    //
+    // Positions chosen to avoid overlap with existing worlds
+    // and to feel naturally spread through the 3D space.
+    //
+    // Pixels  — lush green/teal, off to the left and close
+    planets.push(createPlanet(
+      6, 0x22ff99, new THREE.Vector3(-120, 25, -90),
+      "Pixels",
+      "https://www.pixels.xyz/",
+      "img/pixels.png"
+    ));
+
+    // The Arena — warm amber, upper-right quadrant, mid-depth
+    planets.push(createPlanet(
+      5, 0xff9944, new THREE.Vector3(160, -55, -140),
+      "The Arena",
+      "https://arena.social/",
+      "img/the-arena.png"
+    ));
+
+    // Cardano Quest — purple-blue, lower-right, deep field
+    planets.push(createPlanet(
+      8, 0x7c55ff, new THREE.Vector3(55, -80, -240),
+      "Cardano Quest",
+      "https://cardano-quest-island.netlify.app/",
+      "img/cardano-quest.png"
+    ));
+
+    // ── Controls state ──────────────────────────────────────
     const keys = {
       KeyW: false, KeyA: false, KeyS: false, KeyD: false,
       Digit1: false, Digit2: false, Digit3: false, Digit4: false,
       Digit5: false, Digit6: false, Digit7: false, Digit8: false,
+      Digit9: false, Digit0: false, Minus: false,
     };
 
     let isMouseDown     = false;
@@ -402,12 +617,13 @@
 
     const moveSpeed = 40;
     const lookSpeed = 0.0025;
-    const MAX_PITCH  = Math.PI / 2 - 0.1; // module-level so both mouse & touch use it
+    const MAX_PITCH  = Math.PI / 2 - 0.1;
 
     window.addEventListener("keydown", (e) => {
       if (e.code in keys) {
         keys[e.code] = true;
-        flyTarget = null; // cancel fly-to when user takes manual control
+        flyTarget = null;
+        dismissOverlay();
       }
     });
     window.addEventListener("keyup", (e) => {
@@ -418,7 +634,8 @@
       isMouseDown    = true;
       previousMouseX = e.clientX;
       previousMouseY = e.clientY;
-      flyTarget = null; // cancel fly-to on manual mouse drag
+      flyTarget = null;
+      dismissOverlay();
     });
     window.addEventListener("mouseup", () => { isMouseDown = false; });
 
@@ -452,26 +669,17 @@
       }
     }
 
-    // ────────────────────────────────────────────────────────
-    // IMPROVEMENT 4 – Pinch-to-zoom + single-touch look-around
-    //
-    //   Single finger drag → yaw/pitch (same as mouse drag).
-    //   Two finger pinch   → move camera along its forward axis.
-    //   Short tap (< 200 ms, < 10 px drift) → treated as a click
-    //     so planet links open on mobile too.
-    //
-    //   e.preventDefault() is called with { passive: false } to stop
-    //   the browser's default pan/zoom from fighting with our controls.
-    // ────────────────────────────────────────────────────────
+    // ── Touch controls ──────────────────────────────────────
     let lastPinchDistance = null;
     let touchStartPos  = null;
     let touchStartTime = 0;
-    const TAP_MAX_DIST = 10;  // px
-    const TAP_MAX_TIME = 200; // ms
+    const TAP_MAX_DIST = 10;
+    const TAP_MAX_TIME = 200;
 
     renderer.domElement.addEventListener("touchstart", (e) => {
       e.preventDefault();
-      flyTarget = null; // cancel fly-to on manual touch
+      flyTarget = null;
+      dismissOverlay();
 
       if (e.touches.length === 1) {
         isMouseDown    = true;
@@ -490,9 +698,7 @@
 
     renderer.domElement.addEventListener("touchmove", (e) => {
       e.preventDefault();
-
       if (e.touches.length === 1 && isMouseDown) {
-        // Single-finger look
         const dx = e.touches[0].clientX - previousMouseX;
         const dy = e.touches[0].clientY - previousMouseY;
         previousMouseX = e.touches[0].clientX;
@@ -500,30 +706,22 @@
         yaw   -= dx * lookSpeed;
         pitch -= dy * lookSpeed;
         pitch  = Math.max(-MAX_PITCH, Math.min(MAX_PITCH, pitch));
-
       } else if (e.touches.length === 2 && lastPinchDistance !== null) {
-        // Two-finger pinch → zoom
         const newDist = Math.hypot(
           e.touches[1].clientX - e.touches[0].clientX,
           e.touches[1].clientY - e.touches[0].clientY
         );
         const delta = newDist - lastPinchDistance;
         lastPinchDistance = newDist;
-
-        // Move forward (positive delta = fingers apart = zoom in)
-        const forward = new THREE.Vector3(0, 0, -1)
-          .applyQuaternion(camera.quaternion);
+        const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion);
         camera.position.addScaledVector(forward, delta * 0.6);
       }
     }, { passive: false });
 
     renderer.domElement.addEventListener("touchend", (e) => {
       if (e.touches.length < 2) lastPinchDistance = null;
-
       if (e.touches.length === 0) {
         isMouseDown = false;
-
-        // Tap-to-click detection
         if (touchStartPos && e.changedTouches.length > 0) {
           const cx   = e.changedTouches[0].clientX;
           const cy   = e.changedTouches[0].clientY;
@@ -533,37 +731,18 @@
           }
         }
         touchStartPos = null;
-
       } else if (e.touches.length === 1) {
-        // Went from pinch back to single finger — resume look-around
         isMouseDown    = true;
         previousMouseX = e.touches[0].clientX;
         previousMouseY = e.touches[0].clientY;
       }
     }, { passive: false });
 
-    // ────────────────────────────────────────────────────────
-    // IMPROVEMENT 2 – Smooth lerp/tween camera fly-to
-    //
-    //   moveCameraNearPlanet() no longer teleports.  Instead it sets
-    //   flyTarget = { position, yaw, pitch, planet }.
-    //
-    //   Each frame, updateCameraFly() lerps the camera toward the
-    //   target at FLY_ALPHA ≈ 8 % per frame (≈ 0.5 s to 95 % at 60 fps).
-    //
-    //   lerpAngle() wraps angle differences into [-π, π] before lerping
-    //   so the camera always turns the short way around.
-    //
-    //   The fly is cancelled automatically when the user:
-    //     • holds W/A/S/D
-    //     • starts a mouse drag
-    //     • touches the screen
-    // ────────────────────────────────────────────────────────
-    let flyTarget = null;        // { position, yaw, pitch, planet }
-    const FLY_ALPHA = 0.08;      // lerp weight per frame
+    // ── Camera fly-to (lerp) ────────────────────────────────
+    let flyTarget = null;
+    const FLY_ALPHA = 0.08;
 
     function lerpAngle(a, b, t) {
-      // Shortest-path angle lerp — wraps delta into [-π, π]
       let diff = b - a;
       while (diff >  Math.PI) diff -= 2 * Math.PI;
       while (diff < -Math.PI) diff += 2 * Math.PI;
@@ -571,37 +750,25 @@
     }
 
     function moveCameraNearPlanet(planet) {
-      // Don't re-trigger if already tracking this planet
       if (flyTarget && flyTarget.planet === planet) return;
-
       const offsetDist = planet.userData.radius * 4;
       const dir = new THREE.Vector3()
-        .subVectors(camera.position, planet.position)
-        .normalize();
+        .subVectors(camera.position, planet.position).normalize();
       if (dir.lengthSq() === 0) dir.set(0, 0, 1);
-
       const targetPos = new THREE.Vector3()
-        .copy(planet.position)
-        .add(dir.multiplyScalar(offsetDist));
-
-      // Compute the yaw/pitch that faces the planet from targetPos
+        .copy(planet.position).add(dir.multiplyScalar(offsetDist));
       const v = new THREE.Vector3()
-        .subVectors(planet.position, targetPos)
-        .normalize();
+        .subVectors(planet.position, targetPos).normalize();
       const targetYaw   = Math.atan2(v.x, -v.z);
       const targetPitch = Math.asin(Math.max(-1, Math.min(1, v.y)));
-
       flyTarget = { position: targetPos, yaw: targetYaw, pitch: targetPitch, planet };
     }
 
     function updateCameraFly() {
       if (!flyTarget) return;
-
       const posDist   = camera.position.distanceTo(flyTarget.position);
       const yawDiff   = Math.abs(yaw   - flyTarget.yaw);
       const pitchDiff = Math.abs(pitch - flyTarget.pitch);
-
-      // Snap and clear once close enough
       if (posDist < 0.4 && yawDiff < 0.008 && pitchDiff < 0.008) {
         camera.position.copy(flyTarget.position);
         yaw   = flyTarget.yaw;
@@ -609,34 +776,25 @@
         flyTarget = null;
         return;
       }
-
       camera.position.lerp(flyTarget.position, FLY_ALPHA);
       yaw   = lerpAngle(yaw,   flyTarget.yaw,   FLY_ALPHA);
       pitch = THREE.MathUtils.lerp(pitch, flyTarget.pitch, FLY_ALPHA);
     }
 
-    // Snap-to-planet keyboard shortcuts (1–8, silent in HUD)
+    // Number key shortcuts (1–0 covers first 10 planets, - and = for 11 & 12)
     function handlePlanetShortcuts() {
-      if (keys.Digit1) moveCameraNearPlanet(planets[0]);
-      if (keys.Digit2) moveCameraNearPlanet(planets[1]);
-      if (keys.Digit3) moveCameraNearPlanet(planets[2]);
-      if (keys.Digit4) moveCameraNearPlanet(planets[3]);
-      if (keys.Digit5) moveCameraNearPlanet(planets[4]);
-      if (keys.Digit6) moveCameraNearPlanet(planets[5]);
-      if (keys.Digit7) moveCameraNearPlanet(planets[6]);
-      if (keys.Digit8) moveCameraNearPlanet(planets[7]);
+      const map = [
+        "Digit1","Digit2","Digit3","Digit4","Digit5",
+        "Digit6","Digit7","Digit8","Digit9","Digit0","Minus",
+      ];
+      map.forEach((code, i) => {
+        if (keys[code] && planets[i]) moveCameraNearPlanet(planets[i]);
+      });
     }
 
-    // ────────────────────────────────────────────────────────
-    // Hover + click detection (raycaster + thumbnail tooltip)
-    //
-    // IMPROVEMENT 1: On hover, the tooltip card shows:
-    //   • a 72×72 px preview image pulled from userData.thumbnailUrl
-    //   • the planet's label text below the image
-    // ────────────────────────────────────────────────────────
+    // ── Hover + click (raycaster) ────────────────────────────
     const raycaster = new THREE.Raycaster();
     const mouse     = new THREE.Vector2();
-
     let hoveredPlanet  = null;
     let lastMouseEvent = null;
 
@@ -656,7 +814,6 @@
     }
 
     function showTooltip(planet) {
-      // IMPROVEMENT 1 – thumbnail card
       if (planet.userData.thumbnailUrl) {
         tooltipThumb.src          = planet.userData.thumbnailUrl;
         tooltipThumb.style.display = "block";
@@ -678,14 +835,12 @@
 
       if (hits.length > 0) {
         const planet = hits[0].object;
-
         if (hoveredPlanet !== planet) {
-          // Restore previous planet colour
+          // Restore previous
           if (hoveredPlanet?.userData.originalColor) {
             hoveredPlanet.material.color.copy(hoveredPlanet.userData.originalColor);
           }
           hoveredPlanet = planet;
-
           if (!planet.userData.originalColor) {
             planet.userData.originalColor = planet.material.color.clone();
           }
@@ -694,6 +849,9 @@
           );
           container.style.cursor = "pointer";
           showTooltip(planet);
+
+          // ── HOVER SFX ──────────────────────────────────────
+          playSfx(sfxHover);
         }
       } else {
         if (hoveredPlanet?.userData.originalColor) {
@@ -719,7 +877,12 @@
       const hits = raycaster.intersectObjects(planets, false);
       if (hits.length > 0) {
         const url = hits[0].object.userData.url;
-        if (url) window.open(url, "_blank");
+        if (url) {
+          // ── CLICK SFX ────────────────────────────────────
+          playSfx(sfxClick);
+          // Small delay so SFX plays before browser context switches
+          setTimeout(() => window.open(url, "_blank"), 120);
+        }
       }
     }
 
@@ -740,10 +903,7 @@
       const delta   = clock.getDelta();
       const elapsed = clock.elapsedTime;
 
-      // IMPROVEMENT 5 – Twinkling stars
-      //   Two sine waves with different periods and phases.
-      //   starMaterials[0] small background stars: period ≈ 7.9 s
-      //   starMaterials[1] large foreground stars:  period ≈ 12.6 s
+      // Twinkling stars
       if (starMaterials.length >= 2) {
         starMaterials[0].mat.opacity = starMaterials[0].base + 0.17 * Math.sin(elapsed * 0.80);
         starMaterials[1].mat.opacity = starMaterials[1].base + 0.10 * Math.sin(elapsed * 0.50 + 1.8);
@@ -755,11 +915,7 @@
       });
 
       handlePlanetShortcuts();
-
-      // IMPROVEMENT 2 – camera fly-to (runs before manual movement
-      // so WASD can still override if the user grabs the keys)
       updateCameraFly();
-
       updateCameraRotation();
       updateCameraPosition(delta);
 

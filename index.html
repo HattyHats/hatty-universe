@@ -98,12 +98,58 @@
       transform: translateY(0);
       box-shadow: 0 0 10px rgba(59, 130, 246, 0.6);
     }
+
+    /* ── Bulb.app House Ad ── */
+    .house-ad {
+      position: absolute;
+      left: 12px;
+      top: 310px;        /* below the HUD panel */
+      width: 140px;      /* 1:1 square */
+      height: 140px;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 215, 0, 0.45);
+      box-shadow:
+        0 0 12px rgba(255, 215, 0, 0.25),
+        0 0 30px rgba(255, 215, 0, 0.10);
+      pointer-events: auto;
+      transition: box-shadow 0.2s ease, transform 0.15s ease;
+      text-decoration: none;
+      display: block;
+    }
+
+    .house-ad:hover {
+      box-shadow:
+        0 0 22px rgba(255, 215, 0, 0.6),
+        0 0 55px rgba(255, 215, 0, 0.25);
+      transform: translateY(-2px) scale(1.03);
+    }
+
+    .house-ad img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* Small "Hatty's Pick" label – clearly NOT a Google ad */
+    .house-ad-label {
+      position: absolute;
+      left: 12px;
+      top: 456px;   /* 310 + 140 + 6 */
+      font-size: 9px;
+      color: rgba(255, 215, 0, 0.65);
+      letter-spacing: 0.06em;
+      pointer-events: none;
+      text-transform: uppercase;
+    }
   </style>
 </head>
 <body>
   <div id="universe-container">
+
     <div class="hud">
-      <div class="hud-title">HattyHats – Digital Universe v0.3</div>
+      <div class="hud-title">HattyHats – Digital Universe v0.4</div>
       <div class="hud-body">
         Click inside, then use:
         <br />
@@ -126,6 +172,18 @@
         Hover a planet to see its name, click to open its world.
       </div>
     </div>
+
+    <!-- ── Bulb.app House Ad ── -->
+    <a
+      class="house-ad"
+      href="https://www.bulbapp.io?referral_code=pgx084"
+      target="_blank"
+      rel="noopener noreferrer"
+      title="Hatty's Pick – Bulb.app"
+    >
+      <img src="bulb-ad.gif" alt="Hatty's Pick – Try Bulb.app" />
+    </a>
+    <span class="house-ad-label">Hatty's Pick</span>
 
     <!-- Main site button -->
     <button
@@ -152,6 +210,7 @@
            transition: opacity 0.1s ease-out;
          ">
     </div>
+
   </div>
 
   <!-- Three.js from CDN (module build) -->
@@ -159,7 +218,7 @@
     import * as THREE from "https://unpkg.com/three@0.160.0/build/three.module.js";
 
     const container = document.getElementById("universe-container");
-    const tooltip = document.getElementById("hover-tooltip");
+    const tooltip   = document.getElementById("hover-tooltip");
 
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x02030a);
@@ -179,268 +238,219 @@
     renderer.setPixelRatio(window.devicePixelRatio);
     container.appendChild(renderer.domElement);
 
-    // Lighting
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.35);
+    // ── Lighting (boosted for bright, welcoming planets) ──
+    const ambientLight = new THREE.AmbientLight(0xffffff, 1.0);   // was 0.35
     scene.add(ambientLight);
 
-    const mainLight = new THREE.PointLight(0xffffff, 1.4, 0, 2);
+    const mainLight = new THREE.PointLight(0xffffff, 2.5, 0, 1.5); // was 1.4
     mainLight.position.set(0, 0, 0);
     scene.add(mainLight);
+
+    // Fill light from camera direction so front faces stay fully lit
+    const fillLight = new THREE.DirectionalLight(0xffffff, 1.2);
+    fillLight.position.set(0, 0, 200);
+    scene.add(fillLight);
 
     // Starfield
     function createStarfield() {
       const starCount = 2000;
-      const geometry = new THREE.BufferGeometry();
-      const positions = new Float32Array(starCount * 3);
-
+      const geometry  = new THREE.BufferGeometry();
+      const positions  = new Float32Array(starCount * 3);
       for (let i = 0; i < starCount; i++) {
-        const i3 = i * 3;
-        positions[i3 + 0] = (Math.random() - 0.5) * 2000;
-        positions[i3 + 1] = (Math.random() - 0.5) * 2000;
-        positions[i3 + 2] = (Math.random() - 0.5) * 2000;
+        positions[i * 3 + 0] = (Math.random() - 0.5) * 2000;
+        positions[i * 3 + 1] = (Math.random() - 0.5) * 2000;
+        positions[i * 3 + 2] = (Math.random() - 0.5) * 2000;
       }
-
-      geometry.setAttribute(
-        "position",
-        new THREE.BufferAttribute(positions, 3)
-      );
-
-      const material = new THREE.PointsMaterial({
-        color: 0xffffff,
-        size: 1.1,
-        sizeAttenuation: true,
-      });
-
-      const stars = new THREE.Points(geometry, material);
-      scene.add(stars);
+      geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+      scene.add(new THREE.Points(geometry, new THREE.PointsMaterial({ color: 0xffffff, size: 1.1, sizeAttenuation: true })));
     }
-
     createStarfield();
 
     const textureLoader = new THREE.TextureLoader();
 
-    // Planets + label + URL + texture data
-    function createPlanet(radius, color, position, label, url, textureUrl) {
-      const geometry = new THREE.SphereGeometry(radius, 48, 48);
+    // ── Soft additive glow sprite behind every planet ──
+    function makeGlowCanvas(size, cssColor) {
+      const c    = document.createElement("canvas");
+      c.width    = size;
+      c.height   = size;
+      const ctx  = c.getContext("2d");
+      const half = size / 2;
+      const grad = ctx.createRadialGradient(half, half, 0, half, half, half);
+      grad.addColorStop(0,    cssColor.replace("1)", "0.6)"));
+      grad.addColorStop(0.35, cssColor.replace("1)", "0.22)"));
+      grad.addColorStop(1,    cssColor.replace("1)", "0)"));
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, size, size);
+      return c;
+    }
 
+    function addGlow(planet, radius, glowColor) {
+      const tex = new THREE.CanvasTexture(makeGlowCanvas(256, glowColor));
+      const mat = new THREE.SpriteMaterial({
+        map: tex,
+        transparent: true,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+      });
+      const sprite = new THREE.Sprite(mat);
+      const s = radius * 3.2;
+      sprite.scale.set(s, s, 1);
+      planet.add(sprite);
+    }
+
+    // ── Planet factory ──
+    function createPlanet(radius, emissiveHex, position, label, url, textureUrl, glowColor) {
+      const geometry = new THREE.SphereGeometry(radius, 48, 48);
       const material = new THREE.MeshStandardMaterial({
-        color,
-        roughness: 0.6,
-        metalness: 0.2,
+        color: 0xffffff,                          // white base – texture colors show true
+        roughness: 0.3,
+        metalness: 0.05,
+        emissive: new THREE.Color(emissiveHex),
+        emissiveIntensity: 0.2,
       });
 
       if (textureUrl) {
-        textureLoader.load(
-          textureUrl,
-          (tex) => {
-            tex.wrapS = THREE.RepeatWrapping;
-            tex.wrapT = THREE.RepeatWrapping;
-            material.map = tex;
-            material.needsUpdate = true;
-          },
-          undefined,
-          () => {
-            // if texture fails, you still get a colored planet
-          }
-        );
+        textureLoader.load(textureUrl, (tex) => {
+          tex.wrapS = THREE.RepeatWrapping;
+          tex.wrapT = THREE.RepeatWrapping;
+          material.map          = tex;
+          material.emissiveMap  = tex;   // same texture drives the self-glow
+          material.emissiveIntensity = 0.25;
+          material.needsUpdate  = true;
+        });
       }
 
       const mesh = new THREE.Mesh(geometry, material);
       mesh.position.copy(position);
-      mesh.userData.label = label;
+      mesh.userData.label  = label;
       mesh.userData.radius = radius;
-      mesh.userData.url = url;
+      mesh.userData.url    = url;
       scene.add(mesh);
+
+      addGlow(mesh, radius, glowColor || "rgba(160,200,255,1)");
       return mesh;
     }
 
+    // ── Planet definitions ──
     const planets = [];
-    planets.push(
-      createPlanet(
-        8,
-        0xffffff,
-        new THREE.Vector3(40, 0, -30),
-        "Learn With Hatty",
-        "https://earnwithhatty.com/",
-        "https://i.ibb.co/LhB2ncPR/Learn-with-hatty-2-1.png"
-      )
-    );
-    planets.push(
-      createPlanet(
-        5,
-        0xffffff,
-        new THREE.Vector3(-60, 10, -80),
-        "Hatty Tools",
-        "https://earn-with-hatty-tools.netlify.app/",
-        "https://i.ibb.co/9kWjbb8f/grok-image-f2f24317-2ad0-42f9-8a67-53cfeaec08ca.jpg"
-      )
-    );
-    planets.push(
-      createPlanet(
-        3,
-        0xffffff,
-        new THREE.Vector3(70, 40, -150),
-        "Privacy Gadgets",
-        "https://privacy-gadgets-hub.netlify.app/",
-        "https://i.ibb.co/XZRJ7FJ6/45bb8258-7d85-4d3a-b149-abdcc157035a.jpg"
-      )
-    );
 
-    // New Cardano Planet (official site)
-    planets.push(
-      createPlanet(
-        9,
-        0xffffff,
-        new THREE.Vector3(-90, -40, -180),
-        "Cardano Planet",
-        "https://cardano.org/",
-        "https://i.ibb.co/sv8X6ksV/Screenshot-2026-03-04-112403.png"
-      )
-    );
+    planets.push(createPlanet(
+      8, 0x99ccff, new THREE.Vector3(40, 0, -30),
+      "Learn With Hatty", "https://earnwithhatty.com/",
+      "https://i.ibb.co/LhB2ncPR/Learn-with-hatty-2-1.png",
+      "rgba(100,180,255,1)"
+    ));
+    planets.push(createPlanet(
+      5, 0xffcc55, new THREE.Vector3(-60, 10, -80),
+      "Hatty Tools", "https://earn-with-hatty-tools.netlify.app/",
+      "https://i.ibb.co/9kWjbb8f/grok-image-f2f24317-2ad0-42f9-8a67-53cfeaec08ca.jpg",
+      "rgba(255,200,80,1)"
+    ));
+    planets.push(createPlanet(
+      10, 0x4488ff, new THREE.Vector3(0, -30, -120),
+      "Learn Cardano", "https://learn-cardano.netlify.app/",
+      "https://i.ibb.co/LzgZj25F/cardano-ada-logo.png",
+      "rgba(60,140,255,1)"
+    ));
+    planets.push(createPlanet(
+      3, 0x55ffcc, new THREE.Vector3(70, 40, -150),
+      "Privacy Gadgets", "https://privacy-gadgets-hub.netlify.app/",
+      "https://i.ibb.co/XZRJ7FJ6/45bb8258-7d85-4d3a-b149-abdcc157035a.jpg",
+      "rgba(80,255,200,1)"
+    ));
+    planets.push(createPlanet(
+      9, 0x3355ff, new THREE.Vector3(-90, -40, -180),
+      "Cardano Planet", "https://cardano.org/",
+      "https://i.ibb.co/sv8X6ksV/Screenshot-2026-03-04-112403.png",
+      "rgba(80,110,255,1)"
+    ));
+    planets.push(createPlanet(
+      7, 0xaa55ff, new THREE.Vector3(110, 20, -210),
+      "Voi Planet", "https://voi.network/",
+      "https://i.ibb.co/vCQSwR8R/Screenshot-2026-03-04-112456.png",
+      "rgba(180,100,255,1)"
+    ));
+    planets.push(createPlanet(
+      6, 0xff9955, new THREE.Vector3(-30, 60, -170),
+      "Hatty's News", "https://hattyhats.github.io/hattys-news/",
+      "img/hattys-news.jpeg",
+      "rgba(255,150,80,1)"
+    ));
+    planets.push(createPlanet(
+      7, 0xff55aa, new THREE.Vector3(85, -60, -100),
+      "Hatty's Media", "https://hattys-media.netlify.app/",
+      "img/hattys-media.png",
+      "rgba(255,80,180,1)"
+    ));
 
-    // New Voi Planet (Voi blockchain)
-    planets.push(
-      createPlanet(
-        7,
-        0xffffff,
-        new THREE.Vector3(110, 20, -210),
-        "Voi Planet",
-        "https://voi.network/",
-        "https://i.ibb.co/vCQSwR8R/Screenshot-2026-03-04-112456.png"
-      )
-    );
-
-    // Hatty's News
-    planets.push(
-      createPlanet(
-        6,
-        0xffffff,
-        new THREE.Vector3(-30, 60, -170),
-        "Hatty's News",
-        "https://hattyhats.github.io/hattys-news/",
-        "img/hattys-news.jpeg"
-      )
-    );
-
-    // Hatty's Media
-    planets.push(
-      createPlanet(
-        7,
-        0xffffff,
-        new THREE.Vector3(85, -60, -100),
-        "Hatty's Media",
-        "https://hattys-media.netlify.app/",
-        "img/hattys-media.png"
-      )
-    );
+    // ── NEW planets ──
+    planets.push(createPlanet(
+      6, 0x44ffcc, new THREE.Vector3(-50, 80, -240),
+      "OpenFocus", "https://hattyhats.github.io/Open-Focus/",
+      "img/openfocus.png",
+      "rgba(60,255,200,1)"
+    ));
+    planets.push(createPlanet(
+      5, 0xff4488, new THREE.Vector3(130, -30, -260),
+      "Psycho Satoshi – Audius", "https://audius.co/hatty",
+      "img/audius.webp",
+      "rgba(255,60,140,1)"
+    ));
+    planets.push(createPlanet(
+      4, 0xffdd44, new THREE.Vector3(-120, 30, -300),
+      "PublishOX", "https://www.publish0x.com/@HattyHats",
+      "img/publishox.png",
+      "rgba(255,220,60,1)"
+    ));
 
 
-    // --- Simple WASD + mouse-look controls ---
+    // ── Controls ──
+    const keys = { KeyW:false, KeyA:false, KeyS:false, KeyD:false,
+                   Digit1:false, Digit2:false, Digit3:false, Digit4:false };
 
-    const keys = {
-      KeyW: false,
-      KeyA: false,
-      KeyS: false,
-      KeyD: false,
-      Digit1: false,
-      Digit2: false,
-      Digit3: false,
-      Digit4: false,
-    };
+    let isMouseDown = false, previousMouseX = 0, previousMouseY = 0;
+    let yaw = 0, pitch = 0;
+    const moveSpeed = 40, lookSpeed = 0.0025;
 
-    let isMouseDown = false;
-    let previousMouseX = 0;
-    let previousMouseY = 0;
+    window.addEventListener("keydown", e => { if (e.code in keys) keys[e.code] = true; });
+    window.addEventListener("keyup",   e => { if (e.code in keys) keys[e.code] = false; });
 
-    let yaw = 0;
-    let pitch = 0;
-
-    const moveSpeed = 40;
-    const lookSpeed = 0.0025;
-
-    window.addEventListener("keydown", (event) => {
-      if (event.code in keys) {
-        keys[event.code] = true;
-      }
+    renderer.domElement.addEventListener("mousedown", e => {
+      isMouseDown = true; previousMouseX = e.clientX; previousMouseY = e.clientY;
     });
-
-    window.addEventListener("keyup", (event) => {
-      if (event.code in keys) {
-        keys[event.code] = false;
-      }
-    });
-
-    renderer.domElement.addEventListener("mousedown", (event) => {
-      isMouseDown = true;
-      previousMouseX = event.clientX;
-      previousMouseY = event.clientY;
-    });
-
-    window.addEventListener("mouseup", () => {
-      isMouseDown = false;
-    });
-
-    window.addEventListener("mousemove", (event) => {
+    window.addEventListener("mouseup", () => { isMouseDown = false; });
+    window.addEventListener("mousemove", e => {
       if (!isMouseDown) return;
-
-      const deltaX = event.clientX - previousMouseX;
-      const deltaY = event.clientY - previousMouseY;
-      previousMouseX = event.clientX;
-      previousMouseY = event.clientY;
-
-      yaw -= deltaX * lookSpeed;
-      pitch -= deltaY * lookSpeed;
-
-      const maxPitch = Math.PI / 2 - 0.1;
-      pitch = Math.max(-maxPitch, Math.min(maxPitch, pitch));
+      yaw   -= (e.clientX - previousMouseX) * lookSpeed;
+      pitch -= (e.clientY - previousMouseY) * lookSpeed;
+      pitch  = Math.max(-(Math.PI/2 - 0.1), Math.min(Math.PI/2 - 0.1, pitch));
+      previousMouseX = e.clientX; previousMouseY = e.clientY;
     });
 
     function updateCameraRotation() {
-      const quat = new THREE.Quaternion();
-      quat.setFromEuler(new THREE.Euler(pitch, yaw, 0, "YXZ"));
-      camera.quaternion.copy(quat);
+      camera.quaternion.setFromEuler(new THREE.Euler(pitch, yaw, 0, "YXZ"));
     }
 
     function updateCameraPosition(delta) {
-      const direction = new THREE.Vector3();
-
-      if (keys.KeyW) direction.z -= 1;
-      if (keys.KeyS) direction.z += 1;
-      if (keys.KeyA) direction.x -= 1;
-      if (keys.KeyD) direction.x += 1;
-
-      if (direction.lengthSq() > 0) {
-        direction.normalize();
-        direction.applyQuaternion(camera.quaternion);
-        direction.multiplyScalar(moveSpeed * delta);
-        camera.position.add(direction);
+      const dir = new THREE.Vector3();
+      if (keys.KeyW) dir.z -= 1;
+      if (keys.KeyS) dir.z += 1;
+      if (keys.KeyA) dir.x -= 1;
+      if (keys.KeyD) dir.x += 1;
+      if (dir.lengthSq() > 0) {
+        dir.normalize().applyQuaternion(camera.quaternion).multiplyScalar(moveSpeed * delta);
+        camera.position.add(dir);
       }
     }
 
-    // --- Snap-to-planet shortcuts (1–4) ---
-
     function moveCameraNearPlanet(planet) {
-      const offsetDistance = planet.userData.radius * 4;
-      const direction = new THREE.Vector3()
-        .subVectors(camera.position, planet.position)
-        .normalize();
-
-      if (direction.lengthSq() === 0) {
-        direction.set(0, 0, 1);
-      }
-
-      const targetPosition = new THREE.Vector3()
-        .copy(planet.position)
-        .add(direction.multiplyScalar(offsetDistance));
-
-      camera.position.copy(targetPosition);
+      const dir = new THREE.Vector3().subVectors(camera.position, planet.position).normalize();
+      if (dir.lengthSq() === 0) dir.set(0, 0, 1);
+      camera.position.copy(planet.position).add(dir.multiplyScalar(planet.userData.radius * 4));
       camera.lookAt(planet.position);
-
-      const v = new THREE.Vector3()
-        .subVectors(planet.position, camera.position)
-        .normalize();
-      yaw = Math.atan2(v.x, v.z * -1);
-      pitch = Math.asin(v.y);
+      const v = new THREE.Vector3().subVectors(planet.position, camera.position).normalize();
+      yaw   = Math.atan2(v.x, -v.z);
+      pitch = Math.asin(Math.max(-1, Math.min(1, v.y)));
     }
 
     function handlePlanetShortcuts() {
@@ -450,125 +460,68 @@
       if (keys.Digit4) moveCameraNearPlanet(planets[3]);
     }
 
-    // --- Hover + click detection (raycaster + tooltip) ---
-
+    // ── Hover / click ──
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
+    let hoveredPlanet = null, lastMouseEvent = null;
 
-    let hoveredPlanet = null;
-    let lastMouseEvent = null;
-
-    function updateMouseFromEvent(event) {
-      const rect = renderer.domElement.getBoundingClientRect();
-      const x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-      const y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-      mouse.set(x, y);
-      lastMouseEvent = event;
-    }
-
-    function updateTooltipPosition(event) {
-      if (!event || !hoveredPlanet) return;
-      const x = event.clientX;
-      const y = event.clientY;
-      tooltip.style.left = `${x}px`;
-      tooltip.style.top = `${y}px`;
+    function updateMouse(e) {
+      const r = renderer.domElement.getBoundingClientRect();
+      mouse.set(
+        ((e.clientX - r.left) / r.width)  * 2 - 1,
+        ((e.clientY - r.top)  / r.height) * -2 + 1
+      );
+      lastMouseEvent = e;
     }
 
     function handleHover() {
       raycaster.setFromCamera(mouse, camera);
-      const intersects = raycaster.intersectObjects(planets, false);
+      const hits = raycaster.intersectObjects(planets, false);
 
-      if (intersects.length > 0) {
-        const planet = intersects[0].object;
-
-        if (hoveredPlanet !== planet) {
-          if (hoveredPlanet && hoveredPlanet.userData.originalColor) {
-            hoveredPlanet.material.color.copy(
-              hoveredPlanet.userData.originalColor
-            );
-          }
-
-          hoveredPlanet = planet;
-
-          if (!planet.userData.originalColor) {
-            planet.userData.originalColor = planet.material.color.clone();
-          }
-          const highlightColor = planet.userData.originalColor
-            .clone()
-            .multiplyScalar(1.4);
-          planet.material.color.copy(highlightColor);
-
+      if (hits.length > 0) {
+        const p = hits[0].object;
+        if (hoveredPlanet !== p) {
+          if (hoveredPlanet) hoveredPlanet.material.emissiveIntensity = hoveredPlanet.userData.baseEmissive;
+          hoveredPlanet = p;
+          if (p.userData.baseEmissive === undefined) p.userData.baseEmissive = p.material.emissiveIntensity;
+          p.material.emissiveIntensity = p.userData.baseEmissive * 3.5;
           container.style.cursor = "pointer";
-
-          tooltip.textContent = planet.userData.label || "";
+          tooltip.textContent   = p.userData.label || "";
           tooltip.style.opacity = "1";
         }
+        if (lastMouseEvent) { tooltip.style.left = `${lastMouseEvent.clientX}px`; tooltip.style.top = `${lastMouseEvent.clientY}px`; }
       } else {
-        if (hoveredPlanet && hoveredPlanet.userData.originalColor) {
-          hoveredPlanet.material.color.copy(
-            hoveredPlanet.userData.originalColor
-          );
-        }
-        hoveredPlanet = null;
+        if (hoveredPlanet) { hoveredPlanet.material.emissiveIntensity = hoveredPlanet.userData.baseEmissive; hoveredPlanet = null; }
         container.style.cursor = "default";
-        tooltip.style.opacity = "0";
-      }
-
-      if (lastMouseEvent) {
-        updateTooltipPosition(lastMouseEvent);
+        tooltip.style.opacity  = "0";
       }
     }
 
-    function onMouseMove(event) {
-      updateMouseFromEvent(event);
-      updateTooltipPosition(event);
-      handleHover();
-    }
-
-    function onClick(event) {
-      updateMouseFromEvent(event);
+    renderer.domElement.addEventListener("mousemove", e => { updateMouse(e); handleHover(); });
+    renderer.domElement.addEventListener("click", e => {
+      updateMouse(e);
       raycaster.setFromCamera(mouse, camera);
-      const intersects = raycaster.intersectObjects(planets, false);
-
-      if (intersects.length > 0) {
-        const planet = intersects[0].object;
-        const url = planet.userData.url;
-        if (url) {
-          window.open(url, "_blank");
-        }
-      }
-    }
-
-    renderer.domElement.addEventListener("mousemove", onMouseMove);
-    renderer.domElement.addEventListener("click", onClick);
-
-    // Handle resize
-    window.addEventListener("resize", () => {
-      const width = window.innerWidth;
-      const height = window.innerHeight;
-      camera.aspect = width / height;
-      camera.updateProjectionMatrix();
-      renderer.setSize(width, height);
+      const hits = raycaster.intersectObjects(planets, false);
+      if (hits.length > 0 && hits[0].object.userData.url) window.open(hits[0].object.userData.url, "_blank");
     });
 
-    // Animation loop
-    const clock = new THREE.Clock();
+    window.addEventListener("resize", () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
 
+    // ── Animate ──
+    const clock = new THREE.Clock();
     function animate() {
       const delta = clock.getDelta();
-
-      planets.forEach((planet, index) => {
-        planet.rotation.y += 0.12 * delta * (index + 1);
-      });
-
+      planets.forEach((p, i) => { p.rotation.y += 0.12 * delta * (i + 1); });
       handlePlanetShortcuts();
       updateCameraRotation();
       updateCameraPosition(delta);
-
       renderer.render(scene, camera);
       requestAnimationFrame(animate);
     }
-
     animate();
   </script>
 </body>

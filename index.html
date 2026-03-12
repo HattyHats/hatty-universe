@@ -5,524 +5,493 @@
   <title>HattyHats – Digital Universe (Prototype)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     html, body {
-      width: 100%;
-      height: 100%;
+      width: 100%; height: 100%;
       overflow: hidden;
       background: #02030a;
       color: #f5f5f5;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
-        sans-serif;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
     }
 
-    body {
+    body { display: flex; align-items: stretch; justify-content: stretch; }
+
+    #universe-container { position: relative; width: 100%; height: 100%; }
+    canvas { display: block; }
+
+    /* ── Left sidebar: HUD + ads stacked in a flex column ── */
+    #left-panel {
+      position: absolute;
+      top: 12px; left: 12px;
       display: flex;
-      align-items: stretch;
-      justify-content: stretch;
+      flex-direction: column;
+      gap: 10px;
+      pointer-events: none;      /* panel itself is pass-through */
+      max-height: calc(100vh - 24px);
     }
 
-    #universe-container {
-      position: relative;
-      width: 100%;
-      height: 100%;
-    }
-
-    canvas {
-      display: block;
-    }
-
-    /* Simple HUD text */
+    /* ── HUD ── */
     .hud {
-      position: absolute;
-      top: 12px;
-      left: 12px;
       padding: 8px 12px;
-      background: rgba(0, 0, 0, 0.55);
-      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(0,0,0,0.55);
+      border: 1px solid rgba(255,255,255,0.12);
       border-radius: 6px;
-      font-size: 12px;
-      line-height: 1.5;
-      pointer-events: none;
+      font-size: 12px; line-height: 1.5;
       backdrop-filter: blur(6px);
+      width: 164px;
+      flex-shrink: 0;
+    }
+    .hud-title { font-size: 13px; font-weight: 600; margin-bottom: 4px; color: #fff; }
+    .hud-body  { color: #b0b7ff; }
+    .hud-body strong { color: #fff; font-weight: 600; }
+    .hud-keyboard { display: block; }
+    .hud-touch    { display: none; }
+
+    @media (hover: none) and (pointer: coarse) {
+      .hud-keyboard { display: none; }
+      .hud-touch    { display: block; }
+      .hud { font-size: 11px; }
     }
 
-    .hud-title {
-      font-size: 13px;
-      font-weight: 600;
-      margin-bottom: 4px;
-      color: #ffffff;
-    }
-
-    .hud-body {
-      color: #b0b7ff;
-    }
-
-    .hud-body strong {
-      color: #ffffff;
-      font-weight: 600;
-    }
-
-    /* Main Site button */
+    /* ── Main Site button ── */
     .main-site-button {
-      position: absolute;
-      top: 12px;
-      right: 12px;
-      padding: 6px 12px;
-      border-radius: 999px;
-      border: 1px solid rgba(148, 163, 184, 0.8);
-      background: rgba(15, 23, 42, 0.9);
-      color: #e5e7eb;
-      font-size: 12px;
-      font-weight: 500;
-      cursor: pointer;
-      pointer-events: auto;
-      box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.9);
-      transition: background 0.15s ease, transform 0.1s ease,
-        box-shadow 0.15s ease, border-color 0.15s ease;
+      position: absolute; top: 12px; right: 12px;
+      padding: 6px 12px; border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.8);
+      background: rgba(15,23,42,0.9);
+      color: #e5e7eb; font-size: 12px; font-weight: 500;
+      cursor: pointer; pointer-events: auto;
+      box-shadow: 0 0 0 1px rgba(15,23,42,0.9);
+      transition: background .15s ease, transform .1s ease, box-shadow .15s ease, border-color .15s ease;
     }
-
     .main-site-button:hover {
-      background: rgba(37, 99, 235, 0.95);
-      border-color: rgba(129, 140, 248, 1);
-      box-shadow: 0 0 18px rgba(59, 130, 246, 0.8);
+      background: rgba(37,99,235,0.95);
+      border-color: rgba(129,140,248,1);
+      box-shadow: 0 0 18px rgba(59,130,246,0.8);
       transform: translateY(-1px);
     }
-
     .main-site-button:active {
       transform: translateY(0);
-      box-shadow: 0 0 10px rgba(59, 130, 246, 0.6);
+      box-shadow: 0 0 10px rgba(59,130,246,0.6);
     }
 
-    /* ── Bulb.app House Ad ── */
-    .house-ad {
+    /* ── Mobile d-pad ── */
+    #mobile-controls {
+      display: none;
       position: absolute;
-      left: 12px;
-      top: 310px;        /* below the HUD panel */
-      width: 140px;      /* 1:1 square */
-      height: 140px;
-      border-radius: 10px;
-      overflow: hidden;
-      border: 1px solid rgba(255, 215, 0, 0.45);
-      box-shadow:
-        0 0 12px rgba(255, 215, 0, 0.25),
-        0 0 30px rgba(255, 215, 0, 0.10);
+      bottom: 24px; left: 50%;
+      transform: translateX(-50%);
       pointer-events: auto;
-      transition: box-shadow 0.2s ease, transform 0.15s ease;
-      text-decoration: none;
-      display: block;
+      user-select: none; -webkit-user-select: none;
+      flex-direction: column; align-items: center; gap: 4px;
+    }
+    @media (hover: none) and (pointer: coarse) {
+      #mobile-controls { display: flex; }
+    }
+    .mob-row { display: flex; gap: 4px; }
+    .mob-btn {
+      width: 52px; height: 52px; border-radius: 10px;
+      background: rgba(0,0,0,0.55);
+      border: 1px solid rgba(255,255,255,0.18);
+      color: #fff; font-size: 20px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; backdrop-filter: blur(6px); touch-action: none;
+    }
+    .mob-btn:active, .mob-btn.pressed {
+      background: rgba(59,130,246,0.6);
+      border-color: rgba(129,140,248,1);
     }
 
-    .house-ad:hover {
-      box-shadow:
-        0 0 22px rgba(255, 215, 0, 0.6),
-        0 0 55px rgba(255, 215, 0, 0.25);
-      transform: translateY(-2px) scale(1.03);
+    /* ── Ad panel – shared ── */
+    .house-ad {
+      width: 140px; height: 140px;
+      border-radius: 10px; overflow: hidden;
+      pointer-events: auto;           /* ads ARE clickable */
+      transition: box-shadow .2s ease, transform .15s ease;
+      text-decoration: none; display: block;
+      flex-shrink: 0;
     }
+    .house-ad img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
-    .house-ad img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
+    /* Bulb – gold */
+    .house-ad-bulb  { border: 1px solid rgba(255,215,0,.45); box-shadow: 0 0 12px rgba(255,215,0,.25), 0 0 30px rgba(255,215,0,.10); }
+    .house-ad-bulb:hover  { box-shadow: 0 0 22px rgba(255,215,0,.6), 0 0 55px rgba(255,215,0,.25); transform: translateY(-2px) scale(1.03); }
 
-    /* Small "Hatty's Pick" label – clearly NOT a Google ad */
+    /* Slice – orange */
+    .house-ad-slice { border: 1px solid rgba(255,140,0,.45); box-shadow: 0 0 12px rgba(255,140,0,.25), 0 0 30px rgba(255,140,0,.10); }
+    .house-ad-slice:hover { box-shadow: 0 0 22px rgba(255,140,0,.6), 0 0 55px rgba(255,140,0,.25); transform: translateY(-2px) scale(1.03); }
+
+    /* Lofty – teal */
+    .house-ad-lofty { border: 1px solid rgba(0,220,160,.45); box-shadow: 0 0 12px rgba(0,220,160,.25), 0 0 30px rgba(0,220,160,.10); }
+    .house-ad-lofty:hover { box-shadow: 0 0 22px rgba(0,220,160,.6), 0 0 55px rgba(0,220,160,.25); transform: translateY(-2px) scale(1.03); }
+
+    /* "Hatty's Pick" label sits just under each ad */
     .house-ad-label {
-      position: absolute;
-      left: 12px;
-      top: 456px;   /* 310 + 140 + 6 */
-      font-size: 9px;
-      color: rgba(255, 215, 0, 0.65);
-      letter-spacing: 0.06em;
+      font-size: 9px; color: rgba(255,215,0,.65);
+      letter-spacing: .06em; text-transform: uppercase;
       pointer-events: none;
-      text-transform: uppercase;
+      margin-top: -6px;   /* pull it up close to the ad above */
+    }
+
+    /* Compact on shorter screens */
+    @media (max-height: 820px) {
+      .house-ad { width: 110px; height: 110px; }
+      #left-panel { gap: 6px; }
+    }
+
+    /* Hide ads on very short screens (landscape phone) */
+    @media (max-height: 500px) {
+      .house-ad, .house-ad-label { display: none; }
+    }
+
+    /* Tooltip */
+    #hover-tooltip {
+      position: absolute;
+      padding: 4px 8px; border-radius: 4px;
+      background: rgba(15,23,42,0.92);
+      color: #e5e7eb; font-size: 11px;
+      border: 1px solid rgba(148,163,184,0.7);
+      pointer-events: none;
+      transform: translate(-50%, -120%);
+      white-space: nowrap; opacity: 0;
+      transition: opacity .1s ease-out;
     }
   </style>
 </head>
 <body>
-  <div id="universe-container">
+<div id="universe-container">
+
+  <!-- ── Left panel: HUD + ads stacked, no overlap ── -->
+  <div id="left-panel">
 
     <div class="hud">
-      <div class="hud-title">HattyHats – Digital Universe v0.4</div>
+      <div class="hud-title">HattyHats – Digital Universe v0.5</div>
       <div class="hud-body">
-        Click inside, then use:
-        <br />
-        <strong>W / S</strong> – forward / back
-        <br />
-        <strong>A / D</strong> – left / right
-        <br />
-        Drag mouse – look around
-        <br /><br />
-        <strong>1–4</strong> – jump to a world:
-        <br />
-        1: Learn With Hatty
-        <br />
-        2: Hatty Tools
-        <br />
-        3: Learn Cardano
-        <br />
-        4: Privacy Gadgets
-        <br /><br />
-        Hover a planet to see its name, click to open its world.
+        <span class="hud-keyboard">
+          Click inside, then use:<br />
+          <strong>W / S</strong> – forward / back<br />
+          <strong>A / D</strong> – left / right<br />
+          Drag mouse – look around<br /><br />
+          <strong>1–4</strong> – jump to a world:<br />
+          1: Learn With Hatty<br />
+          2: Hatty Tools<br />
+          3: Learn Cardano<br />
+          4: Privacy Gadgets<br /><br />
+          Hover a planet to see its name,<br />click to open its world.
+        </span>
+        <span class="hud-touch">
+          <strong>1 finger</strong> drag – look around<br />
+          <strong>2 fingers</strong> drag – fly<br />
+          <strong>Tap</strong> a planet to open it<br /><br />
+          Use ↑↓←→ buttons to fly.
+        </span>
       </div>
     </div>
 
-    <!-- ── Bulb.app House Ad ── -->
-    <a
-      class="house-ad"
-      href="https://www.bulbapp.io?referral_code=pgx084"
-      target="_blank"
-      rel="noopener noreferrer"
-      title="Hatty's Pick – Bulb.app"
-    >
+    <!-- ── Bulb ad ── -->
+    <a class="house-ad house-ad-bulb"
+       href="https://www.bulbapp.io?referral_code=pgx084"
+       target="_blank" rel="noopener noreferrer" title="Hatty's Pick – Bulb.app">
       <img src="img/bulb-ad.gif" alt="Hatty's Pick – Try Bulb.app" />
     </a>
     <span class="house-ad-label">Hatty's Pick</span>
 
-    <!-- Main site button -->
-    <button
-      class="main-site-button"
-      onclick="window.open('https://earnwithhatty.com/', '_blank')"
-    >
-      Main Site
-    </button>
+    <!-- ── Slice ad ── -->
+    <a class="house-ad house-ad-slice"
+       href="https://addslice.com/?crew=VFFbJ"
+       target="_blank" rel="noopener noreferrer" title="Hatty's Pick – Slice App">
+      <img src="img/slice-app.gif" alt="Hatty's Pick – Try Slice App" />
+    </a>
+    <span class="house-ad-label">Hatty's Pick</span>
 
-    <!-- Tooltip that follows the mouse on hover -->
-    <div id="hover-tooltip"
-         style="
-           position: absolute;
-           padding: 4px 8px;
-           border-radius: 4px;
-           background: rgba(15, 23, 42, 0.92);
-           color: #e5e7eb;
-           font-size: 11px;
-           border: 1px solid rgba(148, 163, 184, 0.7);
-           pointer-events: none;
-           transform: translate(-50%, -120%);
-           white-space: nowrap;
-           opacity: 0;
-           transition: opacity 0.1s ease-out;
-         ">
+    <!-- ── Lofty ad ── -->
+    <a class="house-ad house-ad-lofty"
+       href="https://www.lofty.ai/refer?utm_source=growsurf&utm_medium=referrals&utm_campaign=referral-program&grsf=0143ph"
+       target="_blank" rel="noopener noreferrer" title="Hatty's Pick – Lofty">
+      <img src="img/lofty-banner.gif" alt="Hatty's Pick – Try Lofty" />
+    </a>
+    <span class="house-ad-label">Hatty's Pick</span>
+
+  </div><!-- /left-panel -->
+
+  <!-- Main Site button -->
+  <button class="main-site-button"
+          onclick="window.open('https://earnwithhatty.com/','_blank')">
+    Main Site
+  </button>
+
+  <!-- Tooltip -->
+  <div id="hover-tooltip"></div>
+
+  <!-- Mobile d-pad -->
+  <div id="mobile-controls">
+    <div class="mob-row"><div class="mob-btn" id="btn-up">↑</div></div>
+    <div class="mob-row">
+      <div class="mob-btn" id="btn-left">←</div>
+      <div class="mob-btn" id="btn-down">↓</div>
+      <div class="mob-btn" id="btn-right">→</div>
     </div>
-
   </div>
 
-  <!-- Three.js from CDN (module build) -->
-  <script type="module">
-    import * as THREE from "https://unpkg.com/three@0.160.0/build/three.module.js";
+</div><!-- /universe-container -->
 
-    const container = document.getElementById("universe-container");
-    const tooltip   = document.getElementById("hover-tooltip");
+<script type="module">
+  import * as THREE from "https://unpkg.com/three@0.160.0/build/three.module.js";
 
-    const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x02030a);
+  const container = document.getElementById("universe-container");
+  const tooltip   = document.getElementById("hover-tooltip");
 
-    // Camera
-    const camera = new THREE.PerspectiveCamera(
-      75,
-      window.innerWidth / window.innerHeight,
-      0.1,
-      2000
-    );
-    camera.position.set(0, 0, 50);
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x02030a);
 
-    // Renderer
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(window.devicePixelRatio);
-    container.appendChild(renderer.domElement);
+  const camera = new THREE.PerspectiveCamera(75, innerWidth/innerHeight, 0.1, 2000);
+  camera.position.set(0, 0, 50);
 
-    // ── Lighting (boosted for bright, welcoming planets) ──
-    const ambientLight = new THREE.AmbientLight(0xffffff, 1.0);   // was 0.35
-    scene.add(ambientLight);
+  const renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setSize(innerWidth, innerHeight);
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  container.appendChild(renderer.domElement);
 
-    const mainLight = new THREE.PointLight(0xffffff, 2.5, 0, 1.5); // was 1.4
-    mainLight.position.set(0, 0, 0);
-    scene.add(mainLight);
+  // Lighting
+  scene.add(new THREE.AmbientLight(0xffffff, 1.0));
+  const mainLight = new THREE.PointLight(0xffffff, 2.5, 0, 1.5);
+  scene.add(mainLight);
+  const fillLight = new THREE.DirectionalLight(0xffffff, 1.2);
+  fillLight.position.set(0, 0, 200);
+  scene.add(fillLight);
 
-    // Fill light from camera direction so front faces stay fully lit
-    const fillLight = new THREE.DirectionalLight(0xffffff, 1.2);
-    fillLight.position.set(0, 0, 200);
-    scene.add(fillLight);
+  // Starfield
+  (function() {
+    const geo = new THREE.BufferGeometry();
+    const pos = new Float32Array(2000 * 3);
+    for (let i = 0; i < 6000; i++) pos[i] = (Math.random()-.5)*2000;
+    geo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+    scene.add(new THREE.Points(geo,
+      new THREE.PointsMaterial({ color:0xffffff, size:1.1, sizeAttenuation:true })
+    ));
+  })();
 
-    // Starfield
-    function createStarfield() {
-      const starCount = 2000;
-      const geometry  = new THREE.BufferGeometry();
-      const positions  = new Float32Array(starCount * 3);
-      for (let i = 0; i < starCount; i++) {
-        positions[i * 3 + 0] = (Math.random() - 0.5) * 2000;
-        positions[i * 3 + 1] = (Math.random() - 0.5) * 2000;
-        positions[i * 3 + 2] = (Math.random() - 0.5) * 2000;
+  const tl = new THREE.TextureLoader();
+
+  // Glow sprite
+  function addGlow(mesh, radius, cssColor) {
+    const c = document.createElement("canvas"); c.width = c.height = 256;
+    const ctx = c.getContext("2d"), h = 128;
+    const g = ctx.createRadialGradient(h,h,0,h,h,h);
+    g.addColorStop(0,    cssColor.replace("1)","0.6)"));
+    g.addColorStop(0.35, cssColor.replace("1)","0.22)"));
+    g.addColorStop(1,    cssColor.replace("1)","0)"));
+    ctx.fillStyle = g; ctx.fillRect(0,0,256,256);
+    const mat = new THREE.SpriteMaterial({
+      map: new THREE.CanvasTexture(c),
+      transparent: true, blending: THREE.AdditiveBlending, depthWrite: false
+    });
+    const sp = new THREE.Sprite(mat);
+    const s = radius * 3.2; sp.scale.set(s,s,1);
+    mesh.add(sp);
+  }
+
+  function makePlanet(radius, emissiveHex, pos, label, url, texUrl, glow) {
+    const mat = new THREE.MeshStandardMaterial({
+      color: 0xffffff, roughness:.3, metalness:.05,
+      emissive: new THREE.Color(emissiveHex), emissiveIntensity:.2
+    });
+    if (texUrl) tl.load(texUrl, tex => {
+      tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+      mat.map = mat.emissiveMap = tex;
+      mat.emissiveIntensity = .25; mat.needsUpdate = true;
+    });
+    const mesh = new THREE.Mesh(new THREE.SphereGeometry(radius,48,48), mat);
+    mesh.position.copy(pos);
+    mesh.userData = { label, url, radius };
+    scene.add(mesh);
+    addGlow(mesh, radius, glow || "rgba(160,200,255,1)");
+    return mesh;
+  }
+
+  const V = (x,y,z) => new THREE.Vector3(x,y,z);
+  const planets = [
+    makePlanet(8, 0x99ccff, V(40,0,-30),     "Learn With Hatty",      "https://earnwithhatty.com/",                     "https://i.ibb.co/LhB2ncPR/Learn-with-hatty-2-1.png",                         "rgba(100,180,255,1)"),
+    makePlanet(5, 0xffcc55, V(-60,10,-80),   "Hatty Tools",           "https://earn-with-hatty-tools.netlify.app/",     "https://i.ibb.co/9kWjbb8f/grok-image-f2f24317-2ad0-42f9-8a67-53cfeaec08ca.jpg","rgba(255,200,80,1)"),
+    makePlanet(10,0x4488ff, V(0,-30,-120),   "Learn Cardano",         "https://learn-cardano.netlify.app/",             "https://i.ibb.co/LzgZj25F/cardano-ada-logo.png",                              "rgba(60,140,255,1)"),
+    makePlanet(3, 0x55ffcc, V(70,40,-150),   "Privacy Gadgets",       "https://privacy-gadgets-hub.netlify.app/",       "https://i.ibb.co/XZRJ7FJ6/45bb8258-7d85-4d3a-b149-abdcc157035a.jpg",         "rgba(80,255,200,1)"),
+    makePlanet(9, 0x3355ff, V(-90,-40,-180), "Cardano Planet",        "https://cardano.org/",                           "https://i.ibb.co/sv8X6ksV/Screenshot-2026-03-04-112403.png",                  "rgba(80,110,255,1)"),
+    makePlanet(7, 0xaa55ff, V(110,20,-210),  "Voi Planet",            "https://voi.network/",                           "https://i.ibb.co/vCQSwR8R/Screenshot-2026-03-04-112456.png",                  "rgba(180,100,255,1)"),
+    makePlanet(6, 0xff9955, V(-30,60,-170),  "Hatty's News",          "https://hattyhats.github.io/hattys-news/",       "img/hattys-news.jpeg",                                                        "rgba(255,150,80,1)"),
+    makePlanet(7, 0xff55aa, V(85,-60,-100),  "Hatty's Media",         "https://hattys-media.netlify.app/",              "img/hattys-media.png",                                                        "rgba(255,80,180,1)"),
+    makePlanet(6, 0x44ffcc, V(-50,80,-240),  "OpenFocus",             "https://hattyhats.github.io/Open-Focus/",        "img/openfucus.png",                                                           "rgba(60,255,200,1)"),
+    makePlanet(5, 0xff4488, V(130,-30,-260), "Psycho Satoshi – Audius","https://audius.co/hatty",                       "img/audius.webp",                                                             "rgba(255,60,140,1)"),
+    makePlanet(4, 0xffdd44, V(-120,30,-300), "PublishOX",             "https://www.publish0x.com/@HattyHats",           "img/publishox.png",                                                           "rgba(255,220,60,1)"),
+  ];
+
+  // ═══════════════════════════════════════
+  //  CONTROLS
+  // ═══════════════════════════════════════
+  const keys = { KeyW:false,KeyA:false,KeyS:false,KeyD:false,
+                 Digit1:false,Digit2:false,Digit3:false,Digit4:false };
+
+  window.addEventListener("keydown", e => { if (e.code in keys) keys[e.code]=true; });
+  window.addEventListener("keyup",   e => { if (e.code in keys) keys[e.code]=false; });
+
+  // D-pad buttons
+  function bindBtn(id, key) {
+    const el = document.getElementById(id); if (!el) return;
+    const on  = () => { keys[key]=true;  el.classList.add("pressed"); };
+    const off = () => { keys[key]=false; el.classList.remove("pressed"); };
+    el.addEventListener("touchstart",  e=>{e.preventDefault();on(); },{passive:false});
+    el.addEventListener("touchend",    e=>{e.preventDefault();off();},{passive:false});
+    el.addEventListener("touchcancel", e=>{e.preventDefault();off();},{passive:false});
+    el.addEventListener("mousedown",  on);
+    el.addEventListener("mouseup",    off);
+    el.addEventListener("mouseleave", off);
+  }
+  bindBtn("btn-up","KeyW"); bindBtn("btn-down","KeyS");
+  bindBtn("btn-left","KeyA"); bindBtn("btn-right","KeyD");
+
+  let yaw=0, pitch=0;
+  const moveSpeed=40, lookSpeed=0.0025;
+
+  // Mouse look
+  let mDown=false, pmx=0, pmy=0;
+  renderer.domElement.addEventListener("mousedown", e=>{mDown=true;pmx=e.clientX;pmy=e.clientY;});
+  window.addEventListener("mouseup", ()=>mDown=false);
+  window.addEventListener("mousemove", e=>{
+    if (!mDown) return;
+    yaw  -= (e.clientX-pmx)*lookSpeed;
+    pitch -= (e.clientY-pmy)*lookSpeed;
+    pitch  = Math.max(-(Math.PI/2-.1), Math.min(Math.PI/2-.1, pitch));
+    pmx=e.clientX; pmy=e.clientY;
+  });
+
+  // Touch look + two-finger move
+  const touches = {};
+  renderer.domElement.addEventListener("touchstart", e=>{
+    e.preventDefault();
+    [...e.changedTouches].forEach(t => touches[t.identifier]={x:t.clientX,y:t.clientY});
+  },{passive:false});
+
+  renderer.domElement.addEventListener("touchmove", e=>{
+    e.preventDefault();
+    const ids = Object.keys(touches);
+    if (ids.length === 1) {
+      const id=ids[0], prev=touches[id];
+      const cur=[...e.changedTouches].find(t=>t.identifier==id);
+      if (cur) {
+        yaw  -= (cur.clientX-prev.x)*lookSpeed;
+        pitch -= (cur.clientY-prev.y)*lookSpeed;
+        pitch  = Math.max(-(Math.PI/2-.1), Math.min(Math.PI/2-.1, pitch));
+        touches[id]={x:cur.clientX,y:cur.clientY};
       }
-      geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
-      scene.add(new THREE.Points(geometry, new THREE.PointsMaterial({ color: 0xffffff, size: 1.1, sizeAttenuation: true })));
-    }
-    createStarfield();
-
-    const textureLoader = new THREE.TextureLoader();
-
-    // ── Soft additive glow sprite behind every planet ──
-    function makeGlowCanvas(size, cssColor) {
-      const c    = document.createElement("canvas");
-      c.width    = size;
-      c.height   = size;
-      const ctx  = c.getContext("2d");
-      const half = size / 2;
-      const grad = ctx.createRadialGradient(half, half, 0, half, half, half);
-      grad.addColorStop(0,    cssColor.replace("1)", "0.6)"));
-      grad.addColorStop(0.35, cssColor.replace("1)", "0.22)"));
-      grad.addColorStop(1,    cssColor.replace("1)", "0)"));
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, size, size);
-      return c;
-    }
-
-    function addGlow(planet, radius, glowColor) {
-      const tex = new THREE.CanvasTexture(makeGlowCanvas(256, glowColor));
-      const mat = new THREE.SpriteMaterial({
-        map: tex,
-        transparent: true,
-        blending: THREE.AdditiveBlending,
-        depthWrite: false,
+    } else if (ids.length >= 2) {
+      let dx=0,dy=0,n=0;
+      [...e.changedTouches].forEach(t=>{
+        const p=touches[t.identifier];
+        if(p){dx+=t.clientX-p.x;dy+=t.clientY-p.y;n++;
+              touches[t.identifier]={x:t.clientX,y:t.clientY};}
       });
-      const sprite = new THREE.Sprite(mat);
-      const s = radius * 3.2;
-      sprite.scale.set(s, s, 1);
-      planet.add(sprite);
-    }
-
-    // ── Planet factory ──
-    function createPlanet(radius, emissiveHex, position, label, url, textureUrl, glowColor) {
-      const geometry = new THREE.SphereGeometry(radius, 48, 48);
-      const material = new THREE.MeshStandardMaterial({
-        color: 0xffffff,                          // white base – texture colors show true
-        roughness: 0.3,
-        metalness: 0.05,
-        emissive: new THREE.Color(emissiveHex),
-        emissiveIntensity: 0.2,
-      });
-
-      if (textureUrl) {
-        textureLoader.load(textureUrl, (tex) => {
-          tex.wrapS = THREE.RepeatWrapping;
-          tex.wrapT = THREE.RepeatWrapping;
-          material.map          = tex;
-          material.emissiveMap  = tex;   // same texture drives the self-glow
-          material.emissiveIntensity = 0.25;
-          material.needsUpdate  = true;
-        });
-      }
-
-      const mesh = new THREE.Mesh(geometry, material);
-      mesh.position.copy(position);
-      mesh.userData.label  = label;
-      mesh.userData.radius = radius;
-      mesh.userData.url    = url;
-      scene.add(mesh);
-
-      addGlow(mesh, radius, glowColor || "rgba(160,200,255,1)");
-      return mesh;
-    }
-
-    // ── Planet definitions ──
-    const planets = [];
-
-    planets.push(createPlanet(
-      8, 0x99ccff, new THREE.Vector3(40, 0, -30),
-      "Learn With Hatty", "https://earnwithhatty.com/",
-      "https://i.ibb.co/LhB2ncPR/Learn-with-hatty-2-1.png",
-      "rgba(100,180,255,1)"
-    ));
-    planets.push(createPlanet(
-      5, 0xffcc55, new THREE.Vector3(-60, 10, -80),
-      "Hatty Tools", "https://earn-with-hatty-tools.netlify.app/",
-      "https://i.ibb.co/9kWjbb8f/grok-image-f2f24317-2ad0-42f9-8a67-53cfeaec08ca.jpg",
-      "rgba(255,200,80,1)"
-    ));
-    planets.push(createPlanet(
-      10, 0x4488ff, new THREE.Vector3(0, -30, -120),
-      "Learn Cardano", "https://learn-cardano.netlify.app/",
-      "https://i.ibb.co/LzgZj25F/cardano-ada-logo.png",
-      "rgba(60,140,255,1)"
-    ));
-    planets.push(createPlanet(
-      3, 0x55ffcc, new THREE.Vector3(70, 40, -150),
-      "Privacy Gadgets", "https://privacy-gadgets-hub.netlify.app/",
-      "https://i.ibb.co/XZRJ7FJ6/45bb8258-7d85-4d3a-b149-abdcc157035a.jpg",
-      "rgba(80,255,200,1)"
-    ));
-    planets.push(createPlanet(
-      9, 0x3355ff, new THREE.Vector3(-90, -40, -180),
-      "Cardano Planet", "https://cardano.org/",
-      "https://i.ibb.co/sv8X6ksV/Screenshot-2026-03-04-112403.png",
-      "rgba(80,110,255,1)"
-    ));
-    planets.push(createPlanet(
-      7, 0xaa55ff, new THREE.Vector3(110, 20, -210),
-      "Voi Planet", "https://voi.network/",
-      "https://i.ibb.co/vCQSwR8R/Screenshot-2026-03-04-112456.png",
-      "rgba(180,100,255,1)"
-    ));
-    planets.push(createPlanet(
-      6, 0xff9955, new THREE.Vector3(-30, 60, -170),
-      "Hatty's News", "https://hattyhats.github.io/hattys-news/",
-      "img/hattys-news.jpeg",
-      "rgba(255,150,80,1)"
-    ));
-    planets.push(createPlanet(
-      7, 0xff55aa, new THREE.Vector3(85, -60, -100),
-      "Hatty's Media", "https://hattys-media.netlify.app/",
-      "img/hattys-media.png",
-      "rgba(255,80,180,1)"
-    ));
-
-    // ── NEW planets ──
-    planets.push(createPlanet(
-      6, 0x44ffcc, new THREE.Vector3(-50, 80, -240),
-      "OpenFocus", "https://hattyhats.github.io/Open-Focus/",
-      "img/openfucus.png",
-      "rgba(60,255,200,1)"
-    ));
-    planets.push(createPlanet(
-      5, 0xff4488, new THREE.Vector3(130, -30, -260),
-      "Psycho Satoshi – Audius", "https://audius.co/hatty",
-      "img/audius.webp",
-      "rgba(255,60,140,1)"
-    ));
-    planets.push(createPlanet(
-      4, 0xffdd44, new THREE.Vector3(-120, 30, -300),
-      "PublishOX", "https://www.publish0x.com/@HattyHats",
-      "img/publishox.png",
-      "rgba(255,220,60,1)"
-    ));
-
-
-    // ── Controls ──
-    const keys = { KeyW:false, KeyA:false, KeyS:false, KeyD:false,
-                   Digit1:false, Digit2:false, Digit3:false, Digit4:false };
-
-    let isMouseDown = false, previousMouseX = 0, previousMouseY = 0;
-    let yaw = 0, pitch = 0;
-    const moveSpeed = 40, lookSpeed = 0.0025;
-
-    window.addEventListener("keydown", e => { if (e.code in keys) keys[e.code] = true; });
-    window.addEventListener("keyup",   e => { if (e.code in keys) keys[e.code] = false; });
-
-    renderer.domElement.addEventListener("mousedown", e => {
-      isMouseDown = true; previousMouseX = e.clientX; previousMouseY = e.clientY;
-    });
-    window.addEventListener("mouseup", () => { isMouseDown = false; });
-    window.addEventListener("mousemove", e => {
-      if (!isMouseDown) return;
-      yaw   -= (e.clientX - previousMouseX) * lookSpeed;
-      pitch -= (e.clientY - previousMouseY) * lookSpeed;
-      pitch  = Math.max(-(Math.PI/2 - 0.1), Math.min(Math.PI/2 - 0.1, pitch));
-      previousMouseX = e.clientX; previousMouseY = e.clientY;
-    });
-
-    function updateCameraRotation() {
-      camera.quaternion.setFromEuler(new THREE.Euler(pitch, yaw, 0, "YXZ"));
-    }
-
-    function updateCameraPosition(delta) {
-      const dir = new THREE.Vector3();
-      if (keys.KeyW) dir.z -= 1;
-      if (keys.KeyS) dir.z += 1;
-      if (keys.KeyA) dir.x -= 1;
-      if (keys.KeyD) dir.x += 1;
-      if (dir.lengthSq() > 0) {
-        dir.normalize().applyQuaternion(camera.quaternion).multiplyScalar(moveSpeed * delta);
-        camera.position.add(dir);
+      if(n){
+        dx/=n;dy/=n;
+        const s=new THREE.Vector3(-dx*.15,0,0).applyQuaternion(camera.quaternion);
+        const f=new THREE.Vector3(0,0,dy*.15).applyQuaternion(camera.quaternion);
+        camera.position.add(s).add(f);
       }
     }
+  },{passive:false});
 
-    function moveCameraNearPlanet(planet) {
-      const dir = new THREE.Vector3().subVectors(camera.position, planet.position).normalize();
-      if (dir.lengthSq() === 0) dir.set(0, 0, 1);
-      camera.position.copy(planet.position).add(dir.multiplyScalar(planet.userData.radius * 4));
-      camera.lookAt(planet.position);
-      const v = new THREE.Vector3().subVectors(planet.position, camera.position).normalize();
-      yaw   = Math.atan2(v.x, -v.z);
-      pitch = Math.asin(Math.max(-1, Math.min(1, v.y)));
-    }
+  renderer.domElement.addEventListener("touchend",    e=>{[...e.changedTouches].forEach(t=>delete touches[t.identifier]);},{passive:false});
+  renderer.domElement.addEventListener("touchcancel", e=>{[...e.changedTouches].forEach(t=>delete touches[t.identifier]);},{passive:false});
 
-    function handlePlanetShortcuts() {
-      if (keys.Digit1) moveCameraNearPlanet(planets[0]);
-      if (keys.Digit2) moveCameraNearPlanet(planets[1]);
-      if (keys.Digit3) moveCameraNearPlanet(planets[2]);
-      if (keys.Digit4) moveCameraNearPlanet(planets[3]);
-    }
-
-    // ── Hover / click ──
-    const raycaster = new THREE.Raycaster();
-    const mouse = new THREE.Vector2();
-    let hoveredPlanet = null, lastMouseEvent = null;
-
-    function updateMouse(e) {
-      const r = renderer.domElement.getBoundingClientRect();
-      mouse.set(
-        ((e.clientX - r.left) / r.width)  * 2 - 1,
-        ((e.clientY - r.top)  / r.height) * -2 + 1
-      );
-      lastMouseEvent = e;
-    }
-
-    function handleHover() {
-      raycaster.setFromCamera(mouse, camera);
-      const hits = raycaster.intersectObjects(planets, false);
-
-      if (hits.length > 0) {
-        const p = hits[0].object;
-        if (hoveredPlanet !== p) {
-          if (hoveredPlanet) hoveredPlanet.material.emissiveIntensity = hoveredPlanet.userData.baseEmissive;
-          hoveredPlanet = p;
-          if (p.userData.baseEmissive === undefined) p.userData.baseEmissive = p.material.emissiveIntensity;
-          p.material.emissiveIntensity = p.userData.baseEmissive * 3.5;
-          container.style.cursor = "pointer";
-          tooltip.textContent   = p.userData.label || "";
-          tooltip.style.opacity = "1";
-        }
-        if (lastMouseEvent) { tooltip.style.left = `${lastMouseEvent.clientX}px`; tooltip.style.top = `${lastMouseEvent.clientY}px`; }
-      } else {
-        if (hoveredPlanet) { hoveredPlanet.material.emissiveIntensity = hoveredPlanet.userData.baseEmissive; hoveredPlanet = null; }
-        container.style.cursor = "default";
-        tooltip.style.opacity  = "0";
+  // Tap to open
+  let tapX=0,tapY=0;
+  renderer.domElement.addEventListener("touchstart", e=>{
+    if(e.touches.length===1){tapX=e.touches[0].clientX;tapY=e.touches[0].clientY;}
+  },{passive:true});
+  renderer.domElement.addEventListener("touchend", e=>{
+    if(e.changedTouches.length===1){
+      const t=e.changedTouches[0];
+      if(Math.hypot(t.clientX-tapX,t.clientY-tapY)<12){
+        const r=renderer.domElement.getBoundingClientRect();
+        mouse.set(((t.clientX-r.left)/r.width)*2-1,-((t.clientY-r.top)/r.height)*2+1);
+        raycaster.setFromCamera(mouse,camera);
+        const h=raycaster.intersectObjects(planets,false);
+        if(h.length&&h[0].object.userData.url) window.open(h[0].object.userData.url,"_blank");
       }
     }
+  },{passive:true});
 
-    renderer.domElement.addEventListener("mousemove", e => { updateMouse(e); handleHover(); });
-    renderer.domElement.addEventListener("click", e => {
-      updateMouse(e);
-      raycaster.setFromCamera(mouse, camera);
-      const hits = raycaster.intersectObjects(planets, false);
-      if (hits.length > 0 && hits[0].object.userData.url) window.open(hits[0].object.userData.url, "_blank");
-    });
+  // Camera helpers
+  function updateRot() { camera.quaternion.setFromEuler(new THREE.Euler(pitch,yaw,0,"YXZ")); }
+  function updatePos(dt) {
+    const d=new THREE.Vector3();
+    if(keys.KeyW)d.z-=1; if(keys.KeyS)d.z+=1;
+    if(keys.KeyA)d.x-=1; if(keys.KeyD)d.x+=1;
+    if(d.lengthSq()>0) camera.position.add(d.normalize().applyQuaternion(camera.quaternion).multiplyScalar(moveSpeed*dt));
+  }
+  function snapTo(p) {
+    const d=new THREE.Vector3().subVectors(camera.position,p.position).normalize();
+    if(!d.lengthSq()) d.set(0,0,1);
+    camera.position.copy(p.position).add(d.multiplyScalar(p.userData.radius*4));
+    camera.lookAt(p.position);
+    const v=new THREE.Vector3().subVectors(p.position,camera.position).normalize();
+    yaw=Math.atan2(v.x,-v.z);
+    pitch=Math.asin(Math.max(-1,Math.min(1,v.y)));
+  }
 
-    window.addEventListener("resize", () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-    });
+  // Hover / click
+  const raycaster=new THREE.Raycaster(), mouse=new THREE.Vector2();
+  let hovered=null, lastEv=null;
 
-    // ── Animate ──
-    const clock = new THREE.Clock();
-    function animate() {
-      const delta = clock.getDelta();
-      planets.forEach((p, i) => { p.rotation.y += 0.12 * delta * (i + 1); });
-      handlePlanetShortcuts();
-      updateCameraRotation();
-      updateCameraPosition(delta);
-      renderer.render(scene, camera);
-      requestAnimationFrame(animate);
+  function updateMouse(e){
+    const r=renderer.domElement.getBoundingClientRect();
+    mouse.set(((e.clientX-r.left)/r.width)*2-1,-((e.clientY-r.top)/r.height)*2+1);
+    lastEv=e;
+  }
+  function doHover(){
+    raycaster.setFromCamera(mouse,camera);
+    const h=raycaster.intersectObjects(planets,false);
+    if(h.length){
+      const p=h[0].object;
+      if(hovered!==p){
+        if(hovered) hovered.material.emissiveIntensity=hovered.userData.baseEI;
+        hovered=p;
+        if(p.userData.baseEI===undefined) p.userData.baseEI=p.material.emissiveIntensity;
+        p.material.emissiveIntensity=p.userData.baseEI*3.5;
+        container.style.cursor="pointer";
+        tooltip.textContent=p.userData.label||"";
+        tooltip.style.opacity="1";
+      }
+      if(lastEv){tooltip.style.left=lastEv.clientX+"px";tooltip.style.top=lastEv.clientY+"px";}
+    } else {
+      if(hovered){hovered.material.emissiveIntensity=hovered.userData.baseEI;hovered=null;}
+      container.style.cursor="default"; tooltip.style.opacity="0";
     }
-    animate();
-  </script>
+  }
+  renderer.domElement.addEventListener("mousemove", e=>{updateMouse(e);doHover();});
+  renderer.domElement.addEventListener("click", e=>{
+    updateMouse(e); raycaster.setFromCamera(mouse,camera);
+    const h=raycaster.intersectObjects(planets,false);
+    if(h.length&&h[0].object.userData.url) window.open(h[0].object.userData.url,"_blank");
+  });
+
+  window.addEventListener("resize",()=>{
+    camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix();
+    renderer.setSize(innerWidth,innerHeight);
+  });
+
+  const clock=new THREE.Clock();
+  function animate(){
+    const dt=clock.getDelta();
+    planets.forEach((p,i)=>p.rotation.y+=.12*dt*(i+1));
+    if(keys.Digit1)snapTo(planets[0]);
+    if(keys.Digit2)snapTo(planets[1]);
+    if(keys.Digit3)snapTo(planets[2]);
+    if(keys.Digit4)snapTo(planets[3]);
+    updateRot(); updatePos(dt);
+    renderer.render(scene,camera);
+    requestAnimationFrame(animate);
+  }
+  animate();
+</script>
 </body>
 </html>

@@ -20,7 +20,6 @@
     #universe-container { position: relative; width: 100%; height: 100%; }
     canvas { display: block; }
 
-    /* ── Left sidebar: HUD + ads stacked in a flex column ── */
     #left-panel {
       position: absolute;
       top: 12px; left: 12px;
@@ -32,7 +31,6 @@
       width: 200px;
     }
 
-    /* ── HUD ── */
     .hud {
       padding: 8px 12px;
       background: rgba(0,0,0,0.55);
@@ -55,7 +53,6 @@
       .hud { font-size: 11px; }
     }
 
-    /* ── Main Site button ── */
     .main-site-button {
       position: absolute; top: 12px; right: 12px;
       padding: 6px 12px; border-radius: 999px;
@@ -77,7 +74,6 @@
       box-shadow: 0 0 10px rgba(59,130,246,0.6);
     }
 
-    /* ── Mobile d-pad ── */
     #mobile-controls {
       display: none;
       position: absolute;
@@ -104,7 +100,6 @@
       border-color: rgba(129,140,248,1);
     }
 
-    /* ── Ad panel – shared ── */
     .house-ad {
       width: 200px; height: 140px;
       border-radius: 10px; overflow: hidden;
@@ -115,19 +110,15 @@
     }
     .house-ad img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
-    /* Bulb – gold */
     .house-ad-bulb  { border: 1px solid rgba(255,215,0,.45); box-shadow: 0 0 12px rgba(255,215,0,.25), 0 0 30px rgba(255,215,0,.10); }
     .house-ad-bulb:hover  { box-shadow: 0 0 22px rgba(255,215,0,.6), 0 0 55px rgba(255,215,0,.25); transform: translateY(-2px) scale(1.03); }
 
-    /* Slice – orange */
     .house-ad-slice { border: 1px solid rgba(255,140,0,.45); box-shadow: 0 0 12px rgba(255,140,0,.25), 0 0 30px rgba(255,140,0,.10); }
     .house-ad-slice:hover { box-shadow: 0 0 22px rgba(255,140,0,.6), 0 0 55px rgba(255,140,0,.25); transform: translateY(-2px) scale(1.03); }
 
-    /* Lofty – teal */
     .house-ad-lofty { height: 280px; border: 1px solid rgba(0,220,160,.45); box-shadow: 0 0 12px rgba(0,220,160,.25), 0 0 30px rgba(0,220,160,.10); }
     .house-ad-lofty:hover { box-shadow: 0 0 22px rgba(0,220,160,.6), 0 0 55px rgba(0,220,160,.25); transform: translateY(-2px) scale(1.03); }
 
-    /* "Hatty's Pick" label sits just under each ad */
     .house-ad-label {
       font-size: 9px; color: rgba(255,215,0,.65);
       letter-spacing: .06em; text-transform: uppercase;
@@ -135,18 +126,15 @@
       margin-top: -6px;
     }
 
-    /* Compact on shorter screens */
     @media (max-height: 820px) {
       .house-ad { width: 160px; height: 110px; }
       #left-panel { gap: 6px; }
     }
 
-    /* Hide ads on very short screens (landscape phone) */
     @media (max-height: 500px) {
       .house-ad, .house-ad-label { display: none; }
     }
 
-    /* Tooltip */
     #hover-tooltip {
       position: absolute;
       padding: 4px 8px; border-radius: 4px;
@@ -163,11 +151,9 @@
 <body>
 <div id="universe-container">
 
-  <!-- ── Left panel: HUD + ads stacked, no overlap ── -->
   <div id="left-panel">
-
     <div class="hud">
-      <div class="hud-title">HattyHats – Digital Universe v0.6</div>
+      <div class="hud-title">HattyHats – Digital Universe v0.7</div>
       <div class="hud-body">
         <span class="hud-keyboard">
           Click inside, then use:<br />
@@ -190,7 +176,6 @@
       </div>
     </div>
 
-    <!-- ── Bulb ad ── -->
     <a class="house-ad house-ad-bulb"
        href="https://www.bulbapp.io?referral_code=pgx084"
        target="_blank" rel="noopener noreferrer" title="Hatty's Pick – Bulb.app">
@@ -198,7 +183,6 @@
     </a>
     <span class="house-ad-label">Hatty's Pick</span>
 
-    <!-- ── Slice ad ── -->
     <a class="house-ad house-ad-slice"
        href="https://addslice.com/?crew=VFFbJ"
        target="_blank" rel="noopener noreferrer" title="Hatty's Pick – Slice App">
@@ -206,26 +190,21 @@
     </a>
     <span class="house-ad-label">Hatty's Pick</span>
 
-    <!-- ── Lofty ad ── -->
     <a class="house-ad house-ad-lofty"
        href="https://www.lofty.ai/refer?utm_source=growsurf&utm_medium=referrals&utm_campaign=referral-program&grsf=0143ph"
        target="_blank" rel="noopener noreferrer" title="Hatty's Pick – Lofty">
       <img src="img/lofty-banner.gif" alt="Hatty's Pick – Try Lofty" />
     </a>
     <span class="house-ad-label">Hatty's Pick</span>
+  </div>
 
-  </div><!-- /left-panel -->
-
-  <!-- Main Site button -->
   <button class="main-site-button"
           onclick="window.open('https://earnwithhatty.com/','_blank')">
     Main Site
   </button>
 
-  <!-- Tooltip -->
   <div id="hover-tooltip"></div>
 
-  <!-- Mobile d-pad -->
   <div id="mobile-controls">
     <div class="mob-row"><div class="mob-btn" id="btn-up">↑</div></div>
     <div class="mob-row">
@@ -235,7 +214,7 @@
     </div>
   </div>
 
-</div><!-- /universe-container -->
+</div>
 
 <script type="module">
   import * as THREE from "https://unpkg.com/three@0.160.0/build/three.module.js";
@@ -254,7 +233,6 @@
   renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
   container.appendChild(renderer.domElement);
 
-  // Lighting
   scene.add(new THREE.AmbientLight(0xffffff, 1.0));
   const mainLight = new THREE.PointLight(0xffffff, 2.5, 0, 1.5);
   scene.add(mainLight);
@@ -262,7 +240,6 @@
   fillLight.position.set(0, 0, 200);
   scene.add(fillLight);
 
-  // Starfield
   (function() {
     const geo = new THREE.BufferGeometry();
     const pos = new Float32Array(2000 * 3);
@@ -275,7 +252,6 @@
 
   const tl = new THREE.TextureLoader();
 
-  // Glow sprite
   function addGlow(mesh, radius, cssColor) {
     const c = document.createElement("canvas"); c.width = c.height = 256;
     const ctx = c.getContext("2d"), h = 128;
@@ -312,40 +288,47 @@
   }
 
   const V = (x,y,z) => new THREE.Vector3(x,y,z);
+
   const planets = [
     // ── Original planets ──
-    makePlanet(8,  0x99ccff, V(40,0,-30),      "Learn With Hatty",        "https://earnwithhatty.com/",                                                                                "https://i.ibb.co/LhB2ncPR/Learn-with-hatty-2-1.png",                          "rgba(100,180,255,1)"),
-    makePlanet(5,  0xffcc55, V(-60,10,-80),    "Hatty Tools",             "https://earn-with-hatty-tools.netlify.app/",                                                               "https://i.ibb.co/9kWjbb8f/grok-image-f2f24317-2ad0-42f9-8a67-53cfeaec08ca.jpg","rgba(255,200,80,1)"),
-    // ── Learn Cardano: link updated to YouTube video ──
-    makePlanet(10, 0x4488ff, V(0,-30,-120),    "Learn Cardano",           "https://youtu.be/xWImSw79Y6I?si=JFPZG8z22KKAHE7f",                                                       "https://i.ibb.co/LzgZj25F/cardano-ada-logo.png",                               "rgba(60,140,255,1)"),
-    makePlanet(3,  0x55ffcc, V(70,40,-150),    "Privacy Gadgets",         "https://privacy-gadgets-hub.netlify.app/",                                                                "https://i.ibb.co/XZRJ7FJ6/45bb8258-7d85-4d3a-b149-abdcc157035a.jpg",          "rgba(80,255,200,1)"),
-    makePlanet(9,  0x3355ff, V(-90,-40,-180),  "Cardano Planet",          "https://cardano.org/",                                                                                    "https://i.ibb.co/sv8X6ksV/Screenshot-2026-03-04-112403.png",                   "rgba(80,110,255,1)"),
-    makePlanet(7,  0xaa55ff, V(110,20,-210),   "Voi Planet",              "https://voi.network/",                                                                                    "https://i.ibb.co/vCQSwR8R/Screenshot-2026-03-04-112456.png",                   "rgba(180,100,255,1)"),
-    makePlanet(6,  0xff9955, V(-30,60,-170),   "Hatty's News",            "https://hattyhats.github.io/hattys-news/",                                                                "img/hattys-news.jpeg",                                                         "rgba(255,150,80,1)"),
-    makePlanet(7,  0xff55aa, V(85,-60,-100),   "Hatty's Media",           "https://hattys-media.netlify.app/",                                                                       "img/hattys-media.png",                                                         "rgba(255,80,180,1)"),
-    makePlanet(6,  0x44ffcc, V(-50,80,-240),   "OpenFocus",               "https://hattyhats.github.io/Open-Focus/",                                                                 "img/openfucus.png",                                                            "rgba(60,255,200,1)"),
-    makePlanet(5,  0xff4488, V(130,-30,-260),  "Psycho Satoshi – Audius", "https://audius.co/hatty",                                                                                 "img/audius.webp",                                                              "rgba(255,60,140,1)"),
-    makePlanet(4,  0xffdd44, V(-120,30,-300),  "PublishOX",               "https://www.publish0x.com/@HattyHats",                                                                    "img/publishox.png",                                                            "rgba(255,220,60,1)"),
+    makePlanet(8,  0x99ccff, V(40,0,-30),      "Learn With Hatty",        "https://earnwithhatty.com/",                                                                                 "https://i.ibb.co/LhB2ncPR/Learn-with-hatty-2-1.png",                           "rgba(100,180,255,1)"),
+    makePlanet(5,  0xffcc55, V(-60,10,-80),    "Hatty Tools",             "https://earn-with-hatty-tools.netlify.app/",                                                                "https://i.ibb.co/9kWjbb8f/grok-image-f2f24317-2ad0-42f9-8a67-53cfeaec08ca.jpg","rgba(255,200,80,1)"),
+    makePlanet(10, 0x4488ff, V(0,-30,-120),    "Learn Cardano",           "https://youtu.be/xWImSw79Y6I?si=JFPZG8z22KKAHE7f",                                                        "https://i.ibb.co/LzgZj25F/cardano-ada-logo.png",                                "rgba(60,140,255,1)"),
+    makePlanet(3,  0x55ffcc, V(70,40,-150),    "Privacy Gadgets",         "https://privacy-gadgets-hub.netlify.app/",                                                                 "https://i.ibb.co/XZRJ7FJ6/45bb8258-7d85-4d3a-b149-abdcc157035a.jpg",           "rgba(80,255,200,1)"),
+    makePlanet(9,  0x3355ff, V(-90,-40,-180),  "Cardano Planet",          "https://cardano.org/",                                                                                     "https://i.ibb.co/sv8X6ksV/Screenshot-2026-03-04-112403.png",                    "rgba(80,110,255,1)"),
+    makePlanet(7,  0xaa55ff, V(110,20,-210),   "Voi Planet",              "https://voi.network/",                                                                                     "https://i.ibb.co/vCQSwR8R/Screenshot-2026-03-04-112456.png",                    "rgba(180,100,255,1)"),
+    makePlanet(6,  0xff9955, V(-30,60,-170),   "Hatty's News",            "https://hattyhats.github.io/hattys-news/",                                                                 "img/hattys-news.jpeg",                                                          "rgba(255,150,80,1)"),
+    makePlanet(7,  0xff55aa, V(85,-60,-100),   "Hatty's Media",           "https://hattys-media.netlify.app/",                                                                        "img/hattys-media.png",                                                          "rgba(255,80,180,1)"),
+    makePlanet(6,  0x44ffcc, V(-50,80,-240),   "OpenFocus",               "https://hattyhats.github.io/Open-Focus/",                                                                  "img/openfucus.png",                                                             "rgba(60,255,200,1)"),
+    makePlanet(5,  0xff4488, V(130,-30,-260),  "Psycho Satoshi – Audius", "https://audius.co/hatty",                                                                                  "img/audius.webp",                                                               "rgba(255,60,140,1)"),
+    makePlanet(4,  0xffdd44, V(-120,30,-300),  "PublishOX",               "https://www.publish0x.com/@HattyHats",                                                                     "img/publishox.png",                                                             "rgba(255,220,60,1)"),
+    makePlanet(6,  0xff8833, V(60,-80,-280),   "Slice App",               "https://addslice.com/?crew=VFFbJ",                                                                         "img/slice-app.gif",                                                             "rgba(255,130,50,1)"),
+    makePlanet(8,  0x00ddaa, V(-150,50,-320),  "Lofty",                   "https://www.lofty.ai/refer?utm_source=growsurf&utm_medium=referrals&utm_campaign=referral-program&grsf=0143ph", "img/lofty-banner.gif",                                                   "rgba(0,220,170,1)"),
+    makePlanet(5,  0x6688ff, V(160,60,-340),   "The Arena",               "https://arena.social/?ref=hatty_hats",                                                                     "img/the-arena.png",                                                             "rgba(100,140,255,1)"),
+    makePlanet(5,  0xee4422, V(-80,-90,-360),  "Chainers",                "https://chainers.io/?r=lzmpadgw",                                                                          "img/chainers.png",                                                              "rgba(240,70,40,1)"),
+    makePlanet(4,  0xffcc00, V(30,100,-380),   "Cointiply",               "https://cointiply.com/r/lNm1",                                                                             "img/cointiply.png",                                                             "rgba(255,210,0,1)"),
+    makePlanet(5,  0x22ccff, V(-170,-30,-400), "CryptoNaut",              "https://cryptonaut.id/?ref=HattyHats",                                                                     "img/cryptonaut.png",                                                            "rgba(30,200,255,1)"),
+    makePlanet(4,  0x88ff44, V(120,80,-420),   "Voi Fountain",            "https://fountain.voirewards.com/",                                                                         "img/voi-fountain.png",                                                          "rgba(140,255,70,1)"),
     // ── New planets ──
-    makePlanet(6,  0xff8833, V(60,-80,-280),   "Slice App",               "https://addslice.com/?crew=VFFbJ",                                                                        "img/slice-app.gif",                                                            "rgba(255,130,50,1)"),
-    makePlanet(8,  0x00ddaa, V(-150,50,-320),  "Lofty",                   "https://www.lofty.ai/refer?utm_source=growsurf&utm_medium=referrals&utm_campaign=referral-program&grsf=0143ph","img/lofty-banner.gif",                                                  "rgba(0,220,170,1)"),
-    makePlanet(5,  0x6688ff, V(160,60,-340),   "The Arena",               "https://arena.social/?ref=hatty_hats",                                                                    "img/the-arena.png",                                                            "rgba(100,140,255,1)"),
-    makePlanet(5,  0xee4422, V(-80,-90,-360),  "Chainers",                "https://chainers.io/?r=lzmpadgw",                                                                         "img/chainers.png",                                                             "rgba(240,70,40,1)"),
-    makePlanet(4,  0xffcc00, V(30,100,-380),   "Cointiply",               "https://cointiply.com/r/lNm1",                                                                            "img/cointiply.png",                                                            "rgba(255,210,0,1)"),
-    makePlanet(5,  0x22ccff, V(-170,-30,-400), "CryptoNaut",              "https://cryptonaut.id/?ref=HattyHats",                                                                    "img/cryptonaut.png",                                                           "rgba(30,200,255,1)"),
-    makePlanet(4,  0x88ff44, V(120,80,-420),   "Voi Fountain",            "https://fountain.voirewards.com/",                                                                        "img/voi-fountain.png",                                                         "rgba(140,255,70,1)"),
+    makePlanet(6,  0xffaa00, V(-40,-110,-440), "Rollercoin",              "https://rollercoin.com/?r=kj0blr6a",                                                                       "img/rollercoin.png",                                                            "rgba(255,170,0,1)"),
+    makePlanet(7,  0x00ccff, V(190,-50,-460),  "Immutable",               "https://play.immutable.com/referral/share/9XVsFq?utm_source=referral",                                     "img/immutable.png",                                                             "rgba(0,200,255,1)"),
+    makePlanet(4,  0x44ff88, V(-190,70,-480),  "FaucetCrypto",            "https://faucetcrypto.com/r/102755",                                                                        "img/faucet-crypto.png",                                                         "rgba(60,255,130,1)"),
+    makePlanet(4,  0xcc44ff, V(50,-130,-500),  "Vie Faucet",              "https://viefaucet.com?r=680856217d2144c71c23c02c",                                                         "img/vie-faucet.png",                                                            "rgba(200,60,255,1)"),
+    makePlanet(5,  0xff3366, V(-100,120,-520), "Suno",                    "https://suno.com/invite/@hattyhats",                                                                       "img/suno.png",                                                                  "rgba(255,50,100,1)"),
+    makePlanet(5,  0xdddddd, V(210,40,-540),   "X (Twitter)",             "https://x.com/hatty_hats",                                                                                "img/x-hatty.png",                                                               "rgba(220,220,220,1)"),
+    makePlanet(5,  0x8855ff, V(-220,-60,-560), "Focus",                   "https://focus.xyz/Hatty_Hats",                                                                             "img/focus.png",                                                                 "rgba(140,80,255,1)"),
+    makePlanet(6,  0x0099ff, V(80,150,-580),   "Iagon",                   "https://iagon.com/",                                                                                       "img/iagon.png",                                                                 "rgba(0,150,255,1)"),
+    makePlanet(5,  0xff6600, V(-60,-150,-600), "TapTools",                "https://www.taptools.io/",                                                                                  "img/tap-tools.png",                                                             "rgba(255,100,0,1)"),
+    makePlanet(4,  0x00ff99, V(230,-80,-620),  "FaucetPay",               "https://faucetpay.io/?r=31394",                                                                            "img/faucet-pay.png",                                                            "rgba(0,255,150,1)"),
   ];
 
-  // ═══════════════════════════════════════
-  //  CONTROLS
-  // ═══════════════════════════════════════
+  // ── Controls ──
   const keys = { KeyW:false,KeyA:false,KeyS:false,KeyD:false,
                  Digit1:false,Digit2:false,Digit3:false,Digit4:false };
 
   window.addEventListener("keydown", e => { if (e.code in keys) keys[e.code]=true; });
   window.addEventListener("keyup",   e => { if (e.code in keys) keys[e.code]=false; });
 
-  // D-pad buttons
   function bindBtn(id, key) {
     const el = document.getElementById(id); if (!el) return;
     const on  = () => { keys[key]=true;  el.classList.add("pressed"); };
@@ -363,7 +346,6 @@
   let yaw=0, pitch=0;
   const moveSpeed=40, lookSpeed=0.0025;
 
-  // Mouse look
   let mDown=false, pmx=0, pmy=0;
   renderer.domElement.addEventListener("mousedown", e=>{mDown=true;pmx=e.clientX;pmy=e.clientY;});
   window.addEventListener("mouseup", ()=>mDown=false);
@@ -375,7 +357,6 @@
     pmx=e.clientX; pmy=e.clientY;
   });
 
-  // Touch look + two-finger move
   const touches = {};
   renderer.domElement.addEventListener("touchstart", e=>{
     e.preventDefault();
@@ -413,7 +394,6 @@
   renderer.domElement.addEventListener("touchend",    e=>{[...e.changedTouches].forEach(t=>delete touches[t.identifier]);},{passive:false});
   renderer.domElement.addEventListener("touchcancel", e=>{[...e.changedTouches].forEach(t=>delete touches[t.identifier]);},{passive:false});
 
-  // Tap to open
   let tapX=0,tapY=0;
   renderer.domElement.addEventListener("touchstart", e=>{
     if(e.touches.length===1){tapX=e.touches[0].clientX;tapY=e.touches[0].clientY;}
@@ -431,7 +411,6 @@
     }
   },{passive:true});
 
-  // Camera helpers
   function updateRot() { camera.quaternion.setFromEuler(new THREE.Euler(pitch,yaw,0,"YXZ")); }
   function updatePos(dt) {
     const d=new THREE.Vector3();
@@ -449,7 +428,6 @@
     pitch=Math.asin(Math.max(-1,Math.min(1,v.y)));
   }
 
-  // Hover / click
   const raycaster=new THREE.Raycaster(), mouse=new THREE.Vector2();
   let hovered=null, lastEv=null;
 

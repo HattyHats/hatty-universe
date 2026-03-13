@@ -116,9 +116,6 @@
     .house-ad-slice { border: 1px solid rgba(255,140,0,.45); box-shadow: 0 0 12px rgba(255,140,0,.25), 0 0 30px rgba(255,140,0,.10); }
     .house-ad-slice:hover { box-shadow: 0 0 22px rgba(255,140,0,.6), 0 0 55px rgba(255,140,0,.25); transform: translateY(-2px) scale(1.03); }
 
-    .house-ad-lofty { height: 280px; border: 1px solid rgba(0,220,160,.45); box-shadow: 0 0 12px rgba(0,220,160,.25), 0 0 30px rgba(0,220,160,.10); }
-    .house-ad-lofty:hover { box-shadow: 0 0 22px rgba(0,220,160,.6), 0 0 55px rgba(0,220,160,.25); transform: translateY(-2px) scale(1.03); }
-
     .house-ad-label {
       font-size: 9px; color: rgba(255,215,0,.65);
       letter-spacing: .06em; text-transform: uppercase;
@@ -187,13 +184,6 @@
        href="https://addslice.com/?crew=VFFbJ"
        target="_blank" rel="noopener noreferrer" title="Hatty's Pick – Slice App">
       <img src="img/slice-app.gif" alt="Hatty's Pick – Try Slice App" />
-    </a>
-    <span class="house-ad-label">Hatty's Pick</span>
-
-    <a class="house-ad house-ad-lofty"
-       href="https://www.lofty.ai/refer?utm_source=growsurf&utm_medium=referrals&utm_campaign=referral-program&grsf=0143ph"
-       target="_blank" rel="noopener noreferrer" title="Hatty's Pick – Lofty">
-      <img src="img/lofty-banner.gif" alt="Hatty's Pick – Try Lofty" />
     </a>
     <span class="house-ad-label">Hatty's Pick</span>
   </div>
@@ -290,7 +280,6 @@
   const V = (x,y,z) => new THREE.Vector3(x,y,z);
 
   const planets = [
-    // ── Original planets ──
     makePlanet(8,  0x99ccff, V(40,0,-30),      "Learn With Hatty",        "https://earnwithhatty.com/",                                                                                 "https://i.ibb.co/LhB2ncPR/Learn-with-hatty-2-1.png",                           "rgba(100,180,255,1)"),
     makePlanet(5,  0xffcc55, V(-60,10,-80),    "Hatty Tools",             "https://earn-with-hatty-tools.netlify.app/",                                                                "https://i.ibb.co/9kWjbb8f/grok-image-f2f24317-2ad0-42f9-8a67-53cfeaec08ca.jpg","rgba(255,200,80,1)"),
     makePlanet(10, 0x4488ff, V(0,-30,-120),    "Learn Cardano",           "https://youtu.be/xWImSw79Y6I?si=JFPZG8z22KKAHE7f",                                                        "https://i.ibb.co/LzgZj25F/cardano-ada-logo.png",                                "rgba(60,140,255,1)"),
@@ -303,13 +292,11 @@
     makePlanet(5,  0xff4488, V(130,-30,-260),  "Psycho Satoshi – Audius", "https://audius.co/hatty",                                                                                  "img/audius.webp",                                                               "rgba(255,60,140,1)"),
     makePlanet(4,  0xffdd44, V(-120,30,-300),  "PublishOX",               "https://www.publish0x.com/@HattyHats",                                                                     "img/publishox.png",                                                             "rgba(255,220,60,1)"),
     makePlanet(6,  0xff8833, V(60,-80,-280),   "Slice App",               "https://addslice.com/?crew=VFFbJ",                                                                         "img/slice-app.gif",                                                             "rgba(255,130,50,1)"),
-    makePlanet(8,  0x00ddaa, V(-150,50,-320),  "Lofty",                   "https://www.lofty.ai/refer?utm_source=growsurf&utm_medium=referrals&utm_campaign=referral-program&grsf=0143ph", "img/lofty-banner.gif",                                                   "rgba(0,220,170,1)"),
     makePlanet(5,  0x6688ff, V(160,60,-340),   "The Arena",               "https://arena.social/?ref=hatty_hats",                                                                     "img/the-arena.png",                                                             "rgba(100,140,255,1)"),
     makePlanet(5,  0xee4422, V(-80,-90,-360),  "Chainers",                "https://chainers.io/?r=lzmpadgw",                                                                          "img/chainers.png",                                                              "rgba(240,70,40,1)"),
     makePlanet(4,  0xffcc00, V(30,100,-380),   "Cointiply",               "https://cointiply.com/r/lNm1",                                                                             "img/cointiply.png",                                                             "rgba(255,210,0,1)"),
     makePlanet(5,  0x22ccff, V(-170,-30,-400), "CryptoNaut",              "https://cryptonaut.id/?ref=HattyHats",                                                                     "img/cryptonaut.png",                                                            "rgba(30,200,255,1)"),
     makePlanet(4,  0x88ff44, V(120,80,-420),   "Voi Fountain",            "https://fountain.voirewards.com/",                                                                         "img/voi-fountain.png",                                                          "rgba(140,255,70,1)"),
-    // ── New planets ──
     makePlanet(6,  0xffaa00, V(-40,-110,-440), "Rollercoin",              "https://rollercoin.com/?r=kj0blr6a",                                                                       "img/rollercoin.png",                                                            "rgba(255,170,0,1)"),
     makePlanet(7,  0x00ccff, V(190,-50,-460),  "Immutable",               "https://play.immutable.com/referral/share/9XVsFq?utm_source=referral",                                     "img/immutable.png",                                                             "rgba(0,200,255,1)"),
     makePlanet(4,  0x44ff88, V(-190,70,-480),  "FaucetCrypto",            "https://faucetcrypto.com/r/102755",                                                                        "img/faucet-crypto.png",                                                         "rgba(60,255,130,1)"),

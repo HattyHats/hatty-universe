@@ -132,6 +132,45 @@
       .house-ad, .house-ad-label { display: none; }
     }
 
+    #tour-btn {
+      position: absolute; bottom: 20px; right: 16px;
+      padding: 8px 18px; border-radius: 999px;
+      border: 1px solid rgba(160,120,255,0.8);
+      background: rgba(15,10,40,0.88);
+      color: #d8b4fe; font-size: 12px; font-weight: 600;
+      cursor: pointer; pointer-events: auto;
+      letter-spacing: .04em;
+      box-shadow: 0 0 14px rgba(140,80,255,0.35), 0 0 0 1px rgba(15,10,40,0.9);
+      transition: background .15s, transform .1s, box-shadow .15s, border-color .15s;
+      z-index: 10;
+    }
+    #tour-btn:hover {
+      background: rgba(109,40,217,0.92);
+      border-color: rgba(196,160,255,1);
+      box-shadow: 0 0 22px rgba(160,100,255,0.75), 0 0 55px rgba(140,80,255,0.3);
+      transform: translateY(-1px);
+    }
+    #tour-btn:active { transform: translateY(0); }
+    #tour-btn.touring {
+      background: rgba(109,40,217,0.92);
+      border-color: rgba(196,160,255,1);
+      box-shadow: 0 0 22px rgba(160,100,255,0.75), 0 0 55px rgba(140,80,255,0.3);
+      color: #fff;
+    }
+
+    #tour-label {
+      position: absolute; bottom: 56px; right: 16px;
+      padding: 5px 12px; border-radius: 6px;
+      background: rgba(10,5,30,0.88);
+      border: 1px solid rgba(160,120,255,0.5);
+      color: #c4b5fd; font-size: 11px; font-weight: 500;
+      pointer-events: none;
+      white-space: nowrap; opacity: 0;
+      transition: opacity .3s ease;
+      z-index: 10;
+      backdrop-filter: blur(6px);
+    }
+
     #hover-tooltip {
       position: absolute;
       padding: 4px 8px; border-radius: 4px;
@@ -194,6 +233,9 @@
   </button>
 
   <div id="hover-tooltip"></div>
+
+  <div id="tour-label">🚀 Touring the Universe…</div>
+  <button id="tour-btn" onclick="toggleTour()">🚀 Take a Tour</button>
 
   <div id="mobile-controls">
     <div class="mob-row"><div class="mob-btn" id="btn-up">↑</div></div>
@@ -307,6 +349,7 @@
     makePlanet(6,  0x0099ff, V(80,150,-580),   "Iagon",                   "https://iagon.com/",                                                                                       "img/iagon.png",                                                                 "rgba(0,150,255,1)"),
     makePlanet(5,  0xff6600, V(-60,-150,-600), "TapTools",                "https://www.taptools.io/",                                                                                  "img/tap-tools.png",                                                             "rgba(255,100,0,1)"),
     makePlanet(4,  0x00ff99, V(230,-80,-620),  "FaucetPay",               "https://faucetpay.io/?r=31394",                                                                            "img/faucet-pay.png",                                                            "rgba(0,255,150,1)"),
+    makePlanet(5,  0x33eeff, V(-130,60,-640),  "Voi Maze",                "https://hattyhats.github.io/voi-maze/",                                                                    "img/voi-maze.png",                                                              "rgba(50,230,255,1)"),
   ];
 
   // ── Controls ──
@@ -455,6 +498,117 @@
     renderer.setSize(innerWidth,innerHeight);
   });
 
+  // ── Guided Tour ──
+  const tourBtn   = document.getElementById("tour-btn");
+  const tourLabel = document.getElementById("tour-label");
+
+  let tourActive  = false;
+  let tourIndex   = 0;
+  let tourPhase   = "travel"; // "travel" | "orbit"
+  let tourTimer   = 0;
+  const ORBIT_DURATION  = 3.0;   // seconds hovering at each planet
+  const TRAVEL_SPEED    = 80;    // units / second (faster than normal fly)
+  const ARRIVE_DIST     = 0.4;   // fraction of offset distance – "close enough"
+
+  // Snapshot of where the camera was before the tour started
+  let preTourPos = new THREE.Vector3();
+  let preTourYaw = 0, preTourPitch = 0;
+
+  function startTour() {
+    tourActive = true;
+    tourIndex  = 0;
+    tourPhase  = "travel";
+    tourTimer  = 0;
+    preTourPos.copy(camera.position);
+    preTourYaw   = yaw;
+    preTourPitch = pitch;
+    tourBtn.textContent = "✕ End Tour";
+    tourBtn.classList.add("touring");
+    tourLabel.style.opacity = "1";
+    showTourLabel(planets[0].userData.label);
+  }
+
+  function endTour() {
+    tourActive = false;
+    tourBtn.textContent = "🚀 Take a Tour";
+    tourBtn.classList.remove("touring");
+    tourLabel.style.opacity = "0";
+    // Smoothly restore – just snap back (user can re-orient)
+    camera.position.copy(preTourPos);
+    yaw   = preTourYaw;
+    pitch = preTourPitch;
+  }
+
+  window.toggleTour = function() {
+    if (tourActive) endTour(); else startTour();
+  };
+
+  function showTourLabel(name) {
+    tourLabel.textContent = "🌍 Visiting: " + name;
+    tourLabel.style.opacity = "1";
+  }
+
+  function getTourTarget(planet) {
+    const offset = planet.userData.radius * 4.5;
+    // Approach from a fixed angle offset so the view is interesting
+    const angle = tourIndex * 1.1;
+    const dir = new THREE.Vector3(Math.sin(angle), 0.25, Math.cos(angle)).normalize();
+    return new THREE.Vector3().copy(planet.position).add(dir.multiplyScalar(offset));
+  }
+
+  function tickTour(dt) {
+    if (!tourActive) return;
+    const planet = planets[tourIndex];
+
+    if (tourPhase === "travel") {
+      const target = getTourTarget(planet);
+      const toTarget = new THREE.Vector3().subVectors(target, camera.position);
+      const dist = toTarget.length();
+
+      if (dist < planet.userData.radius * 1.5) {
+        // Arrived — look at planet and switch to orbit phase
+        camera.lookAt(planet.position);
+        const v = new THREE.Vector3().subVectors(planet.position, camera.position).normalize();
+        yaw   = Math.atan2(v.x, -v.z);
+        pitch = Math.asin(Math.max(-1, Math.min(1, v.y)));
+        tourPhase = "orbit";
+        tourTimer = 0;
+        showTourLabel(planet.userData.label);
+      } else {
+        // Fly toward target
+        const step = Math.min(TRAVEL_SPEED * dt, dist);
+        camera.position.add(toTarget.normalize().multiplyScalar(step));
+        // Smoothly look at the planet while traveling
+        camera.lookAt(planet.position);
+        const v = new THREE.Vector3().subVectors(planet.position, camera.position).normalize();
+        yaw   = Math.atan2(v.x, -v.z);
+        pitch = Math.asin(Math.max(-1, Math.min(1, v.y)));
+      }
+    } else if (tourPhase === "orbit") {
+      // Slowly orbit the planet
+      const orbitRadius = planet.userData.radius * 4.5;
+      const angle = tourIndex * 1.1 + tourTimer * 0.4;
+      const dir = new THREE.Vector3(Math.sin(angle), 0.25, Math.cos(angle)).normalize();
+      camera.position.copy(planet.position).add(dir.multiplyScalar(orbitRadius));
+      camera.lookAt(planet.position);
+      const v = new THREE.Vector3().subVectors(planet.position, camera.position).normalize();
+      yaw   = Math.atan2(v.x, -v.z);
+      pitch = Math.asin(Math.max(-1, Math.min(1, v.y)));
+
+      tourTimer += dt;
+      if (tourTimer >= ORBIT_DURATION) {
+        tourIndex++;
+        if (tourIndex >= planets.length) {
+          endTour();
+        } else {
+          tourPhase = "travel";
+          tourTimer = 0;
+          showTourLabel(planets[tourIndex].userData.label);
+        }
+      }
+    }
+  }
+
   const clock=new THREE.Clock();
   function animate(){
     const dt=clock.getDelta();
@@ -463,7 +617,8 @@
     if(keys.Digit2)snapTo(planets[1]);
     if(keys.Digit3)snapTo(planets[2]);
     if(keys.Digit4)snapTo(planets[3]);
-    updateRot(); updatePos(dt);
+    tickTour(dt);
+    if(!tourActive){ updateRot(); updatePos(dt); }
     renderer.render(scene,camera);
     requestAnimationFrame(animate);
   }

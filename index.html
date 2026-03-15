@@ -132,6 +132,36 @@
       .house-ad, .house-ad-label { display: none; }
     }
 
+    /* ── Jump-To Dropdown ── */
+    #jump-wrap {
+      position: absolute; top: 48px; right: 12px;
+      pointer-events: auto;
+      z-index: 10;
+    }
+    #jump-select {
+      appearance: none; -webkit-appearance: none;
+      padding: 6px 32px 6px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.6);
+      background: rgba(15,23,42,0.9)
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23a0aec0'/%3E%3C/svg%3E")
+        no-repeat right 10px center;
+      color: #e5e7eb; font-size: 12px; font-weight: 500;
+      cursor: pointer;
+      backdrop-filter: blur(6px);
+      transition: border-color .15s, box-shadow .15s;
+      min-width: 140px;
+    }
+    #jump-select:hover, #jump-select:focus {
+      outline: none;
+      border-color: rgba(129,140,248,1);
+      box-shadow: 0 0 14px rgba(59,130,246,0.55);
+    }
+    #jump-select option {
+      background: #0f172a;
+      color: #e5e7eb;
+    }
+
     #tour-btn {
       position: absolute; bottom: 20px; right: 16px;
       padding: 8px 18px; border-radius: 999px;
@@ -196,11 +226,7 @@
           <strong>W / S</strong> – forward / back<br />
           <strong>A / D</strong> – left / right<br />
           Drag mouse – look around<br /><br />
-          <strong>1–4</strong> – jump to a world:<br />
-          1: Learn With Hatty<br />
-          2: Hatty Tools<br />
-          3: Learn Cardano<br />
-          4: Privacy Gadgets<br /><br />
+          Use the <strong>Jump To</strong> menu<br />to warp to any world.<br /><br />
           Hover a planet to see its name,<br />click to open its world.
         </span>
         <span class="hud-touch">
@@ -231,6 +257,42 @@
           onclick="window.open('https://earnwithhatty.com/','_blank')">
     Main Site
   </button>
+
+  <!-- Jump-To Dropdown -->
+  <div id="jump-wrap">
+    <select id="jump-select" onchange="jumpToPlanet(this)">
+      <option value="" disabled selected>🪐 Jump To World…</option>
+      <option value="0">Learn With Hatty</option>
+      <option value="1">Hatty Tools</option>
+      <option value="2">Learn Cardano</option>
+      <option value="3">Privacy Gadgets</option>
+      <option value="4">Cardano Planet</option>
+      <option value="5">Voi Planet</option>
+      <option value="6">Hatty's News</option>
+      <option value="7">Hatty's Media</option>
+      <option value="8">OpenFocus</option>
+      <option value="9">Psycho Satoshi – Audius</option>
+      <option value="10">PublishOX</option>
+      <option value="11">Slice App</option>
+      <option value="12">The Arena</option>
+      <option value="13">Chainers</option>
+      <option value="14">Cointiply</option>
+      <option value="15">CryptoNaut</option>
+      <option value="16">Voi Fountain</option>
+      <option value="17">Rollercoin</option>
+      <option value="18">Immutable</option>
+      <option value="19">FaucetCrypto</option>
+      <option value="20">Vie Faucet</option>
+      <option value="21">Suno</option>
+      <option value="22">X (Twitter)</option>
+      <option value="23">Focus</option>
+      <option value="24">Iagon</option>
+      <option value="25">TapTools</option>
+      <option value="26">FaucetPay</option>
+      <option value="27">Voi Maze</option>
+      <option value="28">CaseBoard</option>
+    </select>
+  </div>
 
   <div id="hover-tooltip"></div>
 
@@ -328,7 +390,7 @@
     makePlanet(3,  0x55ffcc, V(70,40,-150),    "Privacy Gadgets",         "https://privacy-gadgets-hub.netlify.app/",                                                                 "https://i.ibb.co/XZRJ7FJ6/45bb8258-7d85-4d3a-b149-abdcc157035a.jpg",           "rgba(80,255,200,1)"),
     makePlanet(9,  0x3355ff, V(-90,-40,-180),  "Cardano Planet",          "https://cardano.org/",                                                                                     "https://i.ibb.co/sv8X6ksV/Screenshot-2026-03-04-112403.png",                    "rgba(80,110,255,1)"),
     makePlanet(7,  0xaa55ff, V(110,20,-210),   "Voi Planet",              "https://voi.network/",                                                                                     "https://i.ibb.co/vCQSwR8R/Screenshot-2026-03-04-112456.png",                    "rgba(180,100,255,1)"),
-    makePlanet(6,  0xff9955, V(-30,60,-170),   "Hatty's News",            "https://hattys-news.netlify.app/",                                                                 "img/hattys-news.jpeg",                                                          "rgba(255,150,80,1)"),
+    makePlanet(6,  0xff9955, V(-30,60,-170),   "Hatty's News",            "https://hattyhats.github.io/hattys-news/",                                                                 "img/hattys-news.jpeg",                                                          "rgba(255,150,80,1)"),
     makePlanet(7,  0xff55aa, V(85,-60,-100),   "Hatty's Media",           "https://hattys-media.netlify.app/",                                                                        "img/hattys-media.png",                                                          "rgba(255,80,180,1)"),
     makePlanet(6,  0x44ffcc, V(-50,80,-240),   "OpenFocus",               "https://hattyhats.github.io/Open-Focus/",                                                                  "img/openfucus.png",                                                             "rgba(60,255,200,1)"),
     makePlanet(5,  0xff4488, V(130,-30,-260),  "Psycho Satoshi – Audius", "https://audius.co/hatty",                                                                                  "img/audius.webp",                                                               "rgba(255,60,140,1)"),
@@ -350,11 +412,11 @@
     makePlanet(5,  0xff6600, V(-60,-150,-600), "TapTools",                "https://www.taptools.io/",                                                                                  "img/tap-tools.png",                                                             "rgba(255,100,0,1)"),
     makePlanet(4,  0x00ff99, V(230,-80,-620),  "FaucetPay",               "https://faucetpay.io/?r=31394",                                                                            "img/faucet-pay.png",                                                            "rgba(0,255,150,1)"),
     makePlanet(5,  0x33eeff, V(-130,60,-640),  "Voi Maze",                "https://hattyhats.github.io/voi-maze/",                                                                    "img/voi-maze.png",                                                              "rgba(50,230,255,1)"),
+    makePlanet(6,  0xff9900, V(100,-170,-660),  "CaseBoard",               "https://case-board.netlify.app",                                                                            "img/case-board.png",                                                            "rgba(255,150,0,1)"),
   ];
 
   // ── Controls ──
-  const keys = { KeyW:false,KeyA:false,KeyS:false,KeyD:false,
-                 Digit1:false,Digit2:false,Digit3:false,Digit4:false };
+  const keys = { KeyW:false,KeyA:false,KeyS:false,KeyD:false };
 
   window.addEventListener("keydown", e => { if (e.code in keys) keys[e.code]=true; });
   window.addEventListener("keyup",   e => { if (e.code in keys) keys[e.code]=false; });
@@ -609,14 +671,18 @@
     }
   }
 
+  // ── Jump-To dropdown ──
+  window.jumpToPlanet = function(sel) {
+    const idx = parseInt(sel.value, 10);
+    if (!isNaN(idx) && planets[idx]) snapTo(planets[idx]);
+    // Reset select back to placeholder so it can be used again
+    setTimeout(() => { sel.value = ""; }, 50);
+  };
+
   const clock=new THREE.Clock();
   function animate(){
     const dt=clock.getDelta();
     planets.forEach((p,i)=>p.rotation.y+=.12*dt*(i+1));
-    if(keys.Digit1)snapTo(planets[0]);
-    if(keys.Digit2)snapTo(planets[1]);
-    if(keys.Digit3)snapTo(planets[2]);
-    if(keys.Digit4)snapTo(planets[3]);
     tickTour(dt);
     if(!tourActive){ updateRot(); updatePos(dt); }
     renderer.render(scene,camera);

@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <title>HattyHats – Digital Universe (Prototype)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -17,6 +18,221 @@
 
     body { display: flex; align-items: stretch; justify-content: stretch; }
 
+    /* ══════════════════════════════════════════
+       SPLASH SCREEN
+    ══════════════════════════════════════════ */
+    #splash {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      overflow: hidden;
+      background: #000;
+    }
+
+    #splash-bg {
+      position: absolute;
+      inset: 0;
+      background: url('img/universe.gif') center center / cover no-repeat;
+      opacity: 0;
+      animation: bgFadeIn 1.2s ease forwards 0.2s;
+    }
+
+    /* Dark overlay so text pops */
+    #splash-bg::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at center, rgba(0,0,0,0.35) 0%, rgba(0,0,20,0.72) 100%);
+    }
+
+    @keyframes bgFadeIn {
+      to { opacity: 1; }
+    }
+
+    #splash-content {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      text-align: center;
+      padding: 0 20px;
+    }
+
+    #splash-welcome {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: clamp(18px, 3.5vw, 28px);
+      color: #a0c4ff;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      opacity: 0;
+      animation: fadeUp 0.9s ease forwards 1.0s;
+      text-shadow: 0 0 20px rgba(100,180,255,0.7), 0 0 60px rgba(60,120,255,0.3);
+    }
+
+    #splash-title {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 900;
+      font-size: clamp(42px, 9vw, 100px);
+      line-height: 1.05;
+      opacity: 0;
+      animation: fadeUp 1.0s ease forwards 1.8s;
+      display: flex;
+      gap: 0.18em;
+      align-items: baseline;
+    }
+
+    #splash-hatty {
+      color: #fff;
+      position: relative;
+      display: inline-block;
+      animation: glitch 2.5s infinite 2.5s;
+      text-shadow:
+        0 0 20px rgba(160,100,255,0.9),
+        0 0 60px rgba(120,60,255,0.5);
+    }
+
+    #splash-universe {
+      color: #c4b5fd;
+      text-shadow:
+        0 0 30px rgba(180,120,255,0.8),
+        0 0 80px rgba(140,80,255,0.4);
+    }
+
+    #splash-byline {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: clamp(13px, 2.2vw, 18px);
+      color: rgba(200,210,255,0.75);
+      letter-spacing: 0.14em;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 2.6s;
+      margin-top: 4px;
+    }
+
+    #splash-hattyname {
+      color: #a78bfa;
+      display: inline-block;
+      animation: glitch 3s infinite 3.2s;
+      text-shadow: 0 0 12px rgba(167,139,250,0.8);
+    }
+
+    #splash-enter {
+      margin-top: 36px;
+      position: relative;
+      padding: 14px 52px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(13px, 2vw, 16px);
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #fff;
+      background: transparent;
+      border: 2px solid rgba(160,120,255,0.9);
+      border-radius: 4px;
+      cursor: pointer;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 3.4s;
+      transition: all 0.2s ease;
+      /* Pulsing glow */
+      box-shadow:
+        0 0 18px rgba(140,80,255,0.6),
+        0 0 50px rgba(120,60,255,0.25),
+        inset 0 0 18px rgba(140,80,255,0.08);
+    }
+
+    #splash-enter::before {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      border-radius: 6px;
+      background: linear-gradient(135deg, rgba(160,100,255,0.4), rgba(60,120,255,0.4));
+      z-index: -1;
+      opacity: 0;
+      transition: opacity 0.2s;
+      filter: blur(8px);
+    }
+
+    #splash-enter:hover {
+      background: rgba(120,60,255,0.3);
+      box-shadow:
+        0 0 32px rgba(160,100,255,0.9),
+        0 0 90px rgba(120,60,255,0.45),
+        inset 0 0 24px rgba(140,80,255,0.15);
+      transform: translateY(-2px) scale(1.03);
+    }
+
+    #splash-enter:hover::before { opacity: 1; }
+    #splash-enter:active { transform: translateY(0) scale(0.99); }
+
+    /* Scanline effect over splash */
+    #splash::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 3px,
+        rgba(0,0,0,0.07) 3px,
+        rgba(0,0,0,0.07) 4px
+      );
+      pointer-events: none;
+      z-index: 3;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Glitch keyframes ── */
+    @keyframes glitch {
+      0%, 90%, 100% {
+        clip-path: none;
+        transform: translate(0);
+        text-shadow: inherit;
+      }
+      91% {
+        clip-path: polygon(0 20%, 100% 20%, 100% 40%, 0 40%);
+        transform: translate(-4px, 0);
+        text-shadow: 3px 0 #ff00ff, -3px 0 #00ffff;
+      }
+      92% {
+        clip-path: polygon(0 60%, 100% 60%, 100% 75%, 0 75%);
+        transform: translate(4px, 0);
+        text-shadow: -3px 0 #ff00ff, 3px 0 #00ffff;
+      }
+      93% {
+        clip-path: polygon(0 0%, 100% 0%, 100% 15%, 0 15%);
+        transform: translate(-2px, 2px);
+        text-shadow: 2px 0 #ff0055, -2px 0 #00ffcc;
+      }
+      94% {
+        clip-path: none;
+        transform: translate(0);
+      }
+    }
+
+    /* Splash exit animation */
+    #splash.exiting {
+      animation: splashExit 0.7s ease forwards;
+    }
+    @keyframes splashExit {
+      0%   { opacity: 1; transform: scale(1); }
+      60%  { opacity: 0.8; transform: scale(1.04); }
+      100% { opacity: 0; transform: scale(1.08); pointer-events: none; }
+    }
+
+    /* ══════════════════════════════════════════
+       MAIN UNIVERSE UI
+    ══════════════════════════════════════════ */
     #universe-container { position: relative; width: 100%; height: 100%; }
     canvas { display: block; }
 
@@ -212,9 +428,47 @@
       white-space: nowrap; opacity: 0;
       transition: opacity .1s ease-out;
     }
+
+    /* Boost indicator */
+    #boost-indicator {
+      position: absolute;
+      bottom: 20px; left: 50%;
+      transform: translateX(-50%);
+      padding: 4px 14px;
+      border-radius: 999px;
+      background: rgba(250,200,0,0.18);
+      border: 1px solid rgba(250,200,0,0.7);
+      color: #fde68a;
+      font-size: 11px; font-weight: 600;
+      letter-spacing: 0.08em;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.15s ease;
+      z-index: 10;
+      box-shadow: 0 0 12px rgba(250,200,0,0.4);
+    }
+    #boost-indicator.active { opacity: 1; }
   </style>
 </head>
 <body>
+
+<!-- ══ SPLASH SCREEN ══ -->
+<div id="splash">
+  <div id="splash-bg"></div>
+  <div id="splash-content">
+    <div id="splash-welcome">Welcome To:</div>
+    <div id="splash-title">
+      <span id="splash-hatty">Hatty's</span>
+      <span id="splash-universe">Universe</span>
+    </div>
+    <div id="splash-byline">
+      Created by <span id="splash-hattyname">HattyHats</span>
+    </div>
+    <button id="splash-enter" onclick="enterUniverse()">⬡ Enter Universe ⬡</button>
+  </div>
+</div>
+
+<!-- ══ MAIN UNIVERSE ══ -->
 <div id="universe-container">
 
   <div id="left-panel">
@@ -225,6 +479,7 @@
           Click inside, then use:<br />
           <strong>W / S</strong> – forward / back<br />
           <strong>A / D</strong> – left / right<br />
+          <strong>Shift</strong> – boost speed<br />
           Drag mouse – look around<br /><br />
           Use the <strong>Jump To</strong> menu<br />to warp to any world.<br /><br />
           Hover a planet to see its name,<br />click to open its world.
@@ -295,6 +550,7 @@
   </div>
 
   <div id="hover-tooltip"></div>
+  <div id="boost-indicator">⚡ BOOST</div>
 
   <div id="tour-label">🚀 Touring the Universe…</div>
   <button id="tour-btn" onclick="toggleTour()">🚀 Take a Tour</button>
@@ -310,11 +566,21 @@
 
 </div>
 
+<!-- Splash enter handler -->
+<script>
+  function enterUniverse() {
+    const splash = document.getElementById('splash');
+    splash.classList.add('exiting');
+    setTimeout(() => { splash.style.display = 'none'; }, 700);
+  }
+</script>
+
 <script type="module">
   import * as THREE from "https://unpkg.com/three@0.160.0/build/three.module.js";
 
   const container = document.getElementById("universe-container");
   const tooltip   = document.getElementById("hover-tooltip");
+  const boostEl   = document.getElementById("boost-indicator");
 
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(0x02030a);
@@ -416,10 +682,24 @@
   ];
 
   // ── Controls ──
-  const keys = { KeyW:false,KeyA:false,KeyS:false,KeyD:false };
+  // Track shift for boost
+  const keys = { KeyW:false, KeyA:false, KeyS:false, KeyD:false };
+  let shiftDown = false;
 
-  window.addEventListener("keydown", e => { if (e.code in keys) keys[e.code]=true; });
-  window.addEventListener("keyup",   e => { if (e.code in keys) keys[e.code]=false; });
+  window.addEventListener("keydown", e => {
+    if (e.code in keys) keys[e.code] = true;
+    if (e.code === "ShiftLeft" || e.code === "ShiftRight") {
+      shiftDown = true;
+      boostEl.classList.add("active");
+    }
+  });
+  window.addEventListener("keyup", e => {
+    if (e.code in keys) keys[e.code] = false;
+    if (e.code === "ShiftLeft" || e.code === "ShiftRight") {
+      shiftDown = false;
+      boostEl.classList.remove("active");
+    }
+  });
 
   function bindBtn(id, key) {
     const el = document.getElementById(id); if (!el) return;
@@ -436,7 +716,9 @@
   bindBtn("btn-left","KeyA"); bindBtn("btn-right","KeyD");
 
   let yaw=0, pitch=0;
-  const moveSpeed=40, lookSpeed=0.0025;
+  const BASE_SPEED = 40;
+  const BOOST_MULTIPLIER = 3.5;
+  const lookSpeed = 0.0025;
 
   let mDown=false, pmx=0, pmy=0;
   renderer.domElement.addEventListener("mousedown", e=>{mDown=true;pmx=e.clientX;pmy=e.clientY;});
@@ -508,16 +790,27 @@
     const d=new THREE.Vector3();
     if(keys.KeyW)d.z-=1; if(keys.KeyS)d.z+=1;
     if(keys.KeyA)d.x-=1; if(keys.KeyD)d.x+=1;
-    if(d.lengthSq()>0) camera.position.add(d.normalize().applyQuaternion(camera.quaternion).multiplyScalar(moveSpeed*dt));
+    if(d.lengthSq()>0) {
+      const speed = BASE_SPEED * (shiftDown ? BOOST_MULTIPLIER : 1);
+      camera.position.add(d.normalize().applyQuaternion(camera.quaternion).multiplyScalar(speed*dt));
+    }
   }
+
+  // ── Improved snapTo: positions directly in front of planet, facing it dead-center ──
   function snapTo(p) {
-    const d=new THREE.Vector3().subVectors(camera.position,p.position).normalize();
-    if(!d.lengthSq()) d.set(0,0,1);
-    camera.position.copy(p.position).add(d.multiplyScalar(p.userData.radius*4));
+    // Always approach from directly in front along the Z-axis (world space),
+    // biased slightly above for a nice angle. This guarantees the planet is
+    // perfectly centred in the view after snapping.
+    const approachDir = new THREE.Vector3(0, 0.15, 1).normalize();
+    const dist = p.userData.radius * 4.5;
+    camera.position.copy(p.position).add(approachDir.multiplyScalar(dist));
     camera.lookAt(p.position);
-    const v=new THREE.Vector3().subVectors(p.position,camera.position).normalize();
-    yaw=Math.atan2(v.x,-v.z);
-    pitch=Math.asin(Math.max(-1,Math.min(1,v.y)));
+
+    // Derive yaw/pitch from the look direction so free-look stays in sync
+    const fwd = new THREE.Vector3().subVectors(p.position, camera.position).normalize();
+    yaw   = Math.atan2(fwd.x, -fwd.z);
+    pitch = Math.asin(Math.max(-1, Math.min(1, fwd.y)));
+    updateRot();
   }
 
   const raycaster=new THREE.Raycaster(), mouse=new THREE.Vector2();
@@ -566,13 +859,11 @@
 
   let tourActive  = false;
   let tourIndex   = 0;
-  let tourPhase   = "travel"; // "travel" | "orbit"
+  let tourPhase   = "travel";
   let tourTimer   = 0;
-  const ORBIT_DURATION  = 3.0;   // seconds hovering at each planet
-  const TRAVEL_SPEED    = 80;    // units / second (faster than normal fly)
-  const ARRIVE_DIST     = 0.4;   // fraction of offset distance – "close enough"
+  const ORBIT_DURATION  = 3.0;
+  const TRAVEL_SPEED    = 80;
 
-  // Snapshot of where the camera was before the tour started
   let preTourPos = new THREE.Vector3();
   let preTourYaw = 0, preTourPitch = 0;
 
@@ -595,7 +886,6 @@
     tourBtn.textContent = "🚀 Take a Tour";
     tourBtn.classList.remove("touring");
     tourLabel.style.opacity = "0";
-    // Smoothly restore – just snap back (user can re-orient)
     camera.position.copy(preTourPos);
     yaw   = preTourYaw;
     pitch = preTourPitch;
@@ -612,7 +902,6 @@
 
   function getTourTarget(planet) {
     const offset = planet.userData.radius * 4.5;
-    // Approach from a fixed angle offset so the view is interesting
     const angle = tourIndex * 1.1;
     const dir = new THREE.Vector3(Math.sin(angle), 0.25, Math.cos(angle)).normalize();
     return new THREE.Vector3().copy(planet.position).add(dir.multiplyScalar(offset));
@@ -628,7 +917,6 @@
       const dist = toTarget.length();
 
       if (dist < planet.userData.radius * 1.5) {
-        // Arrived — look at planet and switch to orbit phase
         camera.lookAt(planet.position);
         const v = new THREE.Vector3().subVectors(planet.position, camera.position).normalize();
         yaw   = Math.atan2(v.x, -v.z);
@@ -637,17 +925,14 @@
         tourTimer = 0;
         showTourLabel(planet.userData.label);
       } else {
-        // Fly toward target
         const step = Math.min(TRAVEL_SPEED * dt, dist);
         camera.position.add(toTarget.normalize().multiplyScalar(step));
-        // Smoothly look at the planet while traveling
         camera.lookAt(planet.position);
         const v = new THREE.Vector3().subVectors(planet.position, camera.position).normalize();
         yaw   = Math.atan2(v.x, -v.z);
         pitch = Math.asin(Math.max(-1, Math.min(1, v.y)));
       }
     } else if (tourPhase === "orbit") {
-      // Slowly orbit the planet
       const orbitRadius = planet.userData.radius * 4.5;
       const angle = tourIndex * 1.1 + tourTimer * 0.4;
       const dir = new THREE.Vector3(Math.sin(angle), 0.25, Math.cos(angle)).normalize();
@@ -675,7 +960,6 @@
   window.jumpToPlanet = function(sel) {
     const idx = parseInt(sel.value, 10);
     if (!isNaN(idx) && planets[idx]) snapTo(planets[idx]);
-    // Reset select back to placeholder so it can be used again
     setTimeout(() => { sel.value = ""; }, 50);
   };
 

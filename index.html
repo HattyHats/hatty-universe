@@ -290,6 +290,10 @@
       box-shadow: 0 0 10px rgba(59,130,246,0.6);
     }
 
+    .music-button {
+      right: 110px;
+    }
+
     #mobile-controls {
       display: none;
       position: absolute;
@@ -507,6 +511,11 @@
     </a>
     <span class="house-ad-label">Hatty's Pick</span>
   </div>
+
+  <audio id="bg-music" src="freedom_costs_too_much.MP3" loop></audio>
+  <button class="main-site-button music-button" onclick="toggleMusic()">
+    🎵 Play Music
+  </button>
 
   <button class="main-site-button"
           onclick="window.open('https://earnwithhatty.com/','_blank')">
@@ -995,6 +1004,18 @@
     requestAnimationFrame(animate);
   }
   animate();
+
+  window.toggleMusic = function() {
+    const audio = document.getElementById('bg-music');
+    const btn = document.querySelector('.music-button');
+    if (audio.paused) {
+      audio.play();
+      btn.textContent = '⏸ Pause Music';
+    } else {
+      audio.pause();
+      btn.textContent = '🎵 Play Music';
+    }
+  };
 </script>
 </body>
 </html>

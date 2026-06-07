@@ -4,6 +4,16 @@
   <meta charset="UTF-8" />
   <title>HattyHats – Digital Universe (Prototype)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -31,23 +41,12 @@
       justify-content: center;
       gap: 0;
       overflow: hidden;
-      background: #000;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(8px);
     }
 
     #splash-bg {
-      position: absolute;
-      inset: 0;
-      background: url('img/universe.gif') center center / cover no-repeat;
-      opacity: 0;
-      animation: bgFadeIn 1.2s ease forwards 0.2s;
-    }
-
-    /* Dark overlay so text pops */
-    #splash-bg::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(ellipse at center, rgba(0,0,0,0.35) 0%, rgba(0,0,20,0.72) 100%);
+      display: none;
     }
 
     @keyframes bgFadeIn {
@@ -136,7 +135,7 @@
       background: transparent;
       border: 2px solid rgba(160,120,255,0.9);
       border-radius: 4px;
-      cursor: pointer;
+      cursor: not-allowed;
       opacity: 0;
       animation: fadeUp 0.8s ease forwards 3.4s;
       transition: all 0.2s ease;
@@ -294,30 +293,18 @@
       right: 110px;
     }
 
-    #mobile-controls {
-      display: none;
+    #joystick-zone {
       position: absolute;
-      bottom: 24px; left: 50%;
-      transform: translateX(-50%);
-      pointer-events: auto;
-      user-select: none; -webkit-user-select: none;
-      flex-direction: column; align-items: center; gap: 4px;
+      bottom: 20px;
+      left: 20px;
+      width: 150px;
+      height: 150px;
+      display: none;
+      z-index: 50;
+      pointer-events: none;
     }
     @media (hover: none) and (pointer: coarse) {
-      #mobile-controls { display: flex; }
-    }
-    .mob-row { display: flex; gap: 4px; }
-    .mob-btn {
-      width: 52px; height: 52px; border-radius: 10px;
-      background: rgba(0,0,0,0.55);
-      border: 1px solid rgba(255,255,255,0.18);
-      color: #fff; font-size: 20px;
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer; backdrop-filter: blur(6px); touch-action: none;
-    }
-    .mob-btn:active, .mob-btn.pressed {
-      background: rgba(59,130,246,0.6);
-      border-color: rgba(129,140,248,1);
+      #joystick-zone { display: block; pointer-events: auto; }
     }
 
     .house-ad {
@@ -458,7 +445,6 @@
 
 <!-- ══ SPLASH SCREEN ══ -->
 <div id="splash">
-  <div id="splash-bg"></div>
   <div id="splash-content">
     <div id="splash-welcome">Welcome To:</div>
     <div id="splash-title">
@@ -468,9 +454,11 @@
     <div id="splash-byline">
       Created by <span id="splash-hattyname">HattyHats</span>
     </div>
-    <button id="splash-enter" onclick="enterUniverse()">⬡ Enter Universe ⬡</button>
+    <button id="splash-enter" onclick="enterUniverse()" disabled>Loading Assets...</button>
   </div>
 </div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/nipplejs/0.10.1/nipplejs.min.js"></script>
 
 <!-- ══ MAIN UNIVERSE ══ -->
 <div id="universe-container">
@@ -500,14 +488,14 @@
     <a class="house-ad house-ad-bulb"
        href="https://www.bulbapp.io?referral_code=pgx084"
        target="_blank" rel="noopener noreferrer" title="Hatty's Pick – Bulb.app">
-      <img src="img/bulb-ad.gif" alt="Hatty's Pick – Try Bulb.app" />
+      <img src="img/bulb-ad.gif" alt="Hatty's Pick – Try Bulb.app" loading="lazy" />
     </a>
     <span class="house-ad-label">Hatty's Pick</span>
 
     <a class="house-ad house-ad-slice"
        href="https://addslice.com/?crew=VFFbJ"
        target="_blank" rel="noopener noreferrer" title="Hatty's Pick – Slice App">
-      <img src="img/slice-app.gif" alt="Hatty's Pick – Try Slice App" />
+      <img src="img/slice-app.gif" alt="Hatty's Pick – Try Slice App" loading="lazy" />
     </a>
     <span class="house-ad-label">Hatty's Pick</span>
   </div>
@@ -565,14 +553,7 @@
   <div id="tour-label">🚀 Touring the Universe…</div>
   <button id="tour-btn" onclick="toggleTour()">🚀 Take a Tour</button>
 
-  <div id="mobile-controls">
-    <div class="mob-row"><div class="mob-btn" id="btn-up">↑</div></div>
-    <div class="mob-row">
-      <div class="mob-btn" id="btn-left">←</div>
-      <div class="mob-btn" id="btn-down">↓</div>
-      <div class="mob-btn" id="btn-right">→</div>
-    </div>
-  </div>
+  <div id="joystick-zone"></div>
 
 </div>
 
@@ -586,7 +567,10 @@
 </script>
 
 <script type="module">
-  import * as THREE from "https://unpkg.com/three@0.160.0/build/three.module.js";
+  import * as THREE from "three";
+  import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
+  import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
+  import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
 
   const container = document.getElementById("universe-container");
   const tooltip   = document.getElementById("hover-tooltip");
@@ -610,6 +594,15 @@
   fillLight.position.set(0, 0, 200);
   scene.add(fillLight);
 
+  const renderScene = new RenderPass(scene, camera);
+  const bloomPass = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 1.5, 0.4, 0.85);
+  bloomPass.threshold = 0.1;
+  bloomPass.strength = 1.6;
+  bloomPass.radius = 0.8;
+  const composer = new EffectComposer(renderer);
+  composer.addPass(renderScene);
+  composer.addPass(bloomPass);
+
   let starField1, starField2;
   (function() {
     const geo1 = new THREE.BufferGeometry();
@@ -627,7 +620,26 @@
     scene.add(starField2);
   })();
 
-  const tl = new THREE.TextureLoader();
+  const manager = new THREE.LoadingManager();
+  const enterBtn = document.getElementById("splash-enter");
+  
+  function setReady() {
+    enterBtn.textContent = '⬡ Enter Universe ⬡';
+    enterBtn.disabled = false;
+    enterBtn.style.cursor = 'pointer';
+  }
+
+  manager.onProgress = function (url, itemsLoaded, itemsTotal) {
+    if (enterBtn.disabled) {
+      enterBtn.textContent = `Loading... ${Math.round((itemsLoaded / itemsTotal) * 100)}%`;
+    }
+  };
+  manager.onLoad = setReady;
+  manager.onError = function(url) {
+    console.warn("Error loading texture:", url);
+    setReady(); // Don't get stuck if an image fails
+  };
+  const tl = new THREE.TextureLoader(manager);
 
   const glowCanvas = document.createElement("canvas"); glowCanvas.width = 256; glowCanvas.height = 256;
   const ctx = glowCanvas.getContext("2d");
@@ -663,19 +675,19 @@
     mesh.position.copy(pos);
     mesh.userData = { label, url, radius };
     scene.add(mesh);
-    addGlow(mesh, radius, emissiveHex);
+    // addGlow(mesh, radius, emissiveHex); // Disabled for Bloom Pass
     return mesh;
   }
 
   const V = (x,y,z) => new THREE.Vector3(x,y,z);
 
   const planets = [
-    makePlanet(8,  0x99ccff, V(50,0,0),      "Learn With Hatty",        "https://earnwithhatty.com/",                                                                                 "https://i.ibb.co/LhB2ncPR/Learn-with-hatty-2-1.png",                           "rgba(100,180,255,1)"),
-    makePlanet(5,  0xffcc55, V(97,10,21),    "Hatty Tools",             "https://earn-with-hatty-tools.netlify.app/",                                                                "https://i.ibb.co/9kWjbb8f/grok-image-f2f24317-2ad0-42f9-8a67-53cfeaec08ca.jpg","rgba(255,200,80,1)"),
-    makePlanet(10, 0x4488ff, V(108,-30,50),    "Learn Cardano",           "https://youtu.be/xWImSw79Y6I?si=JFPZG8z22KKAHE7f",                                                        "https://i.ibb.co/LzgZj25F/cardano-ada-logo.png",                                "rgba(60,140,255,1)"),
-    makePlanet(3,  0x55ffcc, V(131,40,100),    "Privacy Gadgets",         "https://privacy-gadgets-hub.netlify.app/",                                                                 "https://i.ibb.co/XZRJ7FJ6/45bb8258-7d85-4d3a-b149-abdcc157035a.jpg",           "rgba(80,255,200,1)"),
-    makePlanet(9,  0x3355ff, V(130,-40,153),  "Cardano Planet",          "https://cardano.org/",                                                                                     "https://i.ibb.co/sv8X6ksV/Screenshot-2026-03-04-112403.png",                    "rgba(80,110,255,1)"),
-    makePlanet(7,  0xaa55ff, V(111,20,209),   "Voi Planet",              "https://voi.network/",                                                                                     "https://i.ibb.co/vCQSwR8R/Screenshot-2026-03-04-112456.png",                    "rgba(180,100,255,1)"),
+    makePlanet(8,  0x99ccff, V(50,0,0),      "Learn With Hatty",        "https://earnwithhatty.com/",                                                                                 "img/learn-with-hatty.png",                           "rgba(100,180,255,1)"),
+    makePlanet(5,  0xffcc55, V(97,10,21),    "Hatty Tools",             "https://earn-with-hatty-tools.netlify.app/",                                                                "img/hatty-tools.jpg","rgba(255,200,80,1)"),
+    makePlanet(10, 0x4488ff, V(108,-30,50),    "Learn Cardano",           "https://youtu.be/xWImSw79Y6I?si=JFPZG8z22KKAHE7f",                                                        "img/cardano-ada.png",                                "rgba(60,140,255,1)"),
+    makePlanet(3,  0x55ffcc, V(131,40,100),    "Privacy Gadgets",         "https://privacy-gadgets-hub.netlify.app/",                                                                 "img/privacy-gadgets.jpg",           "rgba(80,255,200,1)"),
+    makePlanet(9,  0x3355ff, V(130,-40,153),  "Cardano Planet",          "https://cardano.org/",                                                                                     "img/cardano-planet.png",                    "rgba(80,110,255,1)"),
+    makePlanet(7,  0xaa55ff, V(111,20,209),   "Voi Planet",              "https://voi.network/",                                                                                     "img/voi-planet.png",                    "rgba(180,100,255,1)"),
     makePlanet(6,  0xff9955, V(46,60,166),   "Hatty's News",            "https://hattyhats.github.io/hattys-news/",                                                                 "img/hattys-news.jpeg",                                                          "rgba(255,150,80,1)"),
     makePlanet(7,  0xff55aa, V(7,-60,131),   "Hatty's Media",           "https://hattys-media.netlify.app/",                                                                        "img/hattys-media.png",                                                          "rgba(255,80,180,1)"),
     makePlanet(6,  0x44ffcc, V(-39,80,241),   "OpenFocus",               "https://hattyhats.github.io/Open-Focus/",                                                                  "img/openfucus.png",                                                             "rgba(60,255,200,1)"),
@@ -721,19 +733,26 @@
     }
   });
 
-  function bindBtn(id, key) {
-    const el = document.getElementById(id); if (!el) return;
-    const on  = () => { keys[key]=true;  el.classList.add("pressed"); };
-    const off = () => { keys[key]=false; el.classList.remove("pressed"); };
-    el.addEventListener("touchstart",  e=>{e.preventDefault();on(); },{passive:false});
-    el.addEventListener("touchend",    e=>{e.preventDefault();off();},{passive:false});
-    el.addEventListener("touchcancel", e=>{e.preventDefault();off();},{passive:false});
-    el.addEventListener("mousedown",  on);
-    el.addEventListener("mouseup",    off);
-    el.addEventListener("mouseleave", off);
+  // ── Mobile Joystick ──
+  const isMobile = window.matchMedia("(hover: none) and (pointer: coarse)").matches;
+  if (isMobile && typeof nipplejs !== 'undefined') {
+    const joystickManager = nipplejs.create({
+      zone: document.getElementById('joystick-zone'),
+      mode: 'static',
+      position: { left: '75px', bottom: '75px' },
+      color: 'rgba(160,120,255,0.8)'
+    });
+    joystickManager.on('move', (evt, data) => {
+      const angle = data.angle.degree;
+      keys['KeyW'] = angle > 45 && angle < 135;
+      keys['KeyS'] = angle > 225 && angle < 315;
+      keys['KeyA'] = angle > 135 && angle < 225;
+      keys['KeyD'] = (angle > 315 || angle < 45);
+    });
+    joystickManager.on('end', () => {
+      keys['KeyW'] = keys['KeyS'] = keys['KeyA'] = keys['KeyD'] = false;
+    });
   }
-  bindBtn("btn-up","KeyW"); bindBtn("btn-down","KeyS");
-  bindBtn("btn-left","KeyA"); bindBtn("btn-right","KeyD");
 
   let yaw=0, pitch=0;
   const BASE_SPEED = 40;
@@ -871,6 +890,7 @@
   window.addEventListener("resize",()=>{
     camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix();
     renderer.setSize(innerWidth,innerHeight);
+    composer.setSize(innerWidth,innerHeight);
   });
 
   // ── Guided Tour ──
@@ -1000,7 +1020,7 @@
 
     tickTour(dt);
     if(!tourActive){ updateRot(); updatePos(dt); }
-    renderer.render(scene,camera);
+    composer.render();
     requestAnimationFrame(animate);
   }
   animate();

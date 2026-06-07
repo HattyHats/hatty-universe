@@ -439,6 +439,12 @@
       box-shadow: 0 0 12px rgba(250,200,0,0.4);
     }
     #boost-indicator.active { opacity: 1; }
+    #targeting-system { font-family: 'Orbitron', sans-serif; }
+    #target-search { background: rgba(0,0,0,0.6); border: 1px solid #4488ff; color: #fff; padding: 6px 12px; border-radius: 4px; outline: none; font-family: 'Orbitron', sans-serif; width: 180px; transition: all 0.2s ease; }
+    #target-search:focus { box-shadow: 0 0 8px #4488ff; }
+    #target-dropdown { position: absolute; top: 100%; left: 0; right: 0; background: rgba(0,0,0,0.8); border: 1px solid #4488ff; border-top: none; border-radius: 0 0 4px 4px; display: none; max-height: 200px; overflow-y: auto; z-index: 1000; }
+    .target-item { padding: 8px 12px; cursor: pointer; color: #fff; font-size: 12px; transition: background 0.2s; }
+    .target-item:hover { background: rgba(68,136,255,0.4); }
   </style>
 </head>
 <body>
@@ -511,40 +517,11 @@
   </button>
 
   <!-- Jump-To Dropdown -->
-  <div id="jump-wrap">
-    <select id="jump-select" onchange="jumpToPlanet(this)">
-      <option value="" disabled selected>🪐 Jump To World…</option>
-      <option value="0">Learn With Hatty</option>
-      <option value="1">Hatty Tools</option>
-      <option value="2">Learn Cardano</option>
-      <option value="3">Privacy Gadgets</option>
-      <option value="4">Cardano Planet</option>
-      <option value="5">Voi Planet</option>
-      <option value="6">Hatty's News</option>
-      <option value="7">Hatty's Media</option>
-      <option value="8">OpenFocus</option>
-      <option value="9">Psycho Satoshi – Audius</option>
-      <option value="10">PublishOX</option>
-      <option value="11">Slice App</option>
-      <option value="12">The Arena</option>
-      <option value="13">Chainers</option>
-      <option value="14">Cointiply</option>
-      <option value="15">CryptoNaut</option>
-      <option value="16">Voi Fountain</option>
-      <option value="17">Rollercoin</option>
-      <option value="18">Immutable</option>
-      <option value="19">FaucetCrypto</option>
-      <option value="20">Vie Faucet</option>
-      <option value="21">Suno</option>
-      <option value="22">X (Twitter)</option>
-      <option value="23">Focus</option>
-      <option value="24">Iagon</option>
-      <option value="25">TapTools</option>
-      <option value="26">FaucetPay</option>
-      <option value="27">Voi Maze</option>
-      <option value="28">CaseBoard</option>
-      <option value="29">The Hatty Sun</option>
-    </select>
+  <div id="jump-wrap" style="display:flex; align-items:center; gap:10px;">
+    <div id="targeting-system" style="position:relative;">
+      <input type="text" id="target-search" placeholder="Target System..." autocomplete="off" />
+      <div id="target-dropdown"></div>
+    </div>
   </div>
 
   <div id="hover-tooltip"></div>
@@ -681,37 +658,157 @@
 
   const V = (x,y,z) => new THREE.Vector3(x,y,z);
 
+  
+  const moons = [];
+
+  function makeMoon(parentPlanet, radius, emissiveHex, orbitRadius, orbitSpeed, label, url, texUrl) {
+    const mat = new THREE.MeshStandardMaterial({
+      color: 0xffffff, roughness:.3, metalness:.05,
+      emissive: new THREE.Color(emissiveHex), emissiveIntensity:.2
+    });
+    if (texUrl) tl.load(texUrl, tex => {
+      tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+      mat.map = mat.emissiveMap = tex;
+      mat.emissiveIntensity = .25; mat.needsUpdate = true;
+    });
+    const mesh = new THREE.Mesh(new THREE.SphereGeometry(radius,48,48), mat);
+    
+    const pivot = new THREE.Object3D();
+    pivot.position.copy(parentPlanet.position);
+    scene.add(pivot);
+    
+    mesh.position.set(orbitRadius, 0, 0);
+    mesh.userData = { label, url, radius, isMoon: true, pivot, orbitSpeed, parent: parentPlanet };
+    pivot.add(mesh);
+    
+    planets.push(mesh);
+    moons.push(mesh);
+    return mesh;
+  }
+
+  const pLearnHatty = makePlanet(8,  0x99ccff, V(50,0,0),      "Learn With Hatty",        "https://earnwithhatty.com/", "img/learn-with-hatty.png");
+  const pHattyTools = makePlanet(5,  0xffcc55, V(97,10,21),    "Hatty Tools",             "https://earn-with-hatty-tools.netlify.app/", "img/hatty-tools.jpg");
+  const pLearnCardano = makePlanet(10, 0x4488ff, V(108,-30,50),    "Learn Cardano",           "https://youtu.be/xWImSw79Y6I?si=JFPZG8z22KKAHE7f", "img/cardano-ada.png");
+  const pPrivacyGadgets = makePlanet(3,  0x55ffcc, V(131,40,100),    "Privacy Gadgets",         "https://privacy-gadgets-hub.netlify.app/", "img/privacy-gadgets.jpg");
+  const pCardano = makePlanet(9,  0x3355ff, V(130,-40,153),  "Cardano Planet",          "https://cardano.org/", "img/cardano-planet.png");
+  const pVoi = makePlanet(7,  0xaa55ff, V(111,20,209),   "Voi Planet",              "https://voi.network/", "img/voi-planet.png");
+  
   const planets = [
-    makePlanet(8,  0x99ccff, V(50,0,0),      "Learn With Hatty",        "https://earnwithhatty.com/",                                                                                 "img/learn-with-hatty.png",                           "rgba(100,180,255,1)"),
-    makePlanet(5,  0xffcc55, V(97,10,21),    "Hatty Tools",             "https://earn-with-hatty-tools.netlify.app/",                                                                "img/hatty-tools.jpg","rgba(255,200,80,1)"),
-    makePlanet(10, 0x4488ff, V(108,-30,50),    "Learn Cardano",           "https://youtu.be/xWImSw79Y6I?si=JFPZG8z22KKAHE7f",                                                        "img/cardano-ada.png",                                "rgba(60,140,255,1)"),
-    makePlanet(3,  0x55ffcc, V(131,40,100),    "Privacy Gadgets",         "https://privacy-gadgets-hub.netlify.app/",                                                                 "img/privacy-gadgets.jpg",           "rgba(80,255,200,1)"),
-    makePlanet(9,  0x3355ff, V(130,-40,153),  "Cardano Planet",          "https://cardano.org/",                                                                                     "img/cardano-planet.png",                    "rgba(80,110,255,1)"),
-    makePlanet(7,  0xaa55ff, V(111,20,209),   "Voi Planet",              "https://voi.network/",                                                                                     "img/voi-planet.png",                    "rgba(180,100,255,1)"),
-    makePlanet(6,  0xff9955, V(46,60,166),   "Hatty's News",            "https://hattyhats.github.io/hattys-news/",                                                                 "img/hattys-news.jpeg",                                                          "rgba(255,150,80,1)"),
-    makePlanet(7,  0xff55aa, V(7,-60,131),   "Hatty's Media",           "https://hattys-media.netlify.app/",                                                                        "img/hattys-media.png",                                                          "rgba(255,80,180,1)"),
-    makePlanet(6,  0x44ffcc, V(-39,80,241),   "OpenFocus",               "https://hattyhats.github.io/Open-Focus/",                                                                  "img/openfucus.png",                                                             "rgba(60,255,200,1)"),
-    makePlanet(5,  0xff4488, V(-107,-30,270),  "Psycho Satoshi – Audius", "https://audius.co/hatty",                                                                                  "img/audius.webp",                                                               "rgba(255,60,140,1)"),
-    makePlanet(4,  0xffdd44, V(-181,30,267),  "PublishOX",               "https://www.publish0x.com/@HattyHats",                                                                     "img/publishox.png",                                                             "rgba(255,220,60,1)"),
-    makePlanet(6,  0xff8833, V(-207,-80,196),   "Slice App",               "https://addslice.com/?crew=VFFbJ",                                                                         "img/slice-app.gif",                                                             "rgba(255,130,50,1)"),
-    makePlanet(5,  0x6688ff, V(-321,60,193),   "The Arena",               "https://arena.social/?ref=hatty_hats",                                                                     "img/the-arena.png",                                                             "rgba(100,140,255,1)"),
-    makePlanet(5,  0xee4422, V(-349,-90,117),  "Chainers",                "https://chainers.io/?r=lzmpadgw",                                                                          "img/chainers.png",                                                              "rgba(240,70,40,1)"),
-    makePlanet(4,  0xffcc00, V(-378,100,41),   "Cointiply",               "https://cointiply.com/r/lNm1",                                                                             "img/cointiply.png",                                                             "rgba(255,210,0,1)"),
-    makePlanet(5,  0x22ccff, V(-432,-30,-46), "CryptoNaut",              "https://cryptonaut.id/?ref=HattyHats",                                                                     "img/cryptonaut.png",                                                            "rgba(30,200,255,1)"),
-    makePlanet(4,  0x88ff44, V(-413,80,-139),   "Voi Fountain",            "https://fountain.voirewards.com/",                                                                         "img/voi-fountain.png",                                                          "rgba(140,255,70,1)"),
-    makePlanet(6,  0xffaa00, V(-378,-110,-227), "Rollercoin",              "https://rollercoin.com/?r=kj0blr6a",                                                                       "img/rollercoin.png",                                                            "rgba(255,170,0,1)"),
-    makePlanet(7,  0x00ccff, V(-361,-50,-342),  "Immutable",               "https://play.immutable.com/referral/share/9XVsFq?utm_source=referral",                                     "img/immutable.png",                                                             "rgba(0,200,255,1)"),
-    makePlanet(4,  0x44ff88, V(-289,70,-427),  "FaucetCrypto",            "https://faucetcrypto.com/r/102755",                                                                        "img/faucet-crypto.png",                                                         "rgba(60,255,130,1)"),
-    makePlanet(4,  0xcc44ff, V(-185,-130,-466),  "Vie Faucet",              "https://viefaucet.com?r=680856217d2144c71c23c02c",                                                         "img/vie-faucet.png",                                                            "rgba(200,60,255,1)"),
-    makePlanet(5,  0xff3366, V(-85,120,-522), "Suno",                    "https://suno.com/invite/@hattyhats",                                                                       "img/suno.png",                                                                  "rgba(255,50,100,1)"),
-    makePlanet(5,  0xdddddd, V(31,40,-578),   "X (Twitter)",             "https://x.com/hatty_hats",                                                                                "img/x-hatty.png",                                                               "rgba(220,220,220,1)"),
-    makePlanet(5,  0x8855ff, V(160,-60,-579), "Focus",                   "https://focus.xyz/Hatty_Hats",                                                                             "img/focus.png",                                                                 "rgba(140,80,255,1)"),
-    makePlanet(6,  0x0099ff, V(274,150,-517),   "Iagon",                   "https://iagon.com/",                                                                                       "img/iagon.png",                                                                 "rgba(0,150,255,1)"),
-    makePlanet(5,  0xff6600, V(390,-150,-459), "TapTools",                "https://www.taptools.io/",                                                                                  "img/tap-tools.png",                                                             "rgba(255,100,0,1)"),
-    makePlanet(4,  0x00ff99, V(526,-80,-400),  "FaucetPay",               "https://faucetpay.io/?r=31394",                                                                            "img/faucet-pay.png",                                                            "rgba(0,255,150,1)"),
-    makePlanet(5,  0x33eeff, V(592,60,-274),  "Voi Maze",                "https://hattyhats.github.io/voi-maze/",                                                                    "img/voi-maze.png",                                                              "rgba(50,230,255,1)"),
-    makePlanet(6,  0xff9900, V(651,-170,-143),  "CaseBoard",               "https://case-board.netlify.app",                                                                            "img/case-board.png",                                                            "rgba(255,150,0,1)"),
-    makePlanet(20, 0xffcc00, V(0,0,0),         "The Hatty Sun",           "https://earnwithhatty.com/",                                                                                "hattyhats.png"),  ];
+    pLearnHatty, pHattyTools, pLearnCardano, pPrivacyGadgets, pCardano, pVoi,
+    makePlanet(6,  0xff9955, V(46,60,166),   "Hatty's News",            "https://hattyhats.github.io/hattys-news/", "img/hattys-news.jpeg"),
+    makePlanet(7,  0xff55aa, V(7,-60,131),   "Hatty's Media",           "https://hattys-media.netlify.app/", "img/hattys-media.png"),
+    makePlanet(6,  0x44ffcc, V(-39,80,241),   "OpenFocus",               "https://hattyhats.github.io/Open-Focus/", "img/openfucus.png"),
+    makePlanet(5,  0xff4488, V(-107,-30,270),  "Psycho Satoshi – Audius", "https://audius.co/hatty", "img/audius.webp"),
+    makePlanet(4,  0xffdd44, V(-181,30,267),  "PublishOX",               "https://www.publish0x.com/@HattyHats", "img/publishox.png"),
+    makePlanet(6,  0xff8833, V(-207,-80,196),   "Slice App",               "https://addslice.com/?crew=VFFbJ", "img/slice-app.png"),
+    makePlanet(5,  0x6688ff, V(-321,60,193),   "The Arena",               "https://arena.social/?ref=hatty_hats", "img/the-arena.png"),
+    makePlanet(5,  0xee4422, V(-349,-90,117),  "Chainers",                "https://chainers.io/?r=lzmpadgw", "img/chainers.png"),
+    makePlanet(4,  0xffcc00, V(-378,100,41),   "Cointiply",               "https://cointiply.com/r/lNm1", "img/cointiply.png"),
+    makePlanet(5,  0x22ccff, V(-432,-30,-46), "CryptoNaut",              "https://cryptonaut.id/?ref=HattyHats", "img/cryptonaut.png"),
+    makePlanet(6,  0xffaa00, V(-378,-110,-227), "Rollercoin",              "https://rollercoin.com/?r=kj0blr6a", "img/rollercoin.png"),
+    makePlanet(7,  0x00ccff, V(-361,-50,-342),  "Immutable",               "https://play.immutable.com/referral/share/9XVsFq?utm_source=referral", "img/immutable.png"),
+    makePlanet(4,  0x44ff88, V(-289,70,-427),  "FaucetCrypto",            "https://faucetcrypto.com/r/102755", "img/faucet-crypto.png"),
+    makePlanet(4,  0xcc44ff, V(-185,-130,-466),  "Vie Faucet",              "https://viefaucet.com?r=680856217d2144c71c23c02c", "img/vie-faucet.png"),
+    makePlanet(5,  0xff3366, V(-85,120,-522), "Suno",                    "https://suno.com/invite/@hattyhats", "img/suno.png"),
+    makePlanet(5,  0xdddddd, V(31,40,-578),   "X (Twitter)",             "https://x.com/hatty_hats", "img/x-hatty.png"),
+    makePlanet(5,  0x8855ff, V(160,-60,-579), "Focus",                   "https://focus.xyz/Hatty_Hats", "img/focus.png"),
+    makePlanet(5,  0xff6600, V(390,-150,-459), "TapTools",                "https://www.taptools.io/", "img/tap-tools.png"),
+    makePlanet(4,  0x00ff99, V(526,-80,-400),  "FaucetPay",               "https://faucetpay.io/?r=31394", "img/faucet-pay.png"),
+    makePlanet(5,  0x33eeff, V(592,60,-274),  "Voi Maze",                "https://hattyhats.github.io/voi-maze/", "img/voi-maze.png"),
+    makePlanet(6,  0xff9900, V(651,-170,-143),  "CaseBoard",               "https://case-board.netlify.app", "img/case-board.png"),
+    makePlanet(20, 0xffcc00, V(0,0,0),         "The Hatty Sun",           "https://earnwithhatty.com/", "hattyhats.png")
+  ];
+
+  // Add the Moons!
+  makeMoon(pCardano, 4, 0x0099ff, 18, 0.4, "Iagon", "https://iagon.com/", "img/iagon.png");
+  makeMoon(pCardano, 3.5, 0x00ff88, 26, 0.25, "Palm Economy", "https://palmeconomy.io", "img/palm_economy.png");
+  makeMoon(pVoi, 3.5, 0x88ff44, 15, 0.5, "Voi Fountain", "https://fountain.voirewards.com/", "img/voi_fountain.png");
+  makeMoon(pHattyTools, 2.5, 0x00ffff, 11, 0.6, "Quick-Pad", "https://hatsquickpad.netlify.app/", "img/quick_pad.png");
+  makeMoon(pHattyTools, 3, 0xff00ff, 15, 0.4, "Local-Cast", "https://hattyhats.github.io/local-cast/", "img/local_cast.png");
+  makeMoon(pHattyTools, 2.8, 0x00ff00, 20, 0.3, "Data-Phone", "https://data-phone-app.onrender.com", "img/data_phone.png");
+
+
+  
+  // ── Targeting Laser ──
+  const laserMat = new THREE.LineBasicMaterial({ color: 0x00ffff, linewidth: 2, transparent: true, opacity: 0 });
+  const laserGeo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3()]);
+  const laserLine = new THREE.Line(laserGeo, laserMat);
+  scene.add(laserLine);
+  let activeTarget = null;
+
+  function engageTarget(planet) {
+    activeTarget = planet;
+    snapTo(planet);
+    laserMat.opacity = 0.8;
+  }
+
+  // ── Asteroid Belt ──
+  const astGeo = new THREE.DodecahedronGeometry(1.5, 0);
+  const astMat = new THREE.MeshStandardMaterial({ color: 0x888888, roughness: 0.8, metalness: 0.1 });
+  const asteroidCount = 400;
+  const asteroids = new THREE.InstancedMesh(astGeo, astMat, asteroidCount);
+  const dummy = new THREE.Object3D();
+  for(let i=0; i<asteroidCount; i++) {
+    const angle = Math.random() * Math.PI * 2;
+    const r = 250 + Math.random() * 300;
+    const y = (Math.random() - 0.5) * 80;
+    dummy.position.set(Math.cos(angle)*r, y, Math.sin(angle)*r);
+    dummy.rotation.set(Math.random()*Math.PI, Math.random()*Math.PI, Math.random()*Math.PI);
+    const scale = 0.5 + Math.random() * 2;
+    dummy.scale.set(scale, scale, scale);
+    dummy.updateMatrix();
+    asteroids.setMatrixAt(i, dummy.matrix);
+  }
+  scene.add(asteroids);
+
+  // ── Shooting Stars ──
+  const starGeo = new THREE.CylinderGeometry(0.1, 0.1, 40, 4);
+  starGeo.rotateX(Math.PI / 2);
+  const starMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.8 });
+  const shootingStars = [];
+  for(let i=0; i<5; i++) {
+    const mesh = new THREE.Mesh(starGeo, starMat);
+    mesh.position.set((Math.random()-0.5)*1000, (Math.random()-0.5)*500, (Math.random()-0.5)*1000);
+    mesh.userData = { 
+      dir: new THREE.Vector3((Math.random()-0.5), (Math.random()-0.5), (Math.random()-0.5)).normalize(),
+      speed: 400 + Math.random()*300 
+    };
+    mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0,0,1), mesh.userData.dir);
+    scene.add(mesh);
+    shootingStars.push(mesh);
+  }
+
+  // ── Targeting UI Setup ──
+  const searchInput = document.getElementById("target-search");
+  const searchDrop = document.getElementById("target-dropdown");
+
+  function updateDropdown() {
+    const q = searchInput.value.toLowerCase();
+    searchDrop.innerHTML = "";
+    if(!q) { searchDrop.style.display = "none"; return; }
+    
+    const matches = planets.filter(p => p.userData.label && p.userData.label.toLowerCase().includes(q));
+    if(matches.length === 0) { searchDrop.style.display = "none"; return; }
+    
+    matches.forEach(p => {
+      const d = document.createElement("div");
+      d.className = "target-item";
+      d.textContent = p.userData.label + (p.userData.isMoon ? " (Moon)" : "");
+      d.onclick = () => {
+        searchInput.value = p.userData.label;
+        searchDrop.style.display = "none";
+        engageTarget(p);
+      };
+      searchDrop.appendChild(d);
+    });
+    searchDrop.style.display = "block";
+  }
+
+  searchInput.addEventListener("input", updateDropdown);
+  searchInput.addEventListener("focus", updateDropdown);
+  document.addEventListener("click", e => {
+    if(e.target !== searchInput) searchDrop.style.display = "none";
+  });
 
   // ── Controls ──
   // Track shift for boost
@@ -996,12 +1093,7 @@
     }
   }
 
-  // ── Jump-To dropdown ──
-  window.jumpToPlanet = function(sel) {
-    const idx = parseInt(sel.value, 10);
-    if (!isNaN(idx) && planets[idx]) snapTo(planets[idx]);
-    setTimeout(() => { sel.value = ""; }, 50);
-  };
+
 
   const clock=new THREE.Clock();
   const upVector = new THREE.Vector3(0,1,0);
@@ -1013,10 +1105,37 @@
     if (starField2) starField2.rotation.y -= 0.008 * dt;
 
     planets.forEach((p,i)=> {
-      p.rotation.y+=.12*dt*(i+1);
-      const speed = 0.02 + ((i % 5) * 0.005);
-      p.position.applyAxisAngle(upVector, speed * dt);
+      if(!p.userData.isMoon) {
+        p.rotation.y+=.12*dt*(i+1);
+        const speed = 0.02 + ((i % 5) * 0.005);
+        p.position.applyAxisAngle(upVector, speed * dt);
+      }
     });
+
+    moons.forEach((m) => {
+      m.userData.pivot.position.copy(m.userData.parent.position);
+      m.userData.pivot.rotation.y += m.userData.orbitSpeed * dt;
+      m.rotation.y += 0.5 * dt;
+    });
+
+    if (activeTarget) {
+      // Draw laser from slightly below camera to target
+      const startPos = camera.position.clone().add(new THREE.Vector3(0, -2, 0).applyQuaternion(camera.quaternion));
+      let targetPos = new THREE.Vector3();
+      activeTarget.getWorldPosition(targetPos);
+      laserGeo.setFromPoints([startPos, targetPos]);
+      laserGeo.attributes.position.needsUpdate = true;
+      if (laserMat.opacity > 0) laserMat.opacity -= dt * 0.2; // Fade out slowly
+    }
+
+    asteroids.rotation.y += 0.01 * dt;
+    shootingStars.forEach(s => {
+      s.position.add(s.userData.dir.clone().multiplyScalar(s.userData.speed * dt));
+      if (s.position.length() > 1000) {
+        s.position.set((Math.random()-0.5)*1000, (Math.random()-0.5)*500, (Math.random()-0.5)*1000);
+      }
+    });
+
 
     tickTour(dt);
     if(!tourActive){ updateRot(); updatePos(dt); }

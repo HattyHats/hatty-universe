@@ -545,6 +545,10 @@
     splash.classList.add('exiting');
     setTimeout(() => { splash.style.display = 'none'; }, 700);
     window.isEnteringUniverse = true;
+    setTimeout(() => {
+      window.isEnteringUniverse = false;
+      window.hasEnteredUniverse = true;
+    }, 2500); // Failsafe to guarantee they regain free-roam control
   }
 </script>
 
@@ -1152,12 +1156,11 @@
       camera.position.z -= 50 * dt;
     }
     if (window.isEnteringUniverse) {
-      // Fast swoop in when they click Enter (fixed alpha prevents lag spike teleport)
+      // Fast swoop in when they click Enter
       camera.position.lerp(new THREE.Vector3(0, 0, 50), 0.04);
       if (camera.position.z < 51) {
         window.isEnteringUniverse = false;
         window.hasEnteredUniverse = true;
-        camera.position.set(0, 0, 50);
       }
     }
 

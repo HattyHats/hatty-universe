@@ -578,7 +578,7 @@
 
   const renderScene = new RenderPass(scene, camera);
   const bloomPass = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 1.5, 0.4, 0.85);
-  bloomPass.threshold = 0.1;
+  bloomPass.threshold = 0.45;
   bloomPass.strength = 1.6;
   bloomPass.radius = 0.8;
   const composer = new EffectComposer(renderer);
@@ -644,14 +644,20 @@
   }
 
   function makePlanet(radius, emissiveHex, pos, label, url, texUrl, glow) {
-    const mat = new THREE.MeshStandardMaterial({
-      color: 0xffffff, roughness:.3, metalness:.05,
-      emissive: new THREE.Color(emissiveHex), emissiveIntensity: label === "The Hatty Sun" ? 0.0 : .2
-    });
+    const mat = label === "The Hatty Sun" 
+      ? new THREE.MeshBasicMaterial({ color: 0x666666 }) 
+      : new THREE.MeshStandardMaterial({
+          color: 0xffffff, roughness:.3, metalness:.05,
+          emissive: new THREE.Color(emissiveHex), emissiveIntensity: .2
+        });
     if (texUrl) tl.load(texUrl, tex => {
       tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
-      mat.map = mat.emissiveMap = tex;
-      mat.emissiveIntensity = label === "The Hatty Sun" ? 0.0 : .25; mat.needsUpdate = true;
+      mat.map = tex;
+      if (mat.emissiveMap !== undefined) {
+        mat.emissiveMap = tex;
+        mat.emissiveIntensity = 0.25;
+      }
+      mat.needsUpdate = true;
     });
     const mesh = new THREE.Mesh(new THREE.SphereGeometry(radius,48,48), mat);
     mesh.position.copy(pos);
@@ -672,14 +678,20 @@
   const moons = [];
 
   function makeMoon(parentPlanet, radius, emissiveHex, orbitRadius, orbitSpeed, label, url, texUrl) {
-    const mat = new THREE.MeshStandardMaterial({
-      color: 0xffffff, roughness:.3, metalness:.05,
-      emissive: new THREE.Color(emissiveHex), emissiveIntensity: label === "The Hatty Sun" ? 0.0 : .2
-    });
+    const mat = label === "The Hatty Sun" 
+      ? new THREE.MeshBasicMaterial({ color: 0x666666 }) 
+      : new THREE.MeshStandardMaterial({
+          color: 0xffffff, roughness:.3, metalness:.05,
+          emissive: new THREE.Color(emissiveHex), emissiveIntensity: .2
+        });
     if (texUrl) tl.load(texUrl, tex => {
       tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
-      mat.map = mat.emissiveMap = tex;
-      mat.emissiveIntensity = label === "The Hatty Sun" ? 0.0 : .25; mat.needsUpdate = true;
+      mat.map = tex;
+      if (mat.emissiveMap !== undefined) {
+        mat.emissiveMap = tex;
+        mat.emissiveIntensity = 0.25;
+      }
+      mat.needsUpdate = true;
     });
     const mesh = new THREE.Mesh(new THREE.SphereGeometry(radius,48,48), mat);
     

@@ -45,8 +45,8 @@
       justify-content: center;
       gap: 0;
       overflow: hidden;
-      background: rgba(0,0,0,0.7);
-      backdrop-filter: blur(8px);
+      background: rgba(0,0,0,0.4);
+      backdrop-filter: blur(2px);
     }
 
     #splash-bg {
@@ -544,6 +544,7 @@
     const splash = document.getElementById('splash');
     splash.classList.add('exiting');
     setTimeout(() => { splash.style.display = 'none'; }, 700);
+    window.isEnteringUniverse = true;
   }
 </script>
 
@@ -561,7 +562,7 @@
   scene.background = new THREE.Color(0x02030a);
 
   const camera = new THREE.PerspectiveCamera(75, innerWidth/innerHeight, 0.1, 2000);
-  camera.position.set(0, 0, 50);
+  camera.position.set(0, 0, 800);
 
   const renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setSize(innerWidth, innerHeight);
@@ -645,18 +646,23 @@
   function makePlanet(radius, emissiveHex, pos, label, url, texUrl, glow) {
     const mat = new THREE.MeshStandardMaterial({
       color: 0xffffff, roughness:.3, metalness:.05,
-      emissive: new THREE.Color(emissiveHex), emissiveIntensity:.2
+      emissive: new THREE.Color(emissiveHex), emissiveIntensity: label === "The Hatty Sun" ? 0.0 : .2
     });
     if (texUrl) tl.load(texUrl, tex => {
       tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
       mat.map = mat.emissiveMap = tex;
-      mat.emissiveIntensity = .25; mat.needsUpdate = true;
+      mat.emissiveIntensity = label === "The Hatty Sun" ? 0.0 : .25; mat.needsUpdate = true;
     });
     const mesh = new THREE.Mesh(new THREE.SphereGeometry(radius,48,48), mat);
     mesh.position.copy(pos);
     mesh.userData = { label, url, radius };
     scene.add(mesh);
-    // addGlow(mesh, radius, emissiveHex); // Disabled for Bloom Pass
+    if (label === "The Hatty Sun") {
+      const auraGeo = new THREE.SphereGeometry(radius * 1.25, 32, 32);
+      const auraMat = new THREE.MeshBasicMaterial({ color: 0xff8800, transparent: true, opacity: 0.25, blending: THREE.AdditiveBlending, side: THREE.BackSide, depthWrite: false });
+      const auraMesh = new THREE.Mesh(auraGeo, auraMat);
+      mesh.add(auraMesh);
+    }
     return mesh;
   }
 
@@ -668,12 +674,12 @@
   function makeMoon(parentPlanet, radius, emissiveHex, orbitRadius, orbitSpeed, label, url, texUrl) {
     const mat = new THREE.MeshStandardMaterial({
       color: 0xffffff, roughness:.3, metalness:.05,
-      emissive: new THREE.Color(emissiveHex), emissiveIntensity:.2
+      emissive: new THREE.Color(emissiveHex), emissiveIntensity: label === "The Hatty Sun" ? 0.0 : .2
     });
     if (texUrl) tl.load(texUrl, tex => {
       tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
       mat.map = mat.emissiveMap = tex;
-      mat.emissiveIntensity = .25; mat.needsUpdate = true;
+      mat.emissiveIntensity = label === "The Hatty Sun" ? 0.0 : .25; mat.needsUpdate = true;
     });
     const mesh = new THREE.Mesh(new THREE.SphereGeometry(radius,48,48), mat);
     
@@ -690,49 +696,73 @@
     return mesh;
   }
 
-  const pLearnHatty = makePlanet(8,  0x99ccff, V(50,0,0),      "Learn With Hatty",        "https://earnwithhatty.com/", "img/learn-with-hatty.png");
+  const pLearnHatty = makePlanet(8,  0x99ccff, V(50,0,0),      "Learn With Hatty",        "https://earnwithhatty.com/", "img/learn-with-hatty.jpg");
   const pHattyTools = makePlanet(5,  0xffcc55, V(97,10,21),    "Hatty Tools",             "https://earn-with-hatty-tools.netlify.app/", "img/hatty-tools.jpg");
-  const pLearnCardano = makePlanet(10, 0x4488ff, V(108,-30,50),    "Learn Cardano",           "https://youtu.be/xWImSw79Y6I?si=JFPZG8z22KKAHE7f", "img/cardano-ada.png");
+  const pLearnCardano = makePlanet(10, 0x4488ff, V(108,-30,50),    "Learn Cardano",           "https://youtu.be/xWImSw79Y6I?si=JFPZG8z22KKAHE7f", "img/cardano-ada.jpg");
   const pPrivacyGadgets = makePlanet(3,  0x55ffcc, V(131,40,100),    "Privacy Gadgets",         "https://privacy-gadgets-hub.netlify.app/", "img/privacy-gadgets.jpg");
-  const pCardano = makePlanet(9,  0x3355ff, V(130,-40,153),  "Cardano Planet",          "https://cardano.org/", "img/cardano-planet.png");
-  const pVoi = makePlanet(7,  0xaa55ff, V(111,20,209),   "Voi Planet",              "https://voi.network/", "img/voi-planet.png");
+  const pCardano = makePlanet(9,  0x3355ff, V(130,-40,153),  "Cardano Planet",          "https://cardano.org/", "img/cardano-planet.jpg");
+  const pVoi = makePlanet(7,  0xaa55ff, V(111,20,209),   "Voi Planet",              "https://voi.network/", "img/voi-planet.jpg");
   
+  
+  const pAIHub = makePlanet(12, 0x8822ff, V(-100, 150, 300), "The AI Hub", "", "img/ai_hub.jpg");
+  const pEduHub = makePlanet(11, 0x2288ff, V(250, 100, -200), "Education & Open Source", "", "img/education_hub.jpg");
+
   const planets = [
+    pAIHub, pEduHub,
     pLearnHatty, pHattyTools, pLearnCardano, pPrivacyGadgets, pCardano, pVoi,
-    makePlanet(6,  0xff9955, V(46,60,166),   "Hatty's News",            "https://hattyhats.github.io/hattys-news/", "img/hattys-news.jpeg"),
-    makePlanet(7,  0xff55aa, V(7,-60,131),   "Hatty's Media",           "https://hattys-media.netlify.app/", "img/hattys-media.png"),
-    makePlanet(6,  0x44ffcc, V(-39,80,241),   "OpenFocus",               "https://hattyhats.github.io/Open-Focus/", "img/openfucus.png"),
-    makePlanet(5,  0xff4488, V(-107,-30,270),  "Psycho Satoshi – Audius", "https://audius.co/hatty", "img/audius.webp"),
-    makePlanet(4,  0xffdd44, V(-181,30,267),  "PublishOX",               "https://www.publish0x.com/@HattyHats", "img/publishox.png"),
-    makePlanet(6,  0xff8833, V(-207,-80,196),   "Slice App",               "https://addslice.com/?crew=VFFbJ", "img/slice-app.png"),
-    makePlanet(5,  0x6688ff, V(-321,60,193),   "The Arena",               "https://arena.social/?ref=hatty_hats", "img/the-arena.png"),
-    makePlanet(5,  0xee4422, V(-349,-90,117),  "Chainers",                "https://chainers.io/?r=lzmpadgw", "img/chainers.png"),
-    makePlanet(4,  0xffcc00, V(-378,100,41),   "Cointiply",               "https://cointiply.com/r/lNm1", "img/cointiply.png"),
-    makePlanet(5,  0x22ccff, V(-432,-30,-46), "CryptoNaut",              "https://cryptonaut.id/?ref=HattyHats", "img/cryptonaut.png"),
-    makePlanet(6,  0xffaa00, V(-378,-110,-227), "Rollercoin",              "https://rollercoin.com/?r=kj0blr6a", "img/rollercoin.png"),
-    makePlanet(7,  0x00ccff, V(-361,-50,-342),  "Immutable",               "https://play.immutable.com/referral/share/9XVsFq?utm_source=referral", "img/immutable.png"),
-    makePlanet(4,  0x44ff88, V(-289,70,-427),  "FaucetCrypto",            "https://faucetcrypto.com/r/102755", "img/faucet-crypto.png"),
-    makePlanet(4,  0xcc44ff, V(-185,-130,-466),  "Vie Faucet",              "https://viefaucet.com?r=680856217d2144c71c23c02c", "img/vie-faucet.png"),
-    makePlanet(5,  0xff3366, V(-85,120,-522), "Suno",                    "https://suno.com/invite/@hattyhats", "img/suno.png"),
-    makePlanet(5,  0xdddddd, V(31,40,-578),   "X (Twitter)",             "https://x.com/hatty_hats", "img/x-hatty.png"),
-    makePlanet(5,  0x8855ff, V(160,-60,-579), "Focus",                   "https://focus.xyz/Hatty_Hats", "img/focus.png"),
-    makePlanet(5,  0xff6600, V(390,-150,-459), "TapTools",                "https://www.taptools.io/", "img/tap-tools.png"),
-    makePlanet(4,  0x00ff99, V(526,-80,-400),  "FaucetPay",               "https://faucetpay.io/?r=31394", "img/faucet-pay.png"),
-    makePlanet(5,  0x33eeff, V(592,60,-274),  "Voi Maze",                "https://hattyhats.github.io/voi-maze/", "img/voi-maze.png"),
-    makePlanet(6,  0xff9900, V(651,-170,-143),  "CaseBoard",               "https://case-board.netlify.app", "img/case-board.png"),
-    makePlanet(20, 0xffcc00, V(0,0,0),         "The Hatty Sun",           "https://earnwithhatty.com/", "hattyhats.png")
+    makePlanet(6,  0xff9955, V(46,60,166),   "Hatty's News",            "https://hattyhats.github.io/hattys-news/", "img/hattys-news.jpg"),
+    makePlanet(7,  0xff55aa, V(7,-60,131),   "Hatty's Media",           "https://hattys-media.netlify.app/", "img/hattys-media.jpg"),
+    makePlanet(6,  0x44ffcc, V(-39,80,241),   "OpenFocus",               "https://hattyhats.github.io/Open-Focus/", "img/openfucus.jpg"),
+    makePlanet(5,  0xff4488, V(-107,-30,270),  "Psycho Satoshi – Audius", "https://audius.co/hatty", "img/audius.jpg"),
+    makePlanet(4,  0xffdd44, V(-181,30,267),  "PublishOX",               "https://www.publish0x.com/@HattyHats", "img/publishox.jpg"),
+    makePlanet(6,  0xff8833, V(-207,-80,196),   "Slice App",               "https://addslice.com/?crew=VFFbJ", "img/slice-app.jpg"),
+    makePlanet(5,  0x6688ff, V(-321,60,193),   "The Arena",               "https://arena.social/?ref=hatty_hats", "img/the-arena.jpg"),
+    makePlanet(5,  0xee4422, V(-349,-90,117),  "Chainers",                "https://chainers.io/?r=lzmpadgw", "img/chainers.jpg"),
+    makePlanet(4,  0xffcc00, V(-378,100,41),   "Cointiply",               "https://cointiply.com/r/lNm1", "img/cointiply.jpg"),
+    makePlanet(5,  0x22ccff, V(-432,-30,-46), "CryptoNaut",              "https://cryptonaut.id/?ref=HattyHats", "img/cryptonaut.jpg"),
+    makePlanet(6,  0xffaa00, V(-378,-110,-227), "Rollercoin",              "https://rollercoin.com/?r=kj0blr6a", "img/rollercoin.jpg"),
+    makePlanet(7,  0x00ccff, V(-361,-50,-342),  "Immutable",               "https://play.immutable.com/referral/share/9XVsFq?utm_source=referral", "img/immutable.jpg"),
+    makePlanet(4,  0x44ff88, V(-289,70,-427),  "FaucetCrypto",            "https://faucetcrypto.com/r/102755", "img/faucet-crypto.jpg"),
+    makePlanet(4,  0xcc44ff, V(-185,-130,-466),  "Vie Faucet",              "https://viefaucet.com?r=680856217d2144c71c23c02c", "img/vie-faucet.jpg"),
+    makePlanet(5,  0xff3366, V(-85,120,-522), "Suno",                    "https://suno.com/invite/@hattyhats", "img/suno.jpg"),
+    makePlanet(5,  0xdddddd, V(31,40,-578),   "X (Twitter)",             "https://x.com/hatty_hats", "img/x-hatty.jpg"),
+    makePlanet(5,  0x8855ff, V(160,-60,-579), "Focus",                   "https://focus.xyz/Hatty_Hats", "img/focus.jpg"),
+    makePlanet(5,  0xff6600, V(390,-150,-459), "TapTools",                "https://www.taptools.io/", "img/tap-tools.jpg"),
+    makePlanet(4,  0x00ff99, V(526,-80,-400),  "FaucetPay",               "https://faucetpay.io/?r=31394", "img/faucet-pay.jpg"),
+    makePlanet(5,  0x33eeff, V(592,60,-274),  "Voi Maze",                "https://hattyhats.github.io/voi-maze/", "img/voi-maze.jpg"),
+    makePlanet(6,  0xff9900, V(651,-170,-143),  "CaseBoard",               "https://case-board.netlify.app", "img/case-board.jpg"),
+    makePlanet(20, 0xffcc00, V(0,0,0),         "The Hatty Sun",           "https://earnwithhatty.com/", "hattyhats.jpg")
   ];
 
   // Add the Moons!
-  makeMoon(pCardano, 4, 0x0099ff, 18, 0.4, "Iagon", "https://iagon.com/", "img/iagon.png");
-  makeMoon(pCardano, 3.5, 0x00ff88, 26, 0.25, "Palm Economy", "https://palmeconomy.io", "img/palm_economy.png");
-  makeMoon(pVoi, 3.5, 0x88ff44, 15, 0.5, "Voi Fountain", "https://fountain.voirewards.com/", "img/voi_fountain.png");
-  makeMoon(pHattyTools, 2.5, 0x00ffff, 11, 0.6, "Quick-Pad", "https://hatsquickpad.netlify.app/", "img/quick_pad.png");
-  makeMoon(pHattyTools, 3, 0xff00ff, 15, 0.4, "Local-Cast", "https://hattyhats.github.io/local-cast/", "img/local_cast.png");
-  makeMoon(pHattyTools, 2.8, 0x00ff00, 20, 0.3, "Data-Phone", "https://data-phone-app.onrender.com", "img/data_phone.png");
+  makeMoon(pCardano, 4, 0x0099ff, 18, 0.4, "Iagon", "https://iagon.com/", "img/iagon.jpg");
+  makeMoon(pCardano, 3.5, 0x00ff88, 26, 0.25, "Palm Economy", "https://palmeconomy.io", "img/palm_economy.jpg");
+  makeMoon(pVoi, 3.5, 0x88ff44, 15, 0.5, "Voi Fountain", "https://fountain.voirewards.com/", "img/voi_fountain.jpg");
+  makeMoon(pHattyTools, 2.5, 0x00ffff, 11, 0.6, "Quick-Pad", "https://hatsquickpad.netlify.app/", "img/quick_pad.jpg");
+  makeMoon(pHattyTools, 3, 0xff00ff, 15, 0.4, "Local-Cast", "https://hattyhats.github.io/local-cast/", "img/local_cast.jpg");
+  makeMoon(pHattyTools, 2.8, 0x00ff00, 20, 0.3, "Data-Phone", "https://data-phone-app.onrender.com", "img/data_phone.jpg");
 
 
   
+  
+  // Privacy Moons
+  makeMoon(pPrivacyGadgets, 2.5, 0xff5500, 10, 0.4, "Brave Browser", "https://brave.com/", "img/brave_browser.jpg");
+  makeMoon(pPrivacyGadgets, 2, 0x00ff88, 14, 0.2, "Ghost Protocol", "https://hattyhats.github.io/local-metadata-scrubber/", "img/ghost_protocol.jpg");
+
+  // Cardano Moons
+  makeMoon(pCardano, 3.8, 0x00aaff, 34, 0.35, "Strike Finance", "https://app.strikefinance.org/trade/btc", "img/strike_finance.jpg");
+
+  // AI Hub Moons
+  makeMoon(pAIHub, 4, 0xff00aa, 20, 0.5, "Sentient", "https://www.sentient.xyz/", "img/sentient.jpg");
+  makeMoon(pAIHub, 4.5, 0x0044ff, 28, 0.3, "ASI Alliance", "https://superintelligence.io/", "img/asi_alliance.jpg");
+  makeMoon(pAIHub, 3.5, 0xffaa00, 36, 0.45, "Gensyn", "https://github.com/gensyn-ai", "img/gensyn.jpg");
+  makeMoon(pAIHub, 3, 0x00ff00, 42, 0.25, "Nosana", "https://nosana.com/", "img/nosana.jpg");
+
+  // Education Hub Moons
+  makeMoon(pEduHub, 4, 0x0055ff, 20, 0.4, "NASA", "https://www.nasa.gov/", "img/nasa.jpg");
+  makeMoon(pEduHub, 3.5, 0x00ff88, 28, 0.3, "Code.org", "https://code.org/", "img/code_org.jpg");
+  makeMoon(pEduHub, 3.8, 0x22ffaa, 36, 0.2, "Khan Academy", "https://www.khanacademy.org/", "img/khan_academy.jpg");
+
   // ── Targeting Laser ──
   const laserMat = new THREE.LineBasicMaterial({ color: 0x00ffff, linewidth: 2, transparent: true, opacity: 0 });
   const laserGeo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3()]);
@@ -1104,6 +1134,21 @@
 
   function animate(){
     const dt=clock.getDelta();
+
+    if (camera.position.z > 50 && !window.isEnteringUniverse && !window.hasEnteredUniverse) {
+      // Automatic slow drift while on splash screen
+      camera.position.z -= 50 * dt;
+    }
+    if (window.isEnteringUniverse) {
+      // Fast swoop in when they click Enter (fixed alpha prevents lag spike teleport)
+      camera.position.lerp(new THREE.Vector3(0, 0, 50), 0.04);
+      if (camera.position.z < 51) {
+        window.isEnteringUniverse = false;
+        window.hasEnteredUniverse = true;
+        camera.position.set(0, 0, 50);
+      }
+    }
+
     
     if (starField1) starField1.rotation.y += 0.005 * dt;
     if (starField2) starField2.rotation.y -= 0.008 * dt;

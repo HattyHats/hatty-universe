@@ -483,7 +483,7 @@
           <strong>A / D</strong> – left / right<br />
           <strong>Shift</strong> – boost speed<br />
           Drag mouse – look around<br /><br />
-          Use the <strong>Jump To</strong> menu<br />to warp to any world.<br /><br />
+          Use the <strong>Target System</strong><br />to warp to any world.<br /><br />
           Hover a planet to see its name,<br />click to open its world.
         </span>
         <span class="hud-touch">
@@ -647,7 +647,7 @@
     mesh.add(sp);
   }
 
-  function makePlanet(radius, emissiveHex, pos, label, url, texUrl, glow) {
+  function makePlanet(radius, emissiveHex, pos, label, url, texUrl, glow = true) {
     const mat = label === "The Hatty Sun" 
       ? new THREE.MeshBasicMaterial({ color: 0x666666 }) 
       : new THREE.MeshStandardMaterial({
@@ -672,6 +672,8 @@
       const auraMat = new THREE.MeshBasicMaterial({ color: 0xff8800, transparent: true, opacity: 0.25, blending: THREE.AdditiveBlending, side: THREE.BackSide, depthWrite: false });
       const auraMesh = new THREE.Mesh(auraGeo, auraMat);
       mesh.add(auraMesh);
+    } else if (glow) {
+      addGlow(mesh, radius, emissiveHex);
     }
     return mesh;
   }
@@ -681,7 +683,7 @@
   
   const moons = [];
 
-  function makeMoon(parentPlanet, radius, emissiveHex, orbitRadius, orbitSpeed, label, url, texUrl) {
+  function makeMoon(parentPlanet, radius, emissiveHex, orbitRadius, orbitSpeed, label, url, texUrl, glow = true) {
     const mat = label === "The Hatty Sun" 
       ? new THREE.MeshBasicMaterial({ color: 0x666666 }) 
       : new THREE.MeshStandardMaterial({
@@ -707,6 +709,10 @@
     mesh.userData = { label, url, radius, isMoon: true, pivot, orbitSpeed, parent: parentPlanet };
     pivot.add(mesh);
     
+    if (glow) {
+      addGlow(mesh, radius, emissiveHex);
+    }
+
     planets.push(mesh);
     moons.push(mesh);
     return mesh;
@@ -729,7 +735,7 @@
     makePlanet(6,  0xff9955, V(46,60,166),   "Hatty's News",            "https://hattyhats.github.io/hattys-news/", "img/hattys-news.jpg"),
     makePlanet(7,  0xff55aa, V(7,-60,131),   "Hatty's Media",           "https://hattys-media.netlify.app/", "img/hattys-media.jpg"),
     makePlanet(6,  0x44ffcc, V(-39,80,241),   "OpenFocus",               "https://hattyhats.github.io/Open-Focus/", "img/openfucus.jpg"),
-    makePlanet(5,  0xff4488, V(-107,-30,270),  "Psycho Satoshi – Audius", "https://audius.co/hatty", "img/audius.jpg"),
+    makePlanet(5,  0xff4488, V(-107,-30,270),  "Psycho Satoshi – Audius", "https://audius.co/hatty", "img/audius.webp"),
     makePlanet(4,  0xffdd44, V(-181,30,267),  "PublishOX",               "https://www.publish0x.com/@HattyHats", "img/publishox.jpg"),
     makePlanet(6,  0xff8833, V(-207,-80,196),   "Slice App",               "https://addslice.com/?crew=VFFbJ", "img/slice-app.jpg"),
     makePlanet(5,  0x6688ff, V(-321,60,193),   "The Arena",               "https://arena.social/?ref=hatty_hats", "img/the-arena.jpg"),
@@ -747,6 +753,13 @@
     makePlanet(4,  0x00ff99, V(526,-80,-400),  "FaucetPay",               "https://faucetpay.io/?r=31394", "img/faucet-pay.jpg"),
     makePlanet(5,  0x33eeff, V(592,60,-274),  "Voi Maze",                "https://hattyhats.github.io/voi-maze/", "img/voi-maze.jpg"),
     makePlanet(6,  0xff9900, V(651,-170,-143),  "CaseBoard",               "https://case-board.netlify.app", "img/case-board.jpg"),
+    makePlanet(5,  0x00e5ff, V(-225,45,230),   "Sweat Wallet",            "https://swe.at/c/REPbkMXl0V", "img/sweat_wallet.jpg"),
+    makePlanet(5,  0x10b981, V(-255,-40,210),  "MoneyWalk",               "https://gravitylabs.onelink.me/czwV/kawvz8qs?deep_link_sub2=WU7KLQ&deep_link_value=invitation", "img/moneywalk.jpg"),
+    makePlanet(6,  0x84cc16, V(-380,-30,100),  "Pixels",                  "https://play.pixels.xyz/", "img/pixels.jpg"),
+    makePlanet(7,  0xec4899, V(-410,80,70),    "Decentraland",            "https://decentraland.org/", "img/decentraland.jpg"),
+    makePlanet(7,  0xff4400, V(-250,-140,320), "Stellar Assault",         "", "img/stellar_assault.jpg"),
+    makePlanet(6,  0xdd22ff, V(340,180,220),   "SoundScape",              "", "img/soundscape.jpg"),
+    makePlanet(6,  0x00ffcc, V(-480,160,-150), "Trippy",                  "", "img/trippy.jpg"),
     makePlanet(20, 0xffcc00, V(0,0,0),         "The Hatty Sun",           "https://earnwithhatty.com/", "hattyhats.jpg")
   ];
 
@@ -758,9 +771,6 @@
   makeMoon(pHattyTools, 3, 0xff00ff, 15, 0.4, "Local-Cast", "https://hattyhats.github.io/local-cast/", "img/local_cast.jpg");
   makeMoon(pHattyTools, 2.8, 0x00ff00, 20, 0.3, "Data-Phone", "https://data-phone-app.onrender.com", "img/data_phone.jpg");
 
-
-  
-  
   // Privacy Moons
   makeMoon(pPrivacyGadgets, 2.5, 0xff5500, 10, 0.4, "Brave Browser", "https://brave.com/", "img/brave_browser.jpg");
   makeMoon(pPrivacyGadgets, 2, 0x00ff88, 14, 0.2, "Ghost Protocol", "https://hattyhats.github.io/local-metadata-scrubber/", "img/ghost_protocol.jpg");
@@ -773,6 +783,8 @@
   makeMoon(pAIHub, 4.5, 0x0044ff, 28, 0.3, "ASI Alliance", "https://superintelligence.io/", "img/asi_alliance.jpg");
   makeMoon(pAIHub, 3.5, 0xffaa00, 36, 0.45, "Gensyn", "https://github.com/gensyn-ai", "img/gensyn.jpg");
   makeMoon(pAIHub, 3, 0x00ff00, 42, 0.25, "Nosana", "https://nosana.com/", "img/nosana.jpg");
+  makeMoon(pAIHub, 3.8, 0x00eeff, 50, 0.35, "Neural-Mesh", "", "img/neural_mesh.jpg");
+  makeMoon(pAIHub, 3.6, 0x00aaff, 58, 0.28, "UpRock", "https://link.uprock.com/i/388cf0aa", "img/uprock.jpg");
 
   // Education Hub Moons
   makeMoon(pEduHub, 4, 0x0055ff, 20, 0.4, "NASA", "https://www.nasa.gov/", "img/nasa.jpg");
@@ -984,16 +996,15 @@
 
   // ── Improved snapTo: positions directly in front of planet, facing it dead-center ──
   function snapTo(p) {
-    // Always approach from directly in front along the Z-axis (world space),
-    // biased slightly above for a nice angle. This guarantees the planet is
-    // perfectly centred in the view after snapping.
+    const worldPos = new THREE.Vector3();
+    p.getWorldPosition(worldPos);
     const approachDir = new THREE.Vector3(0, 0.15, 1).normalize();
     const dist = p.userData.radius * 4.5;
-    camera.position.copy(p.position).add(approachDir.multiplyScalar(dist));
-    camera.lookAt(p.position);
+    camera.position.copy(worldPos).add(approachDir.multiplyScalar(dist));
+    camera.lookAt(worldPos);
 
     // Derive yaw/pitch from the look direction so free-look stays in sync
-    const fwd = new THREE.Vector3().subVectors(p.position, camera.position).normalize();
+    const fwd = new THREE.Vector3().subVectors(worldPos, camera.position).normalize();
     yaw   = Math.atan2(fwd.x, -fwd.z);
     pitch = Math.asin(Math.max(-1, Math.min(1, fwd.y)));
     updateRot();
@@ -1088,15 +1099,19 @@
   }
 
   function getTourTarget(planet) {
+    const worldPos = new THREE.Vector3();
+    planet.getWorldPosition(worldPos);
     const offset = planet.userData.radius * 4.5;
     const angle = tourIndex * 1.1;
     const dir = new THREE.Vector3(Math.sin(angle), 0.25, Math.cos(angle)).normalize();
-    return new THREE.Vector3().copy(planet.position).add(dir.multiplyScalar(offset));
+    return worldPos.add(dir.multiplyScalar(offset));
   }
 
   function tickTour(dt) {
     if (!tourActive) return;
     const planet = planets[tourIndex];
+    const planetPos = new THREE.Vector3();
+    planet.getWorldPosition(planetPos);
 
     if (tourPhase === "travel") {
       const target = getTourTarget(planet);
@@ -1104,8 +1119,8 @@
       const dist = toTarget.length();
 
       if (dist < planet.userData.radius * 1.5) {
-        camera.lookAt(planet.position);
-        const v = new THREE.Vector3().subVectors(planet.position, camera.position).normalize();
+        camera.lookAt(planetPos);
+        const v = new THREE.Vector3().subVectors(planetPos, camera.position).normalize();
         yaw   = Math.atan2(v.x, -v.z);
         pitch = Math.asin(Math.max(-1, Math.min(1, v.y)));
         tourPhase = "orbit";
@@ -1114,8 +1129,8 @@
       } else {
         const step = Math.min(TRAVEL_SPEED * dt, dist);
         camera.position.add(toTarget.normalize().multiplyScalar(step));
-        camera.lookAt(planet.position);
-        const v = new THREE.Vector3().subVectors(planet.position, camera.position).normalize();
+        camera.lookAt(planetPos);
+        const v = new THREE.Vector3().subVectors(planetPos, camera.position).normalize();
         yaw   = Math.atan2(v.x, -v.z);
         pitch = Math.asin(Math.max(-1, Math.min(1, v.y)));
       }
@@ -1123,9 +1138,9 @@
       const orbitRadius = planet.userData.radius * 4.5;
       const angle = tourIndex * 1.1 + tourTimer * 0.4;
       const dir = new THREE.Vector3(Math.sin(angle), 0.25, Math.cos(angle)).normalize();
-      camera.position.copy(planet.position).add(dir.multiplyScalar(orbitRadius));
-      camera.lookAt(planet.position);
-      const v = new THREE.Vector3().subVectors(planet.position, camera.position).normalize();
+      camera.position.copy(planetPos).add(dir.multiplyScalar(orbitRadius));
+      camera.lookAt(planetPos);
+      const v = new THREE.Vector3().subVectors(planetPos, camera.position).normalize();
       yaw   = Math.atan2(v.x, -v.z);
       pitch = Math.asin(Math.max(-1, Math.min(1, v.y)));
 

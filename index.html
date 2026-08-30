@@ -414,14 +414,77 @@
 
     #hover-tooltip {
       position: absolute;
-      padding: 4px 8px; border-radius: 4px;
-      background: rgba(15,23,42,0.92);
-      color: #e5e7eb; font-size: 11px;
-      border: 1px solid rgba(148,163,184,0.7);
+      width: 250px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: rgba(10, 15, 30, 0.92);
+      color: #e5e7eb;
+      font-size: 11px;
+      border: 1px solid rgba(160, 120, 255, 0.6);
       pointer-events: none;
-      transform: translate(-50%, -120%);
-      white-space: nowrap; opacity: 0;
-      transition: opacity .1s ease-out;
+      opacity: 0;
+      transition: opacity .15s ease-out;
+      z-index: 100;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.65), 0 0 15px rgba(140, 80, 255, 0.35);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .tt-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .tt-img {
+      width: 44px;
+      height: 44px;
+      border-radius: 8px;
+      object-fit: cover;
+      border: 1px solid rgba(160, 120, 255, 0.6);
+      box-shadow: 0 0 8px rgba(160, 120, 255, 0.4);
+      flex-shrink: 0;
+      background: #02030a;
+    }
+    .tt-title-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      overflow: hidden;
+    }
+    .tt-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .tt-badge {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 9px;
+      color: #a78bfa;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .tt-desc {
+      font-size: 11px;
+      line-height: 1.4;
+      color: #cbd5e1;
+    }
+    .tt-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding-top: 6px;
+      font-size: 10px;
+      color: #94a3b8;
+    }
+    .tt-action {
+      color: #38bdf8;
+      font-weight: 600;
     }
 
     /* Boost indicator */
@@ -647,7 +710,7 @@
     mesh.add(sp);
   }
 
-  function makePlanet(radius, emissiveHex, pos, label, url, texUrl, glow = true) {
+  function makePlanet(radius, emissiveHex, pos, label, url, texUrl, desc = "", category = "", glow = true) {
     const mat = label === "The Hatty Sun" 
       ? new THREE.MeshBasicMaterial({ color: 0x666666 }) 
       : new THREE.MeshStandardMaterial({
@@ -665,7 +728,7 @@
     });
     const mesh = new THREE.Mesh(new THREE.SphereGeometry(radius,48,48), mat);
     mesh.position.copy(pos);
-    mesh.userData = { label, url, radius };
+    mesh.userData = { label, url, radius, texUrl, desc, category };
     scene.add(mesh);
     if (label === "The Hatty Sun") {
       const auraGeo = new THREE.SphereGeometry(radius * 1.25, 32, 32);
@@ -683,7 +746,7 @@
   
   const moons = [];
 
-  function makeMoon(parentPlanet, radius, emissiveHex, orbitRadius, orbitSpeed, label, url, texUrl, glow = true) {
+  function makeMoon(parentPlanet, radius, emissiveHex, orbitRadius, orbitSpeed, label, url, texUrl, desc = "", category = "", glow = true) {
     const mat = label === "The Hatty Sun" 
       ? new THREE.MeshBasicMaterial({ color: 0x666666 }) 
       : new THREE.MeshStandardMaterial({
@@ -706,7 +769,7 @@
     scene.add(pivot);
     
     mesh.position.set(orbitRadius, 0, 0);
-    mesh.userData = { label, url, radius, isMoon: true, pivot, orbitSpeed, parent: parentPlanet };
+    mesh.userData = { label, url, radius, isMoon: true, pivot, orbitSpeed, parent: parentPlanet, texUrl, desc, category };
     pivot.add(mesh);
     
     if (glow) {
@@ -718,78 +781,78 @@
     return mesh;
   }
 
-  const pLearnHatty = makePlanet(8,  0x99ccff, V(50,0,0),      "Learn With Hatty",        "https://earnwithhatty.com/", "img/learn-with-hatty.jpg");
-  const pHattyTools = makePlanet(5,  0xffcc55, V(97,10,21),    "Hatty Tools",             "https://earn-with-hatty-tools.netlify.app/", "img/hatty-tools.jpg");
-  const pLearnCardano = makePlanet(10, 0x4488ff, V(108,-30,50),    "Learn Cardano",           "https://youtu.be/xWImSw79Y6I?si=JFPZG8z22KKAHE7f", "img/cardano-ada.jpg");
-  const pPrivacyGadgets = makePlanet(3,  0x55ffcc, V(131,40,100),    "Privacy Gadgets",         "https://privacy-gadgets-hub.netlify.app/", "img/privacy-gadgets.jpg");
-  const pCardano = makePlanet(9,  0x3355ff, V(130,-40,153),  "Cardano Planet",          "https://cardano.org/", "img/cardano-planet.jpg");
-  const pVoi = makePlanet(7,  0xaa55ff, V(111,20,209),   "Voi Planet",              "https://voi.network/", "img/voi-planet.jpg");
+  const pLearnHatty = makePlanet(8,  0x99ccff, V(50,0,0),      "Learn With Hatty",        "https://earnwithhatty.com/", "img/learn-with-hatty.jpg", "Educational platform & YouTube guides for crypto, tech, and online earning.", "Education");
+  const pHattyTools = makePlanet(5,  0xffcc55, V(97,10,21),    "Hatty Tools",             "https://earn-with-hatty-tools.netlify.app/", "img/hatty-tools.jpg", "Curated suite of custom web apps, utilities, and developer tools.", "Tools");
+  const pLearnCardano = makePlanet(10, 0x4488ff, V(108,-30,50),    "Learn Cardano",           "https://youtu.be/xWImSw79Y6I?si=JFPZG8z22KKAHE7f", "img/cardano-ada.jpg", "Comprehensive video guide to Cardano staking, UTxO model, and ecosystem.", "Cardano");
+  const pPrivacyGadgets = makePlanet(3,  0x55ffcc, V(131,40,100),    "Privacy Gadgets",         "https://privacy-gadgets-hub.netlify.app/", "img/privacy-gadgets.jpg", "Curated hub for digital privacy tools, metadata scrubbers, and security hardware.", "Privacy");
+  const pCardano = makePlanet(9,  0x3355ff, V(130,-40,153),  "Cardano Planet",          "https://cardano.org/", "img/cardano-planet.jpg", "Proof-of-stake layer-1 blockchain engineered for security, research, and sustainability.", "Blockchain");
+  const pVoi = makePlanet(7,  0xaa55ff, V(111,20,209),   "Voi Planet",              "https://voi.network/", "img/voi-planet.jpg", "High-performance blockchain network designed for micro-transactions, staking, and dApps.", "Blockchain");
   
   
-  const pAIHub = makePlanet(12, 0x8822ff, V(-100, 150, 300), "The AI Hub", "", "img/ai_hub.jpg");
-  const pEduHub = makePlanet(11, 0x2288ff, V(250, 100, -200), "Education & Open Source", "", "img/education_hub.jpg");
+  const pAIHub = makePlanet(12, 0x8822ff, V(-100, 150, 300), "The AI Hub", "", "img/ai_hub.jpg", "Central sector connecting decentralized AI, compute engines, and neural intelligence networks.", "AI Hub");
+  const pEduHub = makePlanet(11, 0x2288ff, V(250, 100, -200), "Education & Open Source", "", "img/education_hub.jpg", "Cosmic hub dedicated to coding literacy, space science, and open-access learning.", "Education Hub");
 
   const planets = [
     pAIHub, pEduHub,
     pLearnHatty, pHattyTools, pLearnCardano, pPrivacyGadgets, pCardano, pVoi,
-    makePlanet(6,  0xff9955, V(46,60,166),   "Hatty's News",            "https://hattyhats.github.io/hattys-news/", "img/hattys-news.jpg"),
-    makePlanet(7,  0xff55aa, V(7,-60,131),   "Hatty's Media",           "https://hattys-media.netlify.app/", "img/hattys-media.jpg"),
-    makePlanet(6,  0x44ffcc, V(-39,80,241),   "OpenFocus",               "https://hattyhats.github.io/Open-Focus/", "img/openfucus.jpg"),
-    makePlanet(5,  0xff4488, V(-107,-30,270),  "Psycho Satoshi – Audius", "https://audius.co/hatty", "img/audius.webp"),
-    makePlanet(4,  0xffdd44, V(-181,30,267),  "PublishOX",               "https://www.publish0x.com/@HattyHats", "img/publishox.jpg"),
-    makePlanet(6,  0xff8833, V(-207,-80,196),   "Slice App",               "https://addslice.com/?crew=VFFbJ", "img/slice-app.jpg"),
-    makePlanet(5,  0x6688ff, V(-321,60,193),   "The Arena",               "https://arena.social/?ref=hatty_hats", "img/the-arena.jpg"),
-    makePlanet(5,  0xee4422, V(-349,-90,117),  "Chainers",                "https://chainers.io/?r=lzmpadgw", "img/chainers.jpg"),
-    makePlanet(4,  0xffcc00, V(-378,100,41),   "Cointiply",               "https://cointiply.com/r/lNm1", "img/cointiply.jpg"),
-    makePlanet(5,  0x22ccff, V(-432,-30,-46), "CryptoNaut",              "https://cryptonaut.id/?ref=HattyHats", "img/cryptonaut.jpg"),
-    makePlanet(6,  0xffaa00, V(-378,-110,-227), "Rollercoin",              "https://rollercoin.com/?r=kj0blr6a", "img/rollercoin.jpg"),
-    makePlanet(7,  0x00ccff, V(-361,-50,-342),  "Immutable",               "https://play.immutable.com/referral/share/9XVsFq?utm_source=referral", "img/immutable.jpg"),
-    makePlanet(4,  0x44ff88, V(-289,70,-427),  "FaucetCrypto",            "https://faucetcrypto.com/r/102755", "img/faucet-crypto.jpg"),
-    makePlanet(4,  0xcc44ff, V(-185,-130,-466),  "Vie Faucet",              "https://viefaucet.com?r=680856217d2144c71c23c02c", "img/vie-faucet.jpg"),
-    makePlanet(5,  0xff3366, V(-85,120,-522), "Suno",                    "https://suno.com/invite/@hattyhats", "img/suno.jpg"),
-    makePlanet(5,  0xdddddd, V(31,40,-578),   "X (Twitter)",             "https://x.com/hatty_hats", "img/x-hatty.jpg"),
-    makePlanet(5,  0x8855ff, V(160,-60,-579), "Focus",                   "https://focus.xyz/Hatty_Hats", "img/focus.jpg"),
-    makePlanet(5,  0xff6600, V(390,-150,-459), "TapTools",                "https://www.taptools.io/", "img/tap-tools.jpg"),
-    makePlanet(4,  0x00ff99, V(526,-80,-400),  "FaucetPay",               "https://faucetpay.io/?r=31394", "img/faucet-pay.jpg"),
-    makePlanet(5,  0x33eeff, V(592,60,-274),  "Voi Maze",                "https://hattyhats.github.io/voi-maze/", "img/voi-maze.jpg"),
-    makePlanet(6,  0xff9900, V(651,-170,-143),  "CaseBoard",               "https://case-board.netlify.app", "img/case-board.jpg"),
-    makePlanet(5,  0x00e5ff, V(-225,45,230),   "Sweat Wallet",            "https://swe.at/c/REPbkMXl0V", "img/sweat_wallet.jpg"),
-    makePlanet(5,  0x10b981, V(-255,-40,210),  "MoneyWalk",               "https://gravitylabs.onelink.me/czwV/kawvz8qs?deep_link_sub2=WU7KLQ&deep_link_value=invitation", "img/moneywalk.jpg"),
-    makePlanet(6,  0x84cc16, V(-380,-30,100),  "Pixels",                  "https://play.pixels.xyz/", "img/pixels.jpg"),
-    makePlanet(7,  0xec4899, V(-410,80,70),    "Decentraland",            "https://decentraland.org/", "img/decentraland.jpg"),
-    makePlanet(7,  0xff4400, V(-250,-140,320), "Stellar Assault",         "", "img/stellar_assault.jpg"),
-    makePlanet(6,  0xdd22ff, V(340,180,220),   "SoundScape",              "", "img/soundscape.jpg"),
-    makePlanet(6,  0x00ffcc, V(-480,160,-150), "Trippy",                  "", "img/trippy.jpg"),
-    makePlanet(20, 0xffcc00, V(0,0,0),         "The Hatty Sun",           "https://earnwithhatty.com/", "hattyhats.jpg")
+    makePlanet(6,  0xff9955, V(46,60,166),   "Hatty's News",            "https://hattyhats.github.io/hattys-news/", "img/hattys-news.jpg", "Latest articles, tutorials, announcements, and alpha from Hatty.", "News"),
+    makePlanet(7,  0xff55aa, V(7,-60,131),   "Hatty's Media",           "https://hattys-media.netlify.app/", "img/hattys-media.jpg", "Multimedia vault containing custom artwork, videos, graphics, and music.", "Media"),
+    makePlanet(6,  0x44ffcc, V(-39,80,241),   "OpenFocus",               "https://hattyhats.github.io/Open-Focus/", "img/openfucus.jpg", "Minimalist focus timer and task flow web app to keep you productive and distraction-free.", "Productivity"),
+    makePlanet(5,  0xff4488, V(-107,-30,270),  "Psycho Satoshi – Audius", "https://audius.co/hatty", "img/audius.webp", "Decentralized music streaming channel showcasing original tracks and cyber audio experiments.", "Music"),
+    makePlanet(4,  0xffdd44, V(-181,30,267),  "PublishOX",               "https://www.publish0x.com/@HattyHats", "img/publishox.jpg", "Crypto-powered blogging platform where both authors and readers earn crypto rewards.", "Publishing"),
+    makePlanet(6,  0xff8833, V(-207,-80,196),   "Slice App",               "https://addslice.com/?crew=VFFbJ", "img/slice-app.jpg", "Browser extension that pays you passive crypto rewards for seeing unobtrusive ads.", "Passive Earning"),
+    makePlanet(5,  0x6688ff, V(-321,60,193),   "The Arena",               "https://arena.social/?ref=hatty_hats", "img/the-arena.jpg", "Web3 creator monetization platform and tokenized social feed on Avalanche.", "Social"),
+    makePlanet(5,  0xee4422, V(-349,-90,117),  "Chainers",                "https://chainers.io/?r=lzmpadgw", "img/chainers.jpg", "Play-to-earn browser MMORPG featuring collectible voxel avatars, daily free NFTs, and mini-games.", "Gaming"),
+    makePlanet(4,  0xffcc00, V(-378,100,41),   "Cointiply",               "https://cointiply.com/r/lNm1", "img/cointiply.jpg", "Premier crypto rewards faucet with games, surveys, and daily loyalty bonuses.", "Rewards"),
+    makePlanet(5,  0x22ccff, V(-432,-30,-46), "CryptoNaut",              "https://cryptonaut.id/?ref=HattyHats", "img/cryptonaut.jpg", "Digital asset dashboard, portfolio tracking tools, and market radar for crypto traders.", "Analytics"),
+    makePlanet(6,  0xffaa00, V(-378,-110,-227), "Rollercoin",              "https://rollercoin.com/?r=kj0blr6a", "img/rollercoin.jpg", "Online virtual crypto mining simulator game that pays out real cryptocurrency.", "Gaming"),
+    makePlanet(7,  0x00ccff, V(-361,-50,-342),  "Immutable",               "https://play.immutable.com/referral/share/9XVsFq?utm_source=referral", "img/immutable.jpg", "Leading Layer-2 Ethereum scaling network and gaming platform for frictionless web3 games.", "Gaming"),
+    makePlanet(4,  0x44ff88, V(-289,70,-427),  "FaucetCrypto",            "https://faucetcrypto.com/r/102755", "img/faucet-crypto.jpg", "Multi-cryptocurrency faucet with RPG leveling systems, inventory gear, and direct payouts.", "Faucet"),
+    makePlanet(4,  0xcc44ff, V(-185,-130,-466),  "Vie Faucet",              "https://viefaucet.com?r=680856217d2144c71c23c02c", "img/vie-faucet.jpg", "Fast multi-coin micro-earning faucet with auto-claims and instant payments.", "Faucet"),
+    makePlanet(5,  0xff3366, V(-85,120,-522), "Suno",                    "https://suno.com/invite/@hattyhats", "img/suno.jpg", "Generative AI music studio turning text prompts and lyrics into radio-ready songs in seconds.", "AI Music"),
+    makePlanet(5,  0xdddddd, V(31,40,-578),   "X (Twitter)",             "https://x.com/hatty_hats", "img/x-hatty.jpg", "Hatty's official social feed for quick updates, thoughts, alpha leaks, and discussions.", "Social"),
+    makePlanet(5,  0x8855ff, V(160,-60,-579), "Focus",                   "https://focus.xyz/Hatty_Hats", "img/focus.jpg", "Decentralized Web3 social network built on DeSo blockchain for creator monetization.", "Social"),
+    makePlanet(5,  0xff6600, V(390,-150,-459), "TapTools",                "https://www.taptools.io/", "img/tap-tools.jpg", "Real-time DEX charts, volume radars, and token tracking intelligence for Cardano.", "Analytics"),
+    makePlanet(4,  0x00ff99, V(526,-80,-400),  "FaucetPay",               "https://faucetpay.io/?r=31394", "img/faucet-pay.jpg", "Secure micro-wallet and payment processor connecting hundreds of faucet platforms.", "Wallet"),
+    makePlanet(5,  0x33eeff, V(592,60,-274),  "Voi Maze",                "https://hattyhats.github.io/voi-maze/", "img/voi-maze.jpg", "Retro labyrinth browser puzzle game integrated with the Voi ecosystem.", "Gaming"),
+    makePlanet(6,  0xff9900, V(651,-170,-143),  "CaseBoard",               "https://case-board.netlify.app", "img/case-board.jpg", "Visual crime investigation and mind-mapping corkboard app for connecting clues.", "Productivity"),
+    makePlanet(5,  0x00e5ff, V(-225,45,230),   "Sweat Wallet",            "https://swe.at/c/REPbkMXl0V", "img/sweat_wallet.jpg", "Move-to-earn fitness crypto wallet that rewards your daily walking steps with SWEAT tokens.", "Move-to-Earn"),
+    makePlanet(5,  0x10b981, V(-255,-40,210),  "MoneyWalk",               "https://gravitylabs.onelink.me/czwV/kawvz8qs?deep_link_sub2=WU7KLQ&deep_link_value=invitation", "img/moneywalk.jpg", "Daily step tracking rewards app where walking earns digital coins, gift cards, and rewards.", "Move-to-Earn"),
+    makePlanet(6,  0x84cc16, V(-380,-30,100),  "Pixels",                  "https://play.pixels.xyz/", "img/pixels.jpg", "Cozy retro pixel-art MMORPG with open-world farming, crafting, land ownership, and community.", "Gaming"),
+    makePlanet(7,  0xec4899, V(-410,80,70),    "Decentraland",            "https://decentraland.org/", "img/decentraland.jpg", "Pioneering 3D virtual world where users explore, build, and trade virtual estates and digital fashion.", "Metaverse"),
+    makePlanet(7,  0xff4400, V(-250,-140,320), "Stellar Assault",         "", "img/stellar_assault.jpg", "Arcade space combat dogfighting game with laser weaponry, asteroid dodging, and boss battles.", "Local Game"),
+    makePlanet(6,  0xdd22ff, V(340,180,220),   "SoundScape",              "", "img/soundscape.jpg", "Interactive ambient audio visualizer and generative synth studio.", "Local Audio"),
+    makePlanet(6,  0x00ffcc, V(-480,160,-150), "Trippy",                  "", "img/trippy.jpg", "Psychedelic visual distortion canvas and hypnotic interactive optical illusions.", "Local Visuals"),
+    makePlanet(20, 0xffcc00, V(0,0,0),         "The Hatty Sun",           "https://earnwithhatty.com/", "hattyhats.jpg", "The blazing core of Hatty's Universe and central gateway to the ecosystem.", "Central Star")
   ];
 
   // Add the Moons!
-  makeMoon(pCardano, 4, 0x0099ff, 18, 0.4, "Iagon", "https://iagon.com/", "img/iagon.jpg");
-  makeMoon(pCardano, 3.5, 0x00ff88, 26, 0.25, "Palm Economy", "https://palmeconomy.io", "img/palm_economy.jpg");
-  makeMoon(pVoi, 3.5, 0x88ff44, 15, 0.5, "Voi Fountain", "https://fountain.voirewards.com/", "img/voi_fountain.jpg");
-  makeMoon(pHattyTools, 2.5, 0x00ffff, 11, 0.6, "Quick-Pad", "https://hatsquickpad.netlify.app/", "img/quick_pad.jpg");
-  makeMoon(pHattyTools, 3, 0xff00ff, 15, 0.4, "Local-Cast", "https://hattyhats.github.io/local-cast/", "img/local_cast.jpg");
-  makeMoon(pHattyTools, 2.8, 0x00ff00, 20, 0.3, "Data-Phone", "https://data-phone-app.onrender.com", "img/data_phone.jpg");
+  makeMoon(pCardano, 4, 0x0099ff, 18, 0.4, "Iagon", "https://iagon.com/", "img/iagon.jpg", "Decentralized cloud storage and shared compute processing network built on Cardano.", "DePIN");
+  makeMoon(pCardano, 3.5, 0x00ff88, 26, 0.25, "Palm Economy", "https://palmeconomy.io", "img/palm_economy.jpg", "Sustainable decentralized economy and carbon credit tokenization platform on Cardano.", "DeFi");
+  makeMoon(pVoi, 3.5, 0x88ff44, 15, 0.5, "Voi Fountain", "https://fountain.voirewards.com/", "img/voi_fountain.jpg", "Community rewards portal and staking faucet for active Voi network participants.", "Faucet");
+  makeMoon(pHattyTools, 2.5, 0x00ffff, 11, 0.6, "Quick-Pad", "https://hatsquickpad.netlify.app/", "img/quick_pad.jpg", "Fast, minimalist browser notepad for quick thoughts, code snippets, and daily logs.", "Productivity");
+  makeMoon(pHattyTools, 3, 0xff00ff, 15, 0.4, "Local-Cast", "https://hattyhats.github.io/local-cast/", "img/local_cast.jpg", "Lightweight peer-to-peer screen and media casting directly in browser without servers.", "Streaming");
+  makeMoon(pHattyTools, 2.8, 0x00ff00, 20, 0.3, "Data-Phone", "https://data-phone-app.onrender.com", "img/data_phone.jpg", "Web-based retro communicator and encrypted data terminal tool.", "Tools");
 
   // Privacy Moons
-  makeMoon(pPrivacyGadgets, 2.5, 0xff5500, 10, 0.4, "Brave Browser", "https://brave.com/", "img/brave_browser.jpg");
-  makeMoon(pPrivacyGadgets, 2, 0x00ff88, 14, 0.2, "Ghost Protocol", "https://hattyhats.github.io/local-metadata-scrubber/", "img/ghost_protocol.jpg");
+  makeMoon(pPrivacyGadgets, 2.5, 0xff5500, 10, 0.4, "Brave Browser", "https://brave.com/", "img/brave_browser.jpg", "Fast, privacy-first web browser with built-in ad blocker and BAT crypto rewards.", "Browser");
+  makeMoon(pPrivacyGadgets, 2, 0x00ff88, 14, 0.2, "Ghost Protocol", "https://hattyhats.github.io/local-metadata-scrubber/", "img/ghost_protocol.jpg", "Client-side metadata scrubber and file privacy sanitizer by Hatty.", "Privacy");
 
   // Cardano Moons
-  makeMoon(pCardano, 3.8, 0x00aaff, 34, 0.35, "Strike Finance", "https://app.strikefinance.org/trade/btc", "img/strike_finance.jpg");
+  makeMoon(pCardano, 3.8, 0x00aaff, 34, 0.35, "Strike Finance", "https://app.strikefinance.org/trade/btc", "img/strike_finance.jpg", "Decentralized perpetuals, derivatives, and synthetic asset trading platform on Cardano.", "DeFi");
 
   // AI Hub Moons
-  makeMoon(pAIHub, 4, 0xff00aa, 20, 0.5, "Sentient", "https://www.sentient.xyz/", "img/sentient.jpg");
-  makeMoon(pAIHub, 4.5, 0x0044ff, 28, 0.3, "ASI Alliance", "https://superintelligence.io/", "img/asi_alliance.jpg");
-  makeMoon(pAIHub, 3.5, 0xffaa00, 36, 0.45, "Gensyn", "https://github.com/gensyn-ai", "img/gensyn.jpg");
-  makeMoon(pAIHub, 3, 0x00ff00, 42, 0.25, "Nosana", "https://nosana.com/", "img/nosana.jpg");
-  makeMoon(pAIHub, 3.8, 0x00eeff, 50, 0.35, "Neural-Mesh", "", "img/neural_mesh.jpg");
-  makeMoon(pAIHub, 3.6, 0x00aaff, 58, 0.28, "UpRock", "https://link.uprock.com/i/388cf0aa", "img/uprock.jpg");
+  makeMoon(pAIHub, 4, 0xff00aa, 20, 0.5, "Sentient", "https://www.sentient.xyz/", "img/sentient.jpg", "Open-source decentralized AI platform creating collective AGI through intelligence networks.", "AI");
+  makeMoon(pAIHub, 4.5, 0x0044ff, 28, 0.3, "ASI Alliance", "https://superintelligence.io/", "img/asi_alliance.jpg", "The Artificial Superintelligence Alliance uniting Fetch.ai, SingularityNET, and Ocean Protocol.", "AI");
+  makeMoon(pAIHub, 3.5, 0xffaa00, 36, 0.45, "Gensyn", "https://github.com/gensyn-ai", "img/gensyn.jpg", "Decentralized compute network connecting global hardware to train deep learning models.", "DePIN");
+  makeMoon(pAIHub, 3, 0x00ff00, 42, 0.25, "Nosana", "https://nosana.com/", "img/nosana.jpg", "Crowd-powered GPU compute grid on Solana providing fast and affordable AI inference.", "Compute");
+  makeMoon(pAIHub, 3.8, 0x00eeff, 50, 0.35, "Neural-Mesh", "", "img/neural_mesh.jpg", "Interactive neural network topology visualizer and synaptic graph generator tool.", "AI Tool");
+  makeMoon(pAIHub, 3.6, 0x00aaff, 58, 0.28, "UpRock", "https://link.uprock.com/i/388cf0aa", "img/uprock.jpg", "Decentralized AI DePIN network that monetizes unused internet bandwidth for real-time data.", "DePIN");
 
   // Education Hub Moons
-  makeMoon(pEduHub, 4, 0x0055ff, 20, 0.4, "NASA", "https://www.nasa.gov/", "img/nasa.jpg");
-  makeMoon(pEduHub, 3.5, 0x00ff88, 28, 0.3, "Code.org", "https://code.org/", "img/code_org.jpg");
-  makeMoon(pEduHub, 3.8, 0x22ffaa, 36, 0.2, "Khan Academy", "https://www.khanacademy.org/", "img/khan_academy.jpg");
+  makeMoon(pEduHub, 4, 0x0055ff, 20, 0.4, "NASA", "https://www.nasa.gov/", "img/nasa.jpg", "Official space agency portal with real-time astronomy imagery and deep space missions.", "Science");
+  makeMoon(pEduHub, 3.5, 0x00ff88, 28, 0.3, "Code.org", "https://code.org/", "img/code_org.jpg", "Global non-profit educational initiative expanding computer science and coding access.", "Coding");
+  makeMoon(pEduHub, 3.8, 0x22ffaa, 36, 0.2, "Khan Academy", "https://www.khanacademy.org/", "img/khan_academy.jpg", "Free world-class personalized learning resources spanning math, science, and computing.", "Education");
 
   // ── Targeting Laser ──
   const laserMat = new THREE.LineBasicMaterial({ color: 0x00ffff, linewidth: 2, transparent: true, opacity: 0 });
@@ -1029,10 +1092,40 @@
         if(p.userData.baseEI===undefined) p.userData.baseEI=p.material.emissiveIntensity;
         p.material.emissiveIntensity=p.userData.baseEI*3.5;
         container.style.cursor="pointer";
-        tooltip.textContent=p.userData.label||"";
+        
+        const u = p.userData;
+        const imgHtml = u.texUrl ? `<img src="${u.texUrl}" class="tt-img" alt="${u.label}">` : '';
+        const badgeText = (u.isMoon ? '🛰️ Moon • ' : '🪐 Planet • ') + (u.category || 'Ecosystem');
+        const actionText = u.url ? 'Click to visit ↗' : (u.isMoon || (u.label && u.label.includes('Hub')) ? 'Hub Sector' : 'Local Project');
+        
+        tooltip.innerHTML = `
+          <div class="tt-header">
+            ${imgHtml}
+            <div class="tt-title-wrap">
+              <div class="tt-title">${u.label}</div>
+              <div class="tt-badge">${badgeText}</div>
+            </div>
+          </div>
+          <div class="tt-desc">${u.desc || 'Explore this world in Hatty\'s Universe.'}</div>
+          <div class="tt-footer">
+            <span>${u.isMoon ? 'Orbiting World' : 'Celestial Body'}</span>
+            <span class="tt-action">${actionText}</span>
+          </div>
+        `;
         tooltip.style.opacity="1";
       }
-      if(lastEv){tooltip.style.left=lastEv.clientX+"px";tooltip.style.top=lastEv.clientY+"px";}
+      if(lastEv){
+        let tx = lastEv.clientX + 16;
+        let ty = lastEv.clientY + 16;
+        if (tx + 260 > window.innerWidth) {
+          tx = lastEv.clientX - 265;
+        }
+        if (ty + 180 > window.innerHeight) {
+          ty = lastEv.clientY - 180;
+        }
+        tooltip.style.left = tx + "px";
+        tooltip.style.top = ty + "px";
+      }
     } else {
       if(hovered){hovered.material.emissiveIntensity=hovered.userData.baseEI;hovered=null;}
       container.style.cursor="default"; tooltip.style.opacity="0";

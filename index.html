@@ -512,6 +512,258 @@
     #target-dropdown { position: absolute; top: 100%; left: 0; right: 0; background: rgba(0,0,0,0.8); border: 1px solid #4488ff; border-top: none; border-radius: 0 0 4px 4px; display: none; max-height: 200px; overflow-y: auto; z-index: 1000; }
     .target-item { padding: 8px 12px; cursor: pointer; color: #fff; font-size: 12px; transition: background 0.2s; }
     .target-item:hover { background: rgba(68,136,255,0.4); }
+
+    /* ══════════════════════════════════════════
+       HOLOGRAPHIC HOLODECK MODAL
+    ══════════════════════════════════════════ */
+    #holodeck-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 10000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(2, 4, 15, 0.78);
+      backdrop-filter: blur(12px);
+      padding: 20px;
+    }
+    #holodeck-modal.open {
+      display: flex;
+      animation: modalFadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    @keyframes modalFadeIn {
+      from { opacity: 0; transform: scale(0.94); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+    .holo-card {
+      position: relative;
+      width: 100%;
+      max-width: 520px;
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.96), rgba(30, 27, 75, 0.94));
+      border: 1px solid rgba(160, 120, 255, 0.8);
+      border-radius: 16px;
+      box-shadow: 0 0 40px rgba(139, 92, 246, 0.4), inset 0 0 20px rgba(139, 92, 246, 0.15);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      font-family: system-ui, -apple-system, sans-serif;
+      overflow: hidden;
+    }
+    .holo-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, transparent, #a78bfa, #38bdf8, transparent);
+      animation: scanLine 3s infinite linear;
+    }
+    @keyframes scanLine {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+    .holo-close {
+      position: absolute;
+      top: 14px; right: 14px;
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.05);
+      color: #cbd5e1;
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+    .holo-close:hover {
+      background: rgba(239, 68, 68, 0.3);
+      border-color: #ef4444;
+      color: #fff;
+    }
+    .holo-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .holo-preview-img {
+      width: 76px; height: 76px;
+      border-radius: 14px;
+      object-fit: cover;
+      border: 2px solid rgba(160, 120, 255, 0.7);
+      box-shadow: 0 0 20px rgba(160, 120, 255, 0.5);
+      flex-shrink: 0;
+      background: #02030a;
+    }
+    .holo-title-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .holo-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 18px;
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: 0.05em;
+    }
+    .holo-badge-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .holo-badge {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 10px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(147, 51, 234, 0.25);
+      border: 1px solid rgba(192, 132, 252, 0.5);
+      color: #d8b4fe;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .holo-body {
+      font-size: 13px;
+      line-height: 1.6;
+      color: #cbd5e1;
+      background: rgba(0, 0, 0, 0.35);
+      padding: 12px 14px;
+      border-radius: 8px;
+      border-left: 3px solid #8b5cf6;
+    }
+    .holo-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 4px;
+    }
+    .holo-btn {
+      flex: 1;
+      min-width: 125px;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .holo-btn-warp {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.85), rgba(168, 85, 247, 0.85));
+      border: 1px solid rgba(192, 132, 252, 0.8);
+      color: #fff;
+      box-shadow: 0 0 16px rgba(168, 85, 247, 0.4);
+    }
+    .holo-btn-warp:hover {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 1), rgba(168, 85, 247, 1));
+      box-shadow: 0 0 25px rgba(168, 85, 247, 0.7);
+      transform: translateY(-1px);
+    }
+    .holo-btn-launch {
+      background: linear-gradient(135deg, rgba(14, 165, 233, 0.85), rgba(37, 99, 235, 0.85));
+      border: 1px solid rgba(56, 189, 248, 0.8);
+      color: #fff;
+      box-shadow: 0 0 16px rgba(56, 189, 248, 0.4);
+    }
+    .holo-btn-launch:hover {
+      background: linear-gradient(135deg, rgba(14, 165, 233, 1), rgba(37, 99, 235, 1));
+      box-shadow: 0 0 25px rgba(56, 189, 248, 0.7);
+      transform: translateY(-1px);
+    }
+    .holo-btn-copy {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #e2e8f0;
+    }
+    .holo-btn-copy:hover {
+      background: rgba(255, 255, 255, 0.16);
+      border-color: rgba(255, 255, 255, 0.4);
+      color: #fff;
+    }
+
+    /* ══════════════════════════════════════════
+       RADAR & WARP OVERLAY
+    ══════════════════════════════════════════ */
+    #galaxy-radar {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(15, 23, 42, 0.85) 0%, rgba(2, 6, 23, 0.95) 100%);
+      border: 2px solid rgba(56, 189, 248, 0.6);
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.3), inset 0 0 15px rgba(56, 189, 248, 0.15);
+      pointer-events: auto;
+      z-index: 10;
+      backdrop-filter: blur(4px);
+    }
+    #galaxy-radar canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      border-radius: 50%;
+    }
+    .radar-label {
+      position: absolute;
+      top: -18px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 9px;
+      color: #38bdf8;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+    @media (hover: none) and (pointer: coarse) {
+      #galaxy-radar {
+        bottom: auto;
+        top: 60px;
+        right: 12px;
+        left: auto;
+        width: 100px;
+        height: 100px;
+      }
+    }
+    #warp-overlay {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9998;
+      background: radial-gradient(circle, rgba(255,255,255,0.95) 0%, rgba(99,102,241,0.6) 40%, transparent 80%);
+      opacity: 0;
+      transition: opacity 0.25s ease-out;
+    }
+    #warp-overlay.active {
+      opacity: 1;
+    }
+
+    #online-explorers-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      background: rgba(15, 23, 42, 0.82);
+      border: 1px solid rgba(56, 189, 248, 0.45);
+      border-radius: 4px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 11px;
+      color: #7dd3fc;
+      letter-spacing: 0.06em;
+      white-space: nowrap;
+      user-select: none;
+      backdrop-filter: blur(6px);
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.18);
+    }
   </style>
 </head>
 <body>
@@ -532,6 +784,7 @@
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/nipplejs/0.10.1/nipplejs.min.js"></script>
+<script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
 
 <!-- ══ MAIN UNIVERSE ══ -->
 <div id="universe-container">
@@ -583,8 +836,9 @@
     Main Site
   </button>
 
-  <!-- Jump-To Dropdown -->
+  <!-- Jump-To & Multiplayer Status -->
   <div id="jump-wrap" style="display:flex; align-items:center; gap:10px;">
+    <div id="online-explorers-badge">🟢 1 Explorer Online</div>
     <div id="targeting-system" style="position:relative;">
       <input type="text" id="target-search" placeholder="Target System..." autocomplete="off" />
       <div id="target-dropdown"></div>
@@ -598,6 +852,38 @@
   <button id="tour-btn" onclick="toggleTour()">🚀 Take a Tour</button>
 
   <div id="joystick-zone"></div>
+
+  <!-- Galaxy Radar Mini-Map -->
+  <div id="galaxy-radar">
+    <div class="radar-label">GALAXY RADAR</div>
+    <canvas id="radar-canvas" width="140" height="140"></canvas>
+  </div>
+
+  <!-- Warp Flash Overlay -->
+  <div id="warp-overlay"></div>
+
+  <!-- Holographic Holodeck Modal -->
+  <div id="holodeck-modal">
+    <div class="holo-card">
+      <button class="holo-close" onclick="closeHolodeck()">✕</button>
+      <div class="holo-header">
+        <img id="holo-img" class="holo-preview-img" src="" alt="Planet Preview" />
+        <div class="holo-title-group">
+          <div id="holo-title" class="holo-title">Planet Name</div>
+          <div class="holo-badge-row">
+            <span id="holo-type-badge" class="holo-badge">🪐 PLANET</span>
+            <span id="holo-cat-badge" class="holo-badge">GAMING</span>
+          </div>
+        </div>
+      </div>
+      <div id="holo-desc" class="holo-body">Description here</div>
+      <div class="holo-actions">
+        <button id="holo-warp-btn" class="holo-btn holo-btn-warp" onclick="warpToCurrentHolodeck()">🚀 Engage Warp</button>
+        <button id="holo-launch-btn" class="holo-btn holo-btn-launch" onclick="launchCurrentHolodeck()">🌐 Visit World</button>
+        <button id="holo-copy-btn" class="holo-btn holo-btn-copy" onclick="copyCurrentHolodeckLink()">📋 Copy Link</button>
+      </div>
+    </div>
+  </div>
 
 </div>
 
@@ -710,6 +996,122 @@
     mesh.add(sp);
   }
 
+  // ── Web Audio Synthesizer ──
+  const AudioEngine = {
+    ctx: null,
+    thrusterOsc: null,
+    thrusterGain: null,
+    init() {
+      if (!this.ctx) {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (AudioCtx) this.ctx = new AudioCtx();
+      }
+      if (this.ctx && this.ctx.state === 'suspended') {
+        this.ctx.resume();
+      }
+    },
+    click() {
+      try {
+        this.init();
+        if (!this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(800, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(1400, this.ctx.currentTime + 0.05);
+        gain.gain.setValueAtTime(0.12, this.ctx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.001, this.ctx.currentTime + 0.05);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.05);
+      } catch (e) {}
+    },
+    ping() {
+      try {
+        this.init();
+        if (!this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(1100, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(650, this.ctx.currentTime + 0.12);
+        gain.gain.setValueAtTime(0.08, this.ctx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.001, this.ctx.currentTime + 0.12);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.12);
+      } catch (e) {}
+    },
+    warp() {
+      try {
+        this.init();
+        if (!this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(90, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(600, this.ctx.currentTime + 0.4);
+        osc.frequency.exponentialRampToValueAtTime(70, this.ctx.currentTime + 1.2);
+        gain.gain.setValueAtTime(0.01, this.ctx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.22, this.ctx.currentTime + 0.3);
+        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 1.2);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 1.2);
+      } catch (e) {}
+    },
+    startThruster() {
+      try {
+        this.init();
+        if (!this.ctx || this.thrusterOsc) return;
+        this.thrusterOsc = this.ctx.createOscillator();
+        this.thrusterGain = this.ctx.createGain();
+        this.thrusterOsc.type = 'triangle';
+        this.thrusterOsc.frequency.setValueAtTime(60, this.ctx.currentTime);
+        this.thrusterGain.gain.setValueAtTime(0.01, this.ctx.currentTime);
+        this.thrusterGain.gain.linearRampToValueAtTime(0.12, this.ctx.currentTime + 0.15);
+        this.thrusterOsc.connect(this.thrusterGain);
+        this.thrusterGain.connect(this.ctx.destination);
+        this.thrusterOsc.start();
+      } catch (e) {}
+    },
+    stopThruster() {
+      try {
+        if (this.thrusterGain && this.ctx) {
+          this.thrusterGain.gain.linearRampToValueAtTime(0.001, this.ctx.currentTime + 0.12);
+          setTimeout(() => {
+            if (this.thrusterOsc) {
+              this.thrusterOsc.stop();
+              this.thrusterOsc.disconnect();
+              this.thrusterOsc = null;
+              this.thrusterGain = null;
+            }
+          }, 140);
+        }
+      } catch (e) {}
+    }
+  };
+
+  // ── Planetary Rings ──
+  function addPlanetaryRing(planet, innerR, outerR, hexColor) {
+    const ringGeo = new THREE.RingGeometry(innerR, outerR, 64);
+    ringGeo.rotateX(Math.PI / 2.3);
+    const ringMat = new THREE.MeshStandardMaterial({
+      color: hexColor,
+      side: THREE.DoubleSide,
+      transparent: true,
+      opacity: 0.65,
+      roughness: 0.3,
+      metalness: 0.2
+    });
+    const ringMesh = new THREE.Mesh(ringGeo, ringMat);
+    planet.add(ringMesh);
+    return ringMesh;
+  }
+
   function makePlanet(radius, emissiveHex, pos, label, url, texUrl, desc = "", category = "", glow = true) {
     const mat = label === "The Hatty Sun" 
       ? new THREE.MeshBasicMaterial({ color: 0x666666 }) 
@@ -772,6 +1174,24 @@
     mesh.userData = { label, url, radius, isMoon: true, pivot, orbitSpeed, parent: parentPlanet, texUrl, desc, category };
     pivot.add(mesh);
     
+    // Moon Orbital Track Ring
+    const orbitTrackGeo = new THREE.BufferGeometry();
+    const trackPoints = [];
+    const segments = 64;
+    for (let i = 0; i <= segments; i++) {
+      const theta = (i / segments) * Math.PI * 2;
+      trackPoints.push(new THREE.Vector3(Math.cos(theta) * orbitRadius, 0, Math.sin(theta) * orbitRadius));
+    }
+    orbitTrackGeo.setFromPoints(trackPoints);
+    const orbitTrackMat = new THREE.LineBasicMaterial({
+      color: emissiveHex,
+      transparent: true,
+      opacity: 0.22,
+      depthWrite: false
+    });
+    const orbitTrack = new THREE.Line(orbitTrackGeo, orbitTrackMat);
+    pivot.add(orbitTrack);
+
     if (glow) {
       addGlow(mesh, radius, emissiveHex);
     }
@@ -788,13 +1208,22 @@
   const pCardano = makePlanet(9,  0x3355ff, V(130,-40,153),  "Cardano Planet",          "https://cardano.org/", "img/cardano-planet.jpg", "Proof-of-stake layer-1 blockchain engineered for security, research, and sustainability.", "Blockchain");
   const pVoi = makePlanet(7,  0xaa55ff, V(111,20,209),   "Voi Planet",              "https://voi.network/", "img/voi-planet.jpg", "High-performance blockchain network designed for micro-transactions, staking, and dApps.", "Blockchain");
   
-  
   const pAIHub = makePlanet(12, 0x8822ff, V(-100, 150, 300), "The AI Hub", "", "img/ai_hub.jpg", "Central sector connecting decentralized AI, compute engines, and neural intelligence networks.", "AI Hub");
   const pEduHub = makePlanet(11, 0x2288ff, V(250, 100, -200), "Education & Open Source", "", "img/education_hub.jpg", "Cosmic hub dedicated to coding literacy, space science, and open-access learning.", "Education Hub");
+
+  const pDecentraland = makePlanet(7,  0xec4899, V(-410,80,70),    "Decentraland",            "https://decentraland.org/", "img/decentraland.jpg", "Pioneering 3D virtual world where users explore, build, and trade virtual estates and digital fashion.", "Metaverse");
+  const pSoundScape = makePlanet(6,  0xdd22ff, V(340,180,220),   "SoundScape",              "", "img/soundscape.jpg", "Interactive ambient audio visualizer and generative synth studio.", "Local Audio");
+
+  // Add Planetary Rings
+  addPlanetaryRing(pCardano, 13, 22, 0x38bdf8);
+  addPlanetaryRing(pAIHub, 16, 28, 0xc084fc);
+  addPlanetaryRing(pDecentraland, 10, 18, 0xf472b6);
+  addPlanetaryRing(pSoundScape, 9, 16, 0x22d3ee);
 
   const planets = [
     pAIHub, pEduHub,
     pLearnHatty, pHattyTools, pLearnCardano, pPrivacyGadgets, pCardano, pVoi,
+    pDecentraland, pSoundScape,
     makePlanet(6,  0xff9955, V(46,60,166),   "Hatty's News",            "https://hattyhats.github.io/hattys-news/", "img/hattys-news.jpg", "Latest articles, tutorials, announcements, and alpha from Hatty.", "News"),
     makePlanet(7,  0xff55aa, V(7,-60,131),   "Hatty's Media",           "https://hattys-media.netlify.app/", "img/hattys-media.jpg", "Multimedia vault containing custom artwork, videos, graphics, and music.", "Media"),
     makePlanet(6,  0x44ffcc, V(-39,80,241),   "OpenFocus",               "https://hattyhats.github.io/Open-Focus/", "img/openfucus.jpg", "Minimalist focus timer and task flow web app to keep you productive and distraction-free.", "Productivity"),
@@ -819,10 +1248,10 @@
     makePlanet(5,  0x00e5ff, V(-225,45,230),   "Sweat Wallet",            "https://swe.at/c/REPbkMXl0V", "img/sweat_wallet.jpg", "Move-to-earn fitness crypto wallet that rewards your daily walking steps with SWEAT tokens.", "Move-to-Earn"),
     makePlanet(5,  0x10b981, V(-255,-40,210),  "MoneyWalk",               "https://gravitylabs.onelink.me/czwV/kawvz8qs?deep_link_sub2=WU7KLQ&deep_link_value=invitation", "img/moneywalk.jpg", "Daily step tracking rewards app where walking earns digital coins, gift cards, and rewards.", "Move-to-Earn"),
     makePlanet(6,  0x84cc16, V(-380,-30,100),  "Pixels",                  "https://play.pixels.xyz/", "img/pixels.jpg", "Cozy retro pixel-art MMORPG with open-world farming, crafting, land ownership, and community.", "Gaming"),
-    makePlanet(7,  0xec4899, V(-410,80,70),    "Decentraland",            "https://decentraland.org/", "img/decentraland.jpg", "Pioneering 3D virtual world where users explore, build, and trade virtual estates and digital fashion.", "Metaverse"),
     makePlanet(7,  0xff4400, V(-250,-140,320), "Stellar Assault",         "", "img/stellar_assault.jpg", "Arcade space combat dogfighting game with laser weaponry, asteroid dodging, and boss battles.", "Local Game"),
-    makePlanet(6,  0xdd22ff, V(340,180,220),   "SoundScape",              "", "img/soundscape.jpg", "Interactive ambient audio visualizer and generative synth studio.", "Local Audio"),
     makePlanet(6,  0x00ffcc, V(-480,160,-150), "Trippy",                  "", "img/trippy.jpg", "Psychedelic visual distortion canvas and hypnotic interactive optical illusions.", "Local Visuals"),
+    makePlanet(6.5, 0x00ff88, V(145,60,120),    "ThreatSphere",            "https://hattyhats.github.io/Hatty-s-Cyber-Threat/", "img/threat_sphere.jpg", "Real-time cyber threat intelligence map and global digital defense monitor by Hatty.", "Cybersecurity"),
+    makePlanet(6,   0xaa22ff, V(-135,-50,310),  "Wayvl Millix Music",      "https://www.wavyl.com/", "img/wavyl_music.jpg", "Decentralized audio platform and music streaming network powered by the Millix blockchain.", "Music & Web3"),
     makePlanet(20, 0xffcc00, V(0,0,0),         "The Hatty Sun",           "https://earnwithhatty.com/", "hattyhats.jpg", "The blazing core of Hatty's Universe and central gateway to the ecosystem.", "Central Star")
   ];
 
@@ -920,9 +1349,11 @@
       d.className = "target-item";
       d.textContent = p.userData.label + (p.userData.isMoon ? " (Moon)" : "");
       d.onclick = () => {
+        AudioEngine.click();
         searchInput.value = p.userData.label;
         searchDrop.style.display = "none";
         engageTarget(p);
+        triggerWarp(p);
       };
       searchDrop.appendChild(d);
     });
@@ -935,6 +1366,429 @@
     if(e.target !== searchInput) searchDrop.style.display = "none";
   });
 
+  // ── Hyperdrive Warp Jump System ──
+  const warpStarCount = 500;
+  const warpStarsGeo = new THREE.BufferGeometry();
+  const warpStarPos = new Float32Array(warpStarCount * 6);
+  for (let i = 0; i < warpStarCount; i++) {
+    const x = (Math.random() - 0.5) * 80;
+    const y = (Math.random() - 0.5) * 80;
+    const z = -Math.random() * 100;
+    warpStarPos[i * 6]     = x;
+    warpStarPos[i * 6 + 1] = y;
+    warpStarPos[i * 6 + 2] = z;
+    warpStarPos[i * 6 + 3] = x;
+    warpStarPos[i * 6 + 4] = y;
+    warpStarPos[i * 6 + 5] = z - 14;
+  }
+  warpStarsGeo.setAttribute("position", new THREE.BufferAttribute(warpStarPos, 3));
+  const warpStarsMat = new THREE.LineBasicMaterial({
+    color: 0x93c5fd,
+    transparent: true,
+    opacity: 0,
+    blending: THREE.AdditiveBlending
+  });
+  const warpLines = new THREE.LineSegments(warpStarsGeo, warpStarsMat);
+  camera.add(warpLines);
+  scene.add(camera);
+
+  let isWarping = false;
+  let warpProgress = 0;
+  let warpStartPos = new THREE.Vector3();
+  let warpTargetPlanet = null;
+  let warpCallback = null;
+  const warpOverlay = document.getElementById("warp-overlay");
+
+  function triggerWarp(targetPlanet, callback) {
+    if (!targetPlanet) return;
+    AudioEngine.warp();
+    warpTargetPlanet = targetPlanet;
+    warpStartPos.copy(camera.position);
+    isWarping = true;
+    warpProgress = 0;
+    warpCallback = callback || null;
+    
+    if (warpOverlay) {
+      warpOverlay.classList.add("active");
+      setTimeout(() => warpOverlay.classList.remove("active"), 320);
+    }
+  }
+
+  // ── Engine Thruster Trails (Auto-Dissolving) ──
+  const thrusterCount = 80;
+  const thrusterGeo = new THREE.BufferGeometry();
+  const thrusterPositions = new Float32Array(thrusterCount * 3);
+  const thrusterVel = new Float32Array(thrusterCount * 3);
+  const thrusterLife = new Float32Array(thrusterCount);
+  for (let i = 0; i < thrusterCount; i++) {
+    thrusterPositions[i * 3]     = 99999;
+    thrusterPositions[i * 3 + 1] = 99999;
+    thrusterPositions[i * 3 + 2] = 99999;
+    thrusterVel[i * 3]     = 0;
+    thrusterVel[i * 3 + 1] = 0;
+    thrusterVel[i * 3 + 2] = 0;
+    thrusterLife[i] = 0;
+  }
+  thrusterGeo.setAttribute("position", new THREE.BufferAttribute(thrusterPositions, 3));
+  const thrusterMat = new THREE.PointsMaterial({
+    color: 0x38bdf8,
+    size: 2.5,
+    transparent: true,
+    opacity: 0.85,
+    blending: THREE.AdditiveBlending
+  });
+  const thrusterPoints = new THREE.Points(thrusterGeo, thrusterMat);
+  scene.add(thrusterPoints);
+
+  let nextThrusterIdx = 0;
+  function updateThrusters(dt) {
+    const posAttr = thrusterGeo.attributes.position;
+    if (shiftDown) {
+      for (let k = 0; k < 3; k++) {
+        const idx = nextThrusterIdx;
+        nextThrusterIdx = (nextThrusterIdx + 1) % thrusterCount;
+        const backDir = new THREE.Vector3((Math.random()-0.5)*0.8, -0.6, 2.5).applyQuaternion(camera.quaternion);
+        const spawnPos = camera.position.clone().add(backDir);
+        posAttr.setXYZ(idx, spawnPos.x, spawnPos.y, spawnPos.z);
+        thrusterLife[idx] = 1.0;
+        const drift = backDir.clone().normalize().multiplyScalar(16);
+        thrusterVel[idx * 3]     = drift.x;
+        thrusterVel[idx * 3 + 1] = drift.y;
+        thrusterVel[idx * 3 + 2] = drift.z;
+      }
+    }
+    for (let i = 0; i < thrusterCount; i++) {
+      if (thrusterLife[i] > 0) {
+        thrusterLife[i] -= dt * 0.85; // Dissolves over ~1.15 seconds
+        if (thrusterLife[i] <= 0) {
+          thrusterLife[i] = 0;
+          posAttr.setXYZ(i, 99999, 99999, 99999);
+        } else {
+          posAttr.setXYZ(
+            i,
+            posAttr.getX(i) + thrusterVel[i * 3] * dt,
+            posAttr.getY(i) + thrusterVel[i * 3 + 1] * dt,
+            posAttr.getZ(i) + thrusterVel[i * 3 + 2] * dt
+          );
+        }
+      }
+    }
+    posAttr.needsUpdate = true;
+  }
+
+  // ── Real-Time Multiplayer Spaceship Presence ──
+  const callsignAdjectives = ["Star", "Cyber", "Cosmic", "Neon", "Solar", "Quantum", "Hyper", "Vortex", "Astro", "Nova"];
+  const callsignNouns = ["Pilot", "Voyager", "Ranger", "Scout", "Captain", "Explorer", "Seeker", "Navigator", "Wing"];
+  const localCallsign = `${callsignAdjectives[Math.floor(Math.random() * callsignAdjectives.length)]}-${callsignNouns[Math.floor(Math.random() * callsignNouns.length)]}-${Math.floor(Math.random() * 90 + 10)}`;
+  const localPlayerId = "p_" + Math.random().toString(36).substring(2, 9);
+
+  const otherPlayers = new Map(); // id -> { mesh, targetPos, targetQuat, lastSeen, name }
+  const onlineBadgeEl = document.getElementById("online-explorers-badge");
+
+  function updateOnlineBadge() {
+    if (onlineBadgeEl) {
+      const count = otherPlayers.size + 1;
+      onlineBadgeEl.textContent = `🟢 ${count} Explorer${count > 1 ? 's' : ''} Online`;
+    }
+  }
+
+  function createShipMesh(name, hexColor = 0x38bdf8) {
+    const shipGroup = new THREE.Group();
+
+    // Aerodynamic Fuselage
+    const bodyGeo = new THREE.ConeGeometry(0.7, 3.2, 5);
+    bodyGeo.rotateX(Math.PI / 2);
+    const bodyMat = new THREE.MeshStandardMaterial({
+      color: 0x1e293b,
+      roughness: 0.3,
+      metalness: 0.8
+    });
+    const body = new THREE.Mesh(bodyGeo, bodyMat);
+    shipGroup.add(body);
+
+    // Delta Wings with team color
+    const wingGeo = new THREE.BoxGeometry(3.6, 0.08, 1.4);
+    wingGeo.translate(0, 0, 0.4);
+    const wingMat = new THREE.MeshStandardMaterial({
+      color: hexColor,
+      roughness: 0.4,
+      metalness: 0.7,
+      emissive: new THREE.Color(hexColor),
+      emissiveIntensity: 0.25
+    });
+    const wings = new THREE.Mesh(wingGeo, wingMat);
+    shipGroup.add(wings);
+
+    // Glowing Cockpit Visor
+    const canopyGeo = new THREE.SphereGeometry(0.35, 16, 16);
+    canopyGeo.scale(1, 0.6, 1.8);
+    const canopyMat = new THREE.MeshBasicMaterial({
+      color: 0x67e8f9
+    });
+    const canopy = new THREE.Mesh(canopyGeo, canopyMat);
+    canopy.position.set(0, 0.3, -0.4);
+    shipGroup.add(canopy);
+
+    // Rear Ion Thruster Glow
+    const engineGeo = new THREE.SphereGeometry(0.3, 12, 12);
+    const engineMat = new THREE.MeshBasicMaterial({
+      color: 0x38bdf8,
+      transparent: true,
+      opacity: 0.85
+    });
+    const engine = new THREE.Mesh(engineGeo, engineMat);
+    engine.position.set(0, 0, 1.6);
+    shipGroup.add(engine);
+
+    // Billboard Floating Pilot Badge
+    const nameCanvas = document.createElement("canvas");
+    nameCanvas.width = 256;
+    nameCanvas.height = 64;
+    const nCtx = nameCanvas.getContext("2d");
+    nCtx.fillStyle = "rgba(15, 23, 42, 0.8)";
+    if (typeof nCtx.roundRect === "function") {
+      nCtx.roundRect(10, 10, 236, 44, 10);
+      nCtx.fill();
+    } else {
+      nCtx.fillRect(10, 10, 236, 44);
+    }
+    nCtx.strokeStyle = "rgba(56, 189, 248, 0.75)";
+    nCtx.lineWidth = 2;
+    nCtx.stroke();
+    nCtx.font = "bold 20px 'Share Tech Mono', monospace";
+    nCtx.fillStyle = "#38bdf8";
+    nCtx.textAlign = "center";
+    nCtx.textBaseline = "middle";
+    nCtx.fillText("🛸 " + name, 128, 32);
+
+    const nameTex = new THREE.CanvasTexture(nameCanvas);
+    const nameSpriteMat = new THREE.SpriteMaterial({ map: nameTex, transparent: true, depthWrite: false });
+    const nameSprite = new THREE.Sprite(nameSpriteMat);
+    nameSprite.position.set(0, 2.0, 0);
+    nameSprite.scale.set(7, 1.75, 1);
+    shipGroup.add(nameSprite);
+
+    scene.add(shipGroup);
+    return shipGroup;
+  }
+
+  let mqttClient = null;
+  let lastBroadcast = 0;
+
+  function initMultiplayer() {
+    if (typeof mqtt === "undefined") {
+      console.warn("MQTT library unavailable, operating in solo mode.");
+      if (onlineBadgeEl) onlineBadgeEl.textContent = "🟡 Solo Mode";
+      return;
+    }
+
+    const brokerUrls = [
+      "wss://broker.emqx.io:8084/mqtt",
+      "wss://broker.hivemq.com:8884/mqtt"
+    ];
+    let brokerIdx = 0;
+
+    function connect() {
+      try {
+        mqttClient = mqtt.connect(brokerUrls[brokerIdx], {
+          clientId: localPlayerId,
+          clean: true,
+          connectTimeout: 4000,
+          reconnectPeriod: 5000
+        });
+
+        mqttClient.on("connect", () => {
+          mqttClient.subscribe("hattys-universe/v1/presence", { qos: 0 });
+          updateOnlineBadge();
+        });
+
+        mqttClient.on("message", (topic, message) => {
+          try {
+            const data = JSON.parse(message.toString());
+            if (!data || data.id === localPlayerId) return;
+
+            let player = otherPlayers.get(data.id);
+            if (!player) {
+              const mesh = createShipMesh(data.name || "Explorer", 0x38bdf8);
+              mesh.position.set(data.x, data.y, data.z);
+              player = {
+                mesh,
+                targetPos: new THREE.Vector3(data.x, data.y, data.z),
+                targetQuat: new THREE.Quaternion(data.qx, data.qy, data.qz, data.qw),
+                lastSeen: Date.now(),
+                name: data.name
+              };
+              otherPlayers.set(data.id, player);
+              updateOnlineBadge();
+            } else {
+              player.targetPos.set(data.x, data.y, data.z);
+              player.targetQuat.set(data.qx, data.qy, data.qz, data.qw);
+              player.lastSeen = Date.now();
+            }
+          } catch (e) {}
+        });
+
+        mqttClient.on("error", () => {
+          brokerIdx = (brokerIdx + 1) % brokerUrls.length;
+        });
+      } catch (err) {
+        if (onlineBadgeEl) onlineBadgeEl.textContent = "🟡 Solo Mode";
+      }
+    }
+
+    connect();
+  }
+
+  initMultiplayer();
+
+  // ── Galaxy Radar Canvas ──
+  const radarCanvas = document.getElementById("radar-canvas");
+  const radarCtx = radarCanvas ? radarCanvas.getContext("2d") : null;
+  let radarSweep = 0;
+
+  function drawRadar(dt) {
+    if (!radarCtx) return;
+    radarCtx.clearRect(0, 0, 140, 140);
+    
+    radarCtx.strokeStyle = "rgba(56, 189, 248, 0.25)";
+    radarCtx.lineWidth = 1;
+    radarCtx.beginPath();
+    radarCtx.arc(70, 70, 28, 0, Math.PI * 2);
+    radarCtx.arc(70, 70, 56, 0, Math.PI * 2);
+    radarCtx.stroke();
+
+    radarCtx.beginPath();
+    radarCtx.moveTo(70, 12); radarCtx.lineTo(70, 128);
+    radarCtx.moveTo(12, 70); radarCtx.lineTo(128, 70);
+    radarCtx.stroke();
+
+    radarSweep += dt * 2.2;
+    radarCtx.strokeStyle = "rgba(56, 189, 248, 0.4)";
+    radarCtx.beginPath();
+    radarCtx.moveTo(70, 70);
+    radarCtx.lineTo(70 + Math.cos(radarSweep) * 60, 70 + Math.sin(radarSweep) * 60);
+    radarCtx.stroke();
+
+    const scale = 0.08;
+    planets.forEach(p => {
+      const wp = new THREE.Vector3();
+      p.getWorldPosition(wp);
+      const rx = 70 + wp.x * scale;
+      const ry = 70 + wp.z * scale;
+      if (rx >= 6 && rx <= 134 && ry >= 6 && ry <= 134) {
+        radarCtx.fillStyle = p.userData.isMoon ? "#93c5fd" : (p.userData.label === "The Hatty Sun" ? "#facc15" : "#c084fc");
+        radarCtx.beginPath();
+        radarCtx.arc(rx, ry, p.userData.isMoon ? 1.4 : 2.5, 0, Math.PI * 2);
+        radarCtx.fill();
+      }
+    });
+
+    // Draw other online players on radar in vibrant emerald green
+    otherPlayers.forEach(player => {
+      const rx = 70 + player.mesh.position.x * scale;
+      const ry = 70 + player.mesh.position.z * scale;
+      if (rx >= 6 && rx <= 134 && ry >= 6 && ry <= 134) {
+        radarCtx.fillStyle = "#4ade80";
+        radarCtx.beginPath();
+        radarCtx.arc(rx, ry, 3.2, 0, Math.PI * 2);
+        radarCtx.fill();
+      }
+    });
+
+    // Draw local player ship
+    const px = 70 + camera.position.x * scale;
+    const py = 70 + camera.position.z * scale;
+    if (px >= 6 && px <= 134 && py >= 6 && py <= 134) {
+      radarCtx.fillStyle = "#38bdf8";
+      radarCtx.beginPath();
+      radarCtx.arc(px, py, 3.5, 0, Math.PI * 2);
+      radarCtx.fill();
+
+      const fwd = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion);
+      radarCtx.strokeStyle = "#38bdf8";
+      radarCtx.lineWidth = 1.5;
+      radarCtx.beginPath();
+      radarCtx.moveTo(px, py);
+      radarCtx.lineTo(px + fwd.x * 8, py + fwd.z * 8);
+      radarCtx.stroke();
+    }
+  }
+
+  // ── Holographic Holodeck Modal Logic ──
+  const holodeckModal = document.getElementById("holodeck-modal");
+  const holoImg       = document.getElementById("holo-img");
+  const holoTitle     = document.getElementById("holo-title");
+  const holoTypeBadge = document.getElementById("holo-type-badge");
+  const holoCatBadge  = document.getElementById("holo-cat-badge");
+  const holoDesc      = document.getElementById("holo-desc");
+  const holoWarpBtn   = document.getElementById("holo-warp-btn");
+  const holoLaunchBtn = document.getElementById("holo-launch-btn");
+  const holoCopyBtn   = document.getElementById("holo-copy-btn");
+
+  let currentHoloPlanet = null;
+
+  window.openHolodeck = function(planet) {
+    if (!planet) return;
+    currentHoloPlanet = planet;
+    const u = planet.userData;
+    holoTitle.textContent = u.label || "Celestial World";
+    holoImg.src = u.texUrl || "hattyhats.jpg";
+    holoTypeBadge.textContent = u.isMoon ? "🛰️ MOON" : "🪐 PLANET";
+    holoCatBadge.textContent = (u.category || "ECOSYSTEM").toUpperCase();
+    holoDesc.textContent = u.desc || "Explore this world in Hatty's Universe.";
+    
+    if (u.url) {
+      holoLaunchBtn.style.display = "flex";
+      holoCopyBtn.style.display = "flex";
+      holoCopyBtn.textContent = "📋 Copy Link";
+    } else {
+      holoLaunchBtn.style.display = "none";
+      holoCopyBtn.style.display = "none";
+    }
+
+    holodeckModal.classList.add("open");
+    AudioEngine.ping();
+  };
+
+  window.closeHolodeck = function() {
+    holodeckModal.classList.remove("open");
+    currentHoloPlanet = null;
+    AudioEngine.click();
+  };
+
+  window.warpToCurrentHolodeck = function() {
+    if (currentHoloPlanet) {
+      const p = currentHoloPlanet;
+      closeHolodeck();
+      engageTarget(p);
+      triggerWarp(p);
+    }
+  };
+
+  window.launchCurrentHolodeck = function() {
+    if (currentHoloPlanet && currentHoloPlanet.userData.url) {
+      AudioEngine.click();
+      window.open(currentHoloPlanet.userData.url, "_blank");
+    }
+  };
+
+  window.copyCurrentHolodeckLink = function() {
+    if (currentHoloPlanet && currentHoloPlanet.userData.url) {
+      navigator.clipboard.writeText(currentHoloPlanet.userData.url);
+      holoCopyBtn.textContent = "✓ Copied!";
+      AudioEngine.click();
+      setTimeout(() => {
+        holoCopyBtn.textContent = "📋 Copy Link";
+      }, 2000);
+    }
+  };
+
+  window.addEventListener("keydown", e => {
+    if (e.key === "Escape" && holodeckModal && holodeckModal.classList.contains("open")) {
+      closeHolodeck();
+    }
+  });
+
   // ── Controls ──
   // Track shift for boost
   const keys = { KeyW:false, KeyA:false, KeyS:false, KeyD:false };
@@ -943,6 +1797,7 @@
   window.addEventListener("keydown", e => {
     if (e.code in keys) keys[e.code] = true;
     if (e.code === "ShiftLeft" || e.code === "ShiftRight") {
+      if (!shiftDown) AudioEngine.startThruster();
       shiftDown = true;
       boostEl.classList.add("active");
     }
@@ -951,6 +1806,7 @@
     if (e.code in keys) keys[e.code] = false;
     if (e.code === "ShiftLeft" || e.code === "ShiftRight") {
       shiftDown = false;
+      AudioEngine.stopThruster();
       boostEl.classList.remove("active");
     }
   });
@@ -1041,7 +1897,9 @@
         mouse.set(((t.clientX-r.left)/r.width)*2-1,-((t.clientY-r.top)/r.height)*2+1);
         raycaster.setFromCamera(mouse,camera);
         const h=raycaster.intersectObjects(planets,false);
-        if(h.length&&h[0].object.userData.url) window.open(h[0].object.userData.url,"_blank");
+        if(h.length) {
+          openHolodeck(h[0].object);
+        }
       }
     }
   },{passive:true});
@@ -1092,11 +1950,12 @@
         if(p.userData.baseEI===undefined) p.userData.baseEI=p.material.emissiveIntensity;
         p.material.emissiveIntensity=p.userData.baseEI*3.5;
         container.style.cursor="pointer";
+        AudioEngine.ping();
         
         const u = p.userData;
         const imgHtml = u.texUrl ? `<img src="${u.texUrl}" class="tt-img" alt="${u.label}">` : '';
         const badgeText = (u.isMoon ? '🛰️ Moon • ' : '🪐 Planet • ') + (u.category || 'Ecosystem');
-        const actionText = u.url ? 'Click to visit ↗' : (u.isMoon || (u.label && u.label.includes('Hub')) ? 'Hub Sector' : 'Local Project');
+        const actionText = u.url ? 'Click to inspect ↗' : (u.isMoon || (u.label && u.label.includes('Hub')) ? 'Hub Sector' : 'Local Project');
         
         tooltip.innerHTML = `
           <div class="tt-header">
@@ -1135,7 +1994,9 @@
   renderer.domElement.addEventListener("click", e=>{
     updateMouse(e); raycaster.setFromCamera(mouse,camera);
     const h=raycaster.intersectObjects(planets,false);
-    if(h.length&&h[0].object.userData.url) window.open(h[0].object.userData.url,"_blank");
+    if(h.length) {
+      openHolodeck(h[0].object);
+    }
   });
 
   window.addEventListener("resize",()=>{
@@ -1310,7 +2171,80 @@
 
 
     tickTour(dt);
-    if(!tourActive){ updateRot(); updatePos(dt); }
+    if (!tourActive && !isWarping) { updateRot(); updatePos(dt); }
+
+    // Hyperdrive Warp Flight Animation
+    if (isWarping && warpTargetPlanet) {
+      warpProgress += dt * 1.25;
+      const t = Math.min(1, warpProgress);
+      const ease = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+      
+      const worldPos = new THREE.Vector3();
+      warpTargetPlanet.getWorldPosition(worldPos);
+      const approachDir = new THREE.Vector3(0, 0.15, 1).normalize();
+      const dist = warpTargetPlanet.userData.radius * 4.5;
+      const destPos = worldPos.clone().add(approachDir.multiplyScalar(dist));
+
+      camera.position.lerpVectors(warpStartPos, destPos, ease);
+      camera.lookAt(worldPos);
+
+      const fovStretch = Math.sin(t * Math.PI) * 35;
+      camera.fov = 75 + fovStretch;
+      camera.updateProjectionMatrix();
+      warpStarsMat.opacity = Math.min(1, Math.sin(t * Math.PI) * 1.5);
+
+      if (t >= 1) {
+        isWarping = false;
+        camera.fov = 75;
+        camera.updateProjectionMatrix();
+        warpStarsMat.opacity = 0;
+        const fwd = new THREE.Vector3().subVectors(worldPos, camera.position).normalize();
+        yaw   = Math.atan2(fwd.x, -fwd.z);
+        pitch = Math.asin(Math.max(-1, Math.min(1, fwd.y)));
+        updateRot();
+        if (warpCallback) {
+          warpCallback();
+          warpCallback = null;
+        }
+      }
+    }
+
+    updateThrusters(dt);
+
+    // Multiplayer broadcast & remote player interpolation
+    const now = Date.now();
+    if (window.hasEnteredUniverse && mqttClient && mqttClient.connected) {
+      if (now - lastBroadcast > 100) { // 10 Hz
+        lastBroadcast = now;
+        const payload = JSON.stringify({
+          id: localPlayerId,
+          name: localCallsign,
+          x: Math.round(camera.position.x * 10) / 10,
+          y: Math.round(camera.position.y * 10) / 10,
+          z: Math.round(camera.position.z * 10) / 10,
+          qx: Math.round(camera.quaternion.x * 1000) / 1000,
+          qy: Math.round(camera.quaternion.y * 1000) / 1000,
+          qz: Math.round(camera.quaternion.z * 1000) / 1000,
+          qw: Math.round(camera.quaternion.w * 1000) / 1000
+        });
+        mqttClient.publish("hattys-universe/v1/presence", payload, { qos: 0 });
+      }
+    }
+
+    // Prune inactive players (> 5s without update) & smooth interpolation
+    otherPlayers.forEach((player, id) => {
+      if (now - player.lastSeen > 5000) {
+        scene.remove(player.mesh);
+        otherPlayers.delete(id);
+        updateOnlineBadge();
+      } else {
+        player.mesh.position.lerp(player.targetPos, 0.2);
+        player.mesh.quaternion.slerp(player.targetQuat, 0.2);
+      }
+    });
+
+    drawRadar(dt);
+
     composer.render();
     requestAnimationFrame(animate);
   }

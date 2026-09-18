@@ -1514,7 +1514,7 @@
   <div id="jump-wrap" style="display:flex; align-items:center; gap:8px;">
     <div id="online-explorers-badge">🟢 1 Explorer Online</div>
     <select id="sector-select" title="Explore or warp by Galactic Sector" onchange="onSectorSelect(this.value)">
-      <option value="ALL">🌌 All Sectors (59)</option>
+      <option value="ALL">🌌 All Sectors (60)</option>
       <option value="CREATOR">🛠️ Creator Studio</option>
       <option value="BLOCKCHAIN">⛓️ Blockchain Networks</option>
       <option value="AI">🤖 AI & Compute</option>
@@ -1891,7 +1891,7 @@
     if (label.includes("Privacy") || label === "Brave Browser" || label === "Ghost Protocol" || label === "ThreatSphere") return "PRIVACY";
     if (label === "Focus" || label === "The Arena" || label.includes("Twitter") || label.includes("Audius") || label.includes("Wayvl") || label === "Suno") return "SOCIAL_MEDIA";
     if (label === "Rollercoin" || label === "Pixels" || label === "Chainers" || label === "BestPlay" || label === "Decentraland" || label === "Immutable" || label === "Stellar Assault") return "GAMING";
-    if (label === "Cointiply" || label === "Slice App" || label === "Sweat Wallet" || label === "PublishOX" || label === "CryptoNaut" || label.includes("Faucet") || label === "FaucetPay") return "REWARDS";
+    if (label === "Cointiply" || label === "Slice App" || label === "Sweat Wallet" || label === "PublishOX" || label === "CryptoNaut" || label.includes("Faucet") || label === "FaucetPay" || label === "ZBD") return "REWARDS";
     if (label === "SoundScape" || label === "Trippy") return "LABS";
     return "CREATOR";
   }
@@ -2043,6 +2043,7 @@
     makePlanet(6,   0xaa22ff, V(-135,-50,310),  "Wayvl Millix Music",      "https://www.wavyl.com/", "img/wavyl_music.jpg", "Decentralized audio platform and music streaming network powered by the Millix blockchain.", "Music & Web3"),
     makePlanet(5.5, 0xffaa00, V(285,75,-170),   "Satsman",                 "https://satsman.com?ref=hattyhats&c=grow-your-army", "img/satsman.png", "Gamified Bitcoin education platform with daily learning missions and satoshi crypto rewards.", "Bitcoin Education"),
     makePlanet(6,   0x00f0ff, V(175,-65,120),   "Sapphire Crypto",         "https://sapphirecrypto.org/", "img/sapphire_crypto.webp", "Premier crypto intelligence, market analytics, blockchain research, and security insights.", "Crypto Intelligence"),
+    makePlanet(5.5, 0x0088ff, V(-240,-30,-390), "ZBD",                     "https://zbd.link/hcHi/invite?af_sub1=G96DF6&deep_link_value=fwb_two_for_two", "img/zbd.png", "Premier Bitcoin Lightning gaming rewards app & wallet. Play games, complete tasks, and earn real Bitcoin satoshis instantly.", "Bitcoin Rewards"),
     makePlanet(20, 0xffcc00, V(0,0,0),         "The Hatty Sun",           "https://earnwithhatty.com/", "hattyhats.jpg", "The blazing core of Hatty's Universe and central gateway to the ecosystem.", "Central Star")
   ];
 

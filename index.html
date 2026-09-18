@@ -126,8 +126,70 @@
       text-shadow: 0 0 12px rgba(167,139,250,0.8);
     }
 
+    #splash-pilot-box {
+      margin-top: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 2.9s;
+      z-index: 4;
+    }
+    .pilot-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      color: #7dd3fc;
+      text-transform: uppercase;
+    }
+    .pilot-input-wrapper {
+      display: flex;
+      align-items: center;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(56, 189, 248, 0.5);
+      border-radius: 6px;
+      padding: 4px 8px;
+      box-shadow: 0 0 16px rgba(56, 189, 248, 0.25);
+      transition: all 0.2s ease;
+    }
+    .pilot-input-wrapper:focus-within {
+      border-color: #38bdf8;
+      box-shadow: 0 0 24px rgba(56, 189, 248, 0.5);
+    }
+    .pilot-icon {
+      font-size: 14px;
+      margin-right: 6px;
+    }
+    #splash-pilot-input {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #fff;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 14px;
+      width: 170px;
+      text-align: center;
+    }
+    #splash-dice-btn {
+      background: rgba(56, 189, 248, 0.15);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      border-radius: 4px;
+      color: #fff;
+      cursor: pointer;
+      font-size: 14px;
+      padding: 2px 6px;
+      transition: all 0.15s ease;
+      margin-left: 4px;
+    }
+    #splash-dice-btn:hover {
+      background: rgba(56, 189, 248, 0.35);
+      box-shadow: 0 0 8px rgba(56, 189, 248, 0.4);
+      transform: rotate(15deg);
+    }
+
     #splash-enter {
-      margin-top: 36px;
+      margin-top: 18px;
       position: relative;
       padding: 14px 52px;
       font-family: 'Orbitron', sans-serif;
@@ -141,7 +203,7 @@
       border-radius: 4px;
       cursor: not-allowed;
       opacity: 0;
-      animation: fadeUp 0.8s ease forwards 3.4s;
+      animation: fadeUp 0.8s ease forwards 3.3s;
       transition: all 0.2s ease;
       /* Pulsing glow */
       box-shadow:
@@ -247,21 +309,117 @@
       gap: 10px;
       pointer-events: none;
       max-height: calc(100vh - 24px);
-      width: 200px;
+      width: 280px;
+      max-width: calc(100vw - 24px);
+      z-index: 20;
+      overflow-y: auto;
+      overflow-x: hidden;
+      scrollbar-width: none;
+    }
+    #left-panel::-webkit-scrollbar {
+      display: none;
+    }
+
+    .left-nav-row {
+      display: flex;
+      gap: 6px;
+      width: 280px;
+      max-width: 100%;
+      pointer-events: auto;
+    }
+    .panel-toggle-btn {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      background: rgba(15, 23, 42, 0.88);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      color: #e2e8f0;
+      padding: 7px 10px;
+      border-radius: 6px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.4px;
+      cursor: pointer;
+      pointer-events: auto;
+      backdrop-filter: blur(8px);
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+      position: relative;
+      white-space: nowrap;
+    }
+    .panel-toggle-btn:hover {
+      background: rgba(30, 41, 59, 0.95);
+      border-color: #38bdf8;
+      color: #ffffff;
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
+      transform: translateY(-1px);
+    }
+    .panel-toggle-btn.active {
+      background: rgba(14, 165, 233, 0.25);
+      border-color: #38bdf8;
+      color: #38bdf8;
+      box-shadow: 0 0 14px rgba(56, 189, 248, 0.5);
+    }
+    .btn-arrow {
+      font-size: 10px;
+      color: #94a3b8;
+      transition: transform 0.2s ease;
+    }
+    .panel-toggle-btn.active .btn-arrow {
+      transform: rotate(180deg);
+      color: #38bdf8;
+    }
+    .chat-unread-dot {
+      width: 7px;
+      height: 7px;
+      background: #38bdf8;
+      border-radius: 50%;
+      position: absolute;
+      top: 5px;
+      right: 6px;
+      box-shadow: 0 0 6px #38bdf8;
+      animation: pulse-dot 1.5s infinite;
+    }
+    .chat-unread-dot.hidden {
+      display: none !important;
+    }
+    @keyframes pulse-dot {
+      0% { transform: scale(0.9); opacity: 0.7; }
+      50% { transform: scale(1.3); opacity: 1; box-shadow: 0 0 10px #38bdf8; }
+      100% { transform: scale(0.9); opacity: 0.7; }
+    }
+
+    .dropdown-panel {
+      pointer-events: auto;
+      width: 280px;
+      max-width: 100%;
+      animation: dropdown-appear 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .dropdown-panel.hidden {
+      display: none !important;
+    }
+    @keyframes dropdown-appear {
+      from { opacity: 0; transform: translateY(-6px); }
+      to   { opacity: 1; transform: translateY(0); }
     }
 
     .hud {
-      padding: 8px 12px;
-      background: rgba(0,0,0,0.55);
-      border: 1px solid rgba(255,255,255,0.12);
-      border-radius: 6px;
-      font-size: 12px; line-height: 1.5;
-      backdrop-filter: blur(6px);
-      width: 164px;
+      padding: 10px 14px;
+      background: rgba(10, 15, 30, 0.88);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      border-radius: 8px;
+      font-size: 11px; line-height: 1.5;
+      backdrop-filter: blur(12px);
+      width: 100%;
+      box-sizing: border-box;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
       flex-shrink: 0;
     }
-    .hud-title { font-size: 13px; font-weight: 600; margin-bottom: 4px; color: #fff; }
-    .hud-body  { color: #b0b7ff; }
+    .hud-title { font-size: 12px; font-weight: 600; margin-bottom: 6px; color: #38bdf8; font-family: 'Orbitron', sans-serif; letter-spacing: 0.5px; }
+    .hud-body  { color: #cbd5e1; }
     .hud-body strong { color: #fff; font-weight: 600; }
     .hud-keyboard { display: block; }
     .hud-touch    { display: none; }
@@ -270,6 +428,366 @@
       .hud-keyboard { display: none; }
       .hud-touch    { display: block; }
       .hud { font-size: 11px; }
+    }
+
+    /* Live Chat Box Styling */
+    .chat-container {
+      background: rgba(10, 15, 30, 0.88);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      border-radius: 8px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), 0 0 15px rgba(56, 189, 248, 0.15);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .chat-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 10px;
+      background: rgba(15, 23, 42, 0.7);
+      border-bottom: 1px solid rgba(56, 189, 248, 0.2);
+    }
+    .chat-header-title {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      color: #38bdf8;
+      letter-spacing: 0.8px;
+    }
+    .chat-pulse-indicator {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 6px #10b981;
+      display: inline-block;
+    }
+    .chat-pilot-btn {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 10px;
+      font-family: 'Share Tech Mono', monospace;
+      color: #7dd3fc;
+      background: rgba(56, 189, 248, 0.12);
+      padding: 3px 8px;
+      border-radius: 4px;
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      cursor: pointer;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 145px;
+      transition: all 0.15s ease;
+    }
+    .chat-pilot-btn:hover {
+      background: rgba(56, 189, 248, 0.28);
+      border-color: #38bdf8;
+      color: #fff;
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+      transform: translateY(-1px);
+    }
+    .chat-pilot-btn .edit-pen {
+      font-size: 9px;
+      opacity: 0.75;
+      transition: opacity 0.15s;
+    }
+    .chat-pilot-btn:hover .edit-pen {
+      opacity: 1;
+    }
+
+    .hud-pilot-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 8px;
+      margin-bottom: 8px;
+      border-bottom: 1px solid rgba(56, 189, 248, 0.25);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 11px;
+      color: #94a3b8;
+    }
+    .hud-pilot-row strong {
+      color: #38bdf8;
+    }
+    .hud-edit-name-btn {
+      background: rgba(56, 189, 248, 0.15);
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      border-radius: 4px;
+      color: #38bdf8;
+      font-size: 10px;
+      padding: 2px 7px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .hud-edit-name-btn:hover {
+      background: rgba(56, 189, 248, 0.35);
+      border-color: #38bdf8;
+      color: #fff;
+      box-shadow: 0 0 8px rgba(56, 189, 248, 0.4);
+    }
+
+    /* ══════════════════════════════════════════
+       PILOT CALLSIGN CUSTOMIZATION MODAL
+    ══════════════════════════════════════════ */
+    #name-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 10001;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: auto;
+      animation: modalFadeIn 0.2s ease;
+    }
+    #name-modal.hidden {
+      display: none !important;
+    }
+    .name-modal-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(2, 6, 23, 0.82);
+      backdrop-filter: blur(8px);
+    }
+    .name-modal-box {
+      position: relative;
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.96), rgba(30, 27, 75, 0.94));
+      border: 1px solid rgba(56, 189, 248, 0.6);
+      border-radius: 12px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8), 0 0 25px rgba(56, 189, 248, 0.35);
+      width: min(340px, 90vw);
+      overflow: hidden;
+      z-index: 2;
+    }
+    .name-modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      background: rgba(2, 6, 23, 0.8);
+      border-bottom: 1px solid rgba(56, 189, 248, 0.25);
+      font-family: 'Orbitron', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      color: #38bdf8;
+      letter-spacing: 0.5px;
+    }
+    .name-modal-close {
+      background: none;
+      border: none;
+      color: #94a3b8;
+      font-size: 14px;
+      cursor: pointer;
+      padding: 2px 6px;
+      border-radius: 4px;
+      transition: all 0.15s;
+    }
+    .name-modal-close:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.1);
+    }
+    .name-modal-body {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .name-modal-body p {
+      margin: 0;
+      font-size: 11px;
+      color: #cbd5e1;
+      line-height: 1.5;
+    }
+    .name-input-row {
+      display: flex;
+      gap: 8px;
+    }
+    #modal-name-input {
+      flex: 1;
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      border-radius: 6px;
+      color: #fff;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 13px;
+      padding: 8px 10px;
+      outline: none;
+      transition: all 0.2s;
+    }
+    #modal-name-input:focus {
+      border-color: #38bdf8;
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+    }
+    .name-dice-btn {
+      background: rgba(56, 189, 248, 0.15);
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      border-radius: 6px;
+      color: #fff;
+      cursor: pointer;
+      font-size: 16px;
+      padding: 0 12px;
+      transition: all 0.15s;
+    }
+    .name-dice-btn:hover {
+      background: rgba(56, 189, 248, 0.3);
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+      transform: rotate(15deg);
+    }
+    .name-modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 6px;
+    }
+    .name-cancel-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 6px;
+      color: #94a3b8;
+      font-size: 11px;
+      padding: 6px 12px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .name-cancel-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+    }
+    .name-save-btn {
+      background: linear-gradient(135deg, #0284c7, #0369a1);
+      border: 1px solid rgba(56, 189, 248, 0.6);
+      border-radius: 6px;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 6px 14px;
+      cursor: pointer;
+      transition: all 0.15s;
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+    }
+    .name-save-btn:hover {
+      background: #0ea5e9;
+      box-shadow: 0 0 16px rgba(56, 189, 248, 0.6);
+    }
+    .chat-messages-box {
+      height: 190px;
+      overflow-y: auto;
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 11px;
+      line-height: 1.4;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(56, 189, 248, 0.4) transparent;
+    }
+    .chat-messages-box::-webkit-scrollbar {
+      width: 4px;
+    }
+    .chat-messages-box::-webkit-scrollbar-thumb {
+      background: rgba(56, 189, 248, 0.4);
+      border-radius: 2px;
+    }
+    .chat-system-msg {
+      color: #94a3b8;
+      font-style: italic;
+      background: rgba(56, 189, 248, 0.08);
+      border-left: 2px solid #38bdf8;
+      padding: 4px 6px;
+      border-radius: 4px;
+      font-size: 10px;
+    }
+    .chat-msg-row {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      padding: 4px 6px;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 4px;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      animation: msg-fade 0.15s ease;
+    }
+    .chat-msg-row.my-msg {
+      background: rgba(56, 189, 248, 0.08);
+      border-color: rgba(56, 189, 248, 0.2);
+    }
+    @keyframes msg-fade {
+      from { opacity: 0; transform: translateY(3px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .chat-msg-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 10px;
+    }
+    .chat-msg-sender {
+      font-weight: 600;
+      color: #38bdf8;
+      font-family: 'Share Tech Mono', monospace;
+    }
+    .chat-msg-row.my-msg .chat-msg-sender {
+      color: #4ade80;
+    }
+    .chat-msg-time {
+      color: #64748b;
+      font-size: 9px;
+    }
+    .chat-msg-text {
+      color: #f1f5f9;
+      word-break: break-word;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    .chat-input-bar {
+      display: flex;
+      gap: 6px;
+      padding: 8px 10px;
+      background: rgba(15, 23, 42, 0.9);
+      border-top: 1px solid rgba(56, 189, 248, 0.2);
+      margin: 0;
+    }
+    #chat-input {
+      flex: 1;
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      border-radius: 4px;
+      color: #ffffff;
+      font-size: 11px;
+      padding: 5px 8px;
+      outline: none;
+      font-family: inherit;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    #chat-input:focus {
+      border-color: #38bdf8;
+      box-shadow: 0 0 8px rgba(56, 189, 248, 0.4);
+    }
+    #chat-input::placeholder {
+      color: #64748b;
+    }
+    #chat-send-btn {
+      background: linear-gradient(135deg, #0284c7, #0369a1);
+      border: 1px solid rgba(56, 189, 248, 0.5);
+      border-radius: 4px;
+      color: #ffffff;
+      padding: 0 10px;
+      font-size: 11px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+    }
+    #chat-send-btn:hover {
+      background: #0ea5e9;
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
     }
 
     .main-site-button {
@@ -882,6 +1400,14 @@
     <div id="splash-byline">
       Created by <span id="splash-hattyname">HattyHats</span>
     </div>
+    <div id="splash-pilot-box">
+      <div class="pilot-label">Pilot Callsign</div>
+      <div class="pilot-input-wrapper">
+        <span class="pilot-icon">🛸</span>
+        <input type="text" id="splash-pilot-input" maxlength="20" placeholder="Your Callsign..." autocomplete="off" />
+        <button type="button" id="splash-dice-btn" onclick="randomizePilotName()" title="Roll Random Callsign">🎲</button>
+      </div>
+    </div>
     <button id="splash-enter" onclick="enterUniverse()" disabled>Loading Assets...</button>
   </div>
 </div>
@@ -893,24 +1419,69 @@
 <div id="universe-container">
 
   <div id="left-panel">
-    <div class="hud">
-      <div class="hud-title">HattyHats – Digital Universe v0.7</div>
-      <div class="hud-body">
-        <span class="hud-keyboard">
-          Click inside, then use:<br />
-          <strong>W / S</strong> – forward / back<br />
-          <strong>A / D</strong> – left / right<br />
-          <strong>Shift</strong> – boost speed<br />
-          Drag mouse – look around<br /><br />
-          Use the <strong>Target System</strong><br />to warp to any world.<br /><br />
-          Hover a planet to see its name,<br />click to open its world.
-        </span>
-        <span class="hud-touch">
-          <strong>1 finger</strong> drag – look around<br />
-          <strong>2 fingers</strong> drag – fly<br />
-          <strong>Tap</strong> a planet to open it<br /><br />
-          Use ↑↓←→ buttons to fly.
-        </span>
+    <!-- Top Nav Buttons for Instructions & Live Chat -->
+    <div class="left-nav-row">
+      <button id="instructions-btn" class="panel-toggle-btn" onclick="toggleInstructions()" title="Toggle Flight Instructions">
+        📋 Instructions <span id="inst-arrow" class="btn-arrow">▾</span>
+      </button>
+      <button id="chat-btn" class="panel-toggle-btn" onclick="toggleChat()" title="Toggle Galaxy Live Chat">
+        💬 Chat <span id="chat-unread-dot" class="chat-unread-dot hidden"></span> <span id="chat-arrow" class="btn-arrow">▾</span>
+      </button>
+    </div>
+
+    <!-- Dropdown: Instructions Panel (collapsed by default) -->
+    <div id="instructions-panel" class="dropdown-panel hidden">
+      <div class="hud">
+        <div class="hud-title">HattyHats – Digital Universe v0.7</div>
+        <div class="hud-body">
+          <div class="hud-pilot-row">
+            <span>Pilot: <strong id="inst-my-callsign">Explorer</strong></span>
+            <button type="button" class="hud-edit-name-btn" onclick="openNameModal()" title="Customize Pilot Callsign">✏️ Change</button>
+          </div>
+          <span class="hud-keyboard">
+            Click inside, then use:<br />
+            <strong>W / S</strong> – forward / back<br />
+            <strong>A / D</strong> – left / right<br />
+            <strong>Shift</strong> – boost speed<br />
+            Drag mouse – look around<br /><br />
+            Use the <strong>Target System</strong><br />to warp to any world.<br /><br />
+            Hover a planet to see its name,<br />click to open its world.<br /><br />
+            Click <strong>💬 Chat</strong> to communicate live!
+          </span>
+          <span class="hud-touch">
+            <strong>1 finger</strong> drag – look around<br />
+            <strong>2 fingers</strong> drag – fly<br />
+            <strong>Tap</strong> a planet to open it<br /><br />
+            Use ↑↓←→ buttons to fly.<br /><br />
+            Click <strong>💬 Chat</strong> to broadcast!
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dropdown: Live Chat Feed Panel (collapsed by default) -->
+    <div id="chat-panel" class="dropdown-panel hidden">
+      <div class="chat-container">
+        <div class="chat-header">
+          <div class="chat-header-title">
+            <span class="chat-pulse-indicator"></span>
+            <span>GALAXY COMMS</span>
+          </div>
+          <button type="button" class="chat-pilot-btn" id="chat-pilot-display" onclick="openNameModal()" title="Click to Change Pilot Name">
+            🛸 <span id="chat-my-callsign">Explorer</span> <span class="edit-pen">✏️</span>
+          </button>
+        </div>
+
+        <div id="chat-messages" class="chat-messages-box">
+          <div class="chat-system-msg">
+            🌌 Connected to Galaxy Comm-Link. Real-time chat active across all explorers!
+          </div>
+        </div>
+
+        <form id="chat-form" class="chat-input-bar" onsubmit="sendChatMessage(event)">
+          <input type="text" id="chat-input" placeholder="Type transmission..." maxlength="240" autocomplete="off" />
+          <button type="submit" id="chat-send-btn" title="Send Transmission">➤</button>
+        </form>
       </div>
     </div>
 
@@ -1000,11 +1571,37 @@
     </div>
   </div>
 
+  <!-- Pilot Callsign Customization Modal -->
+  <div id="name-modal" class="hidden">
+    <div class="name-modal-overlay" onclick="closeNameModal()"></div>
+    <div class="name-modal-box">
+      <div class="name-modal-header">
+        <span>🛸 CUSTOMIZE CALLSIGN</span>
+        <button type="button" class="name-modal-close" onclick="closeNameModal()">✕</button>
+      </div>
+      <div class="name-modal-body">
+        <p>Choose your callsign displayed over your ship in space and in Galaxy Live Chat:</p>
+        <div class="name-input-row">
+          <input type="text" id="modal-name-input" maxlength="20" placeholder="Enter pilot callsign..." autocomplete="off" />
+          <button type="button" class="name-dice-btn" onclick="randomizePilotName()" title="Roll Random Callsign">🎲</button>
+        </div>
+        <div class="name-modal-actions">
+          <button type="button" class="name-cancel-btn" onclick="closeNameModal()">Cancel</button>
+          <button type="button" class="name-save-btn" onclick="savePilotNameFromModal()">Save Callsign</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <!-- Splash enter handler -->
 <script>
   function enterUniverse() {
+    const splashInput = document.getElementById('splash-pilot-input');
+    if (splashInput && splashInput.value.trim() && window.setLocalCallsign) {
+      window.setLocalCallsign(splashInput.value.trim());
+    }
     const splash = document.getElementById('splash');
     splash.classList.add('exiting');
     setTimeout(() => { splash.style.display = 'none'; }, 700);
@@ -1734,11 +2331,140 @@
     posAttr.needsUpdate = true;
   }
 
-  // ── Real-Time Multiplayer Spaceship Presence ──
-  const callsignAdjectives = ["Star", "Cyber", "Cosmic", "Neon", "Solar", "Quantum", "Hyper", "Vortex", "Astro", "Nova"];
-  const callsignNouns = ["Pilot", "Voyager", "Ranger", "Scout", "Captain", "Explorer", "Seeker", "Navigator", "Wing"];
-  const localCallsign = `${callsignAdjectives[Math.floor(Math.random() * callsignAdjectives.length)]}-${callsignNouns[Math.floor(Math.random() * callsignNouns.length)]}-${Math.floor(Math.random() * 90 + 10)}`;
+  // ── Real-Time Multiplayer Spaceship Presence & Callsigns ──
+  const callsignAdjectives = ["Star", "Cyber", "Cosmic", "Neon", "Solar", "Quantum", "Hyper", "Vortex", "Astro", "Nova", "Shadow", "Apex", "Phantom", "Galactic", "Iron", "Titan", "Zero", "Echo", "Omega", "Falcon"];
+  const callsignNouns = ["Pilot", "Voyager", "Ranger", "Scout", "Captain", "Explorer", "Seeker", "Navigator", "Wing", "Knight", "Hunter", "Ghost", "Ace", "Spectre", "Rider", "Nomad"];
+
+  function generateRandomCallsign() {
+    const adj = callsignAdjectives[Math.floor(Math.random() * callsignAdjectives.length)];
+    const noun = callsignNouns[Math.floor(Math.random() * callsignNouns.length)];
+    const num = Math.floor(Math.random() * 90 + 10);
+    return `${adj}-${noun}-${num}`;
+  }
+
+  let localCallsign = (function() {
+    try {
+      const saved = localStorage.getItem("hattys_pilot_name");
+      if (saved && saved.trim()) return saved.trim().slice(0, 20);
+    } catch(e) {}
+    const gen = generateRandomCallsign();
+    try { localStorage.setItem("hattys_pilot_name", gen); } catch(e) {}
+    return gen;
+  })();
+
   const localPlayerId = "p_" + Math.random().toString(36).substring(2, 9);
+
+  // Sync callsign to all UI tags
+  function syncCallsignUI() {
+    const chatMyCallsignEl = document.getElementById("chat-my-callsign");
+    if (chatMyCallsignEl) chatMyCallsignEl.textContent = localCallsign;
+    const instMyCallsignEl = document.getElementById("inst-my-callsign");
+    if (instMyCallsignEl) instMyCallsignEl.textContent = localCallsign;
+    const splashInput = document.getElementById("splash-pilot-input");
+    if (splashInput) splashInput.value = localCallsign;
+  }
+  syncCallsignUI();
+
+  function setLocalCallsign(newName) {
+    if (!newName) return;
+    const clean = newName.trim().slice(0, 20);
+    if (!clean) return;
+    localCallsign = clean;
+    try {
+      localStorage.setItem("hattys_pilot_name", clean);
+    } catch(e) {}
+
+    syncCallsignUI();
+
+    // Immediately broadcast updated presence packet
+    if (mqttClient && mqttClient.connected && window.hasEnteredUniverse) {
+      const payload = JSON.stringify({
+        id: localPlayerId,
+        name: localCallsign,
+        x: Math.round(camera.position.x * 10) / 10,
+        y: Math.round(camera.position.y * 10) / 10,
+        z: Math.round(camera.position.z * 10) / 10,
+        qx: Math.round(camera.quaternion.x * 1000) / 1000,
+        qy: Math.round(camera.quaternion.y * 1000) / 1000,
+        qz: Math.round(camera.quaternion.z * 1000) / 1000,
+        qw: Math.round(camera.quaternion.w * 1000) / 1000
+      });
+      mqttClient.publish("hattys-universe/v1/presence", payload, { qos: 0 });
+    }
+
+    // Add local notification in chat feed
+    appendChatMessage({
+      name: "SYSTEM",
+      text: `🚀 Pilot Callsign updated to: ${clean}`,
+      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    }, false);
+  }
+  window.setLocalCallsign = setLocalCallsign;
+
+  function randomizePilotName() {
+    if (typeof AudioEngine !== "undefined" && AudioEngine.click) AudioEngine.click();
+    const newName = generateRandomCallsign();
+    const splashInput = document.getElementById("splash-pilot-input");
+    if (splashInput) splashInput.value = newName;
+    const modalInput = document.getElementById("modal-name-input");
+    if (modalInput) modalInput.value = newName;
+    return newName;
+  }
+  window.randomizePilotName = randomizePilotName;
+
+  function openNameModal() {
+    if (typeof AudioEngine !== "undefined" && AudioEngine.click) AudioEngine.click();
+    const modal = document.getElementById("name-modal");
+    const input = document.getElementById("modal-name-input");
+    if (modal) modal.classList.remove("hidden");
+    if (input) {
+      input.value = localCallsign;
+      setTimeout(() => input.focus(), 60);
+    }
+  }
+  window.openNameModal = openNameModal;
+
+  function closeNameModal() {
+    if (typeof AudioEngine !== "undefined" && AudioEngine.click) AudioEngine.click();
+    const modal = document.getElementById("name-modal");
+    if (modal) modal.classList.add("hidden");
+  }
+  window.closeNameModal = closeNameModal;
+
+  function savePilotNameFromModal() {
+    const input = document.getElementById("modal-name-input");
+    if (!input) return;
+    const val = input.value.trim();
+    if (val) {
+      setLocalCallsign(val);
+      if (typeof AudioEngine !== "undefined" && AudioEngine.ping) AudioEngine.ping();
+    }
+    closeNameModal();
+  }
+  window.savePilotNameFromModal = savePilotNameFromModal;
+
+  const modalInputEl = document.getElementById("modal-name-input");
+  if (modalInputEl) {
+    modalInputEl.addEventListener("keydown", (e) => {
+      e.stopPropagation();
+      if (e.key === "Enter") {
+        savePilotNameFromModal();
+      }
+    });
+    modalInputEl.addEventListener("keyup", (e) => e.stopPropagation());
+  }
+
+  const splashInputEl = document.getElementById("splash-pilot-input");
+  if (splashInputEl) {
+    splashInputEl.addEventListener("keydown", (e) => {
+      e.stopPropagation();
+      if (e.key === "Enter") {
+        const btn = document.getElementById("splash-enter");
+        if (btn && !btn.disabled) enterUniverse();
+      }
+    });
+    splashInputEl.addEventListener("keyup", (e) => e.stopPropagation());
+  }
 
   const otherPlayers = new Map(); // id -> { mesh, targetPos, targetQuat, lastSeen, name }
   const onlineBadgeEl = document.getElementById("online-explorers-badge");
@@ -1747,6 +2473,33 @@
     if (onlineBadgeEl) {
       const count = otherPlayers.size + 1;
       onlineBadgeEl.textContent = `🟢 ${count} Explorer${count > 1 ? 's' : ''} Online`;
+    }
+  }
+
+  function drawShipBadge(canvas, name) {
+    const nCtx = canvas.getContext("2d");
+    nCtx.clearRect(0, 0, canvas.width, canvas.height);
+    nCtx.fillStyle = "rgba(15, 23, 42, 0.85)";
+    if (typeof nCtx.roundRect === "function") {
+      nCtx.roundRect(10, 10, 236, 44, 10);
+      nCtx.fill();
+    } else {
+      nCtx.fillRect(10, 10, 236, 44);
+    }
+    nCtx.strokeStyle = "rgba(56, 189, 248, 0.85)";
+    nCtx.lineWidth = 2;
+    nCtx.stroke();
+    nCtx.font = "bold 18px 'Share Tech Mono', monospace";
+    nCtx.fillStyle = "#38bdf8";
+    nCtx.textAlign = "center";
+    nCtx.textBaseline = "middle";
+    nCtx.fillText("🛸 " + (name || "Explorer").slice(0, 18), 128, 32);
+  }
+
+  function updateShipBadge(mesh, newName) {
+    if (mesh && mesh.userData && mesh.userData.badgeCanvas && mesh.userData.badgeTex) {
+      drawShipBadge(mesh.userData.badgeCanvas, newName);
+      mesh.userData.badgeTex.needsUpdate = true;
     }
   }
 
@@ -1802,22 +2555,7 @@
     const nameCanvas = document.createElement("canvas");
     nameCanvas.width = 256;
     nameCanvas.height = 64;
-    const nCtx = nameCanvas.getContext("2d");
-    nCtx.fillStyle = "rgba(15, 23, 42, 0.8)";
-    if (typeof nCtx.roundRect === "function") {
-      nCtx.roundRect(10, 10, 236, 44, 10);
-      nCtx.fill();
-    } else {
-      nCtx.fillRect(10, 10, 236, 44);
-    }
-    nCtx.strokeStyle = "rgba(56, 189, 248, 0.75)";
-    nCtx.lineWidth = 2;
-    nCtx.stroke();
-    nCtx.font = "bold 20px 'Share Tech Mono', monospace";
-    nCtx.fillStyle = "#38bdf8";
-    nCtx.textAlign = "center";
-    nCtx.textBaseline = "middle";
-    nCtx.fillText("🛸 " + name, 128, 32);
+    drawShipBadge(nameCanvas, name);
 
     const nameTex = new THREE.CanvasTexture(nameCanvas);
     const nameSpriteMat = new THREE.SpriteMaterial({ map: nameTex, transparent: true, depthWrite: false });
@@ -1826,8 +2564,199 @@
     nameSprite.scale.set(7, 1.75, 1);
     shipGroup.add(nameSprite);
 
+    shipGroup.userData = {
+      badgeCanvas: nameCanvas,
+      badgeTex: nameTex
+    };
+
     scene.add(shipGroup);
     return shipGroup;
+  }
+
+  // ── Instructions & Live Chat Panel Toggles ──
+  function toggleInstructions() {
+    if (typeof AudioEngine !== "undefined" && AudioEngine.click) AudioEngine.click();
+    const instPanel = document.getElementById("instructions-panel");
+    const instBtn = document.getElementById("instructions-btn");
+    const chatPanel = document.getElementById("chat-panel");
+    const chatBtn = document.getElementById("chat-btn");
+
+    if (!instPanel || !instBtn) return;
+    const isOpening = instPanel.classList.contains("hidden");
+
+    if (isOpening) {
+      instPanel.classList.remove("hidden");
+      instBtn.classList.add("active");
+      const arrow = document.getElementById("inst-arrow");
+      if (arrow) arrow.textContent = "▴";
+
+      // Auto-close chat if open to keep UI clean
+      if (chatPanel && !chatPanel.classList.contains("hidden")) {
+        chatPanel.classList.add("hidden");
+        if (chatBtn) chatBtn.classList.remove("active");
+        const chatArrow = document.getElementById("chat-arrow");
+        if (chatArrow) chatArrow.textContent = "▾";
+      }
+    } else {
+      instPanel.classList.add("hidden");
+      instBtn.classList.remove("active");
+      const arrow = document.getElementById("inst-arrow");
+      if (arrow) arrow.textContent = "▾";
+    }
+  }
+  window.toggleInstructions = toggleInstructions;
+
+  function toggleChat() {
+    if (typeof AudioEngine !== "undefined" && AudioEngine.click) AudioEngine.click();
+    const chatPanel = document.getElementById("chat-panel");
+    const chatBtn = document.getElementById("chat-btn");
+    const instPanel = document.getElementById("instructions-panel");
+    const instBtn = document.getElementById("instructions-btn");
+
+    if (!chatPanel || !chatBtn) return;
+    const isOpening = chatPanel.classList.contains("hidden");
+
+    if (isOpening) {
+      chatPanel.classList.remove("hidden");
+      chatBtn.classList.add("active");
+      const arrow = document.getElementById("chat-arrow");
+      if (arrow) arrow.textContent = "▴";
+
+      // Clear unread badge
+      const dot = document.getElementById("chat-unread-dot");
+      if (dot) dot.classList.add("hidden");
+
+      // Auto-close instructions if open
+      if (instPanel && !instPanel.classList.contains("hidden")) {
+        instPanel.classList.add("hidden");
+        if (instBtn) instBtn.classList.remove("active");
+        const instArrow = document.getElementById("inst-arrow");
+        if (instArrow) instArrow.textContent = "▾";
+      }
+
+      // Scroll to bottom and auto-focus chat input
+      const msgBox = document.getElementById("chat-messages");
+      if (msgBox) msgBox.scrollTop = msgBox.scrollHeight;
+      setTimeout(() => {
+        const input = document.getElementById("chat-input");
+        if (input && !window.matchMedia("(hover: none) and (pointer: coarse)").matches) {
+          input.focus();
+        }
+      }, 100);
+    } else {
+      chatPanel.classList.add("hidden");
+      chatBtn.classList.remove("active");
+      const arrow = document.getElementById("chat-arrow");
+      if (arrow) arrow.textContent = "▾";
+    }
+  }
+  window.toggleChat = toggleChat;
+
+  // ── Galaxy Live Chat Logic ──
+  const recentChatIds = new Set();
+
+  function escapeHtml(str) {
+    if (!str) return "";
+    return String(str)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  function appendChatMessage(data, isMine = false) {
+    const msgBox = document.getElementById("chat-messages");
+    if (!msgBox) return;
+
+    const row = document.createElement("div");
+    row.className = "chat-msg-row" + (isMine ? " my-msg" : "");
+
+    const timeStr = data.time || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const safeName = escapeHtml(data.name || (isMine ? localCallsign : "Explorer"));
+    const safeText = escapeHtml(data.text || "");
+
+    row.innerHTML = `
+      <div class="chat-msg-meta">
+        <span class="chat-msg-sender">${isMine ? '🛸 You (' + safeName + ')' : '🚀 ' + safeName}</span>
+        <span class="chat-msg-time">${timeStr}</span>
+      </div>
+      <div class="chat-msg-text">${safeText}</div>
+    `;
+
+    msgBox.appendChild(row);
+
+    while (msgBox.children.length > 100) {
+      msgBox.removeChild(msgBox.firstChild);
+    }
+
+    msgBox.scrollTop = msgBox.scrollHeight;
+
+    if (!isMine && typeof AudioEngine !== "undefined" && AudioEngine.click) {
+      AudioEngine.click();
+    }
+  }
+
+  function sendChatMessage(e) {
+    if (e && e.preventDefault) e.preventDefault();
+    const input = document.getElementById("chat-input");
+    if (!input) return;
+    const rawText = input.value.trim();
+    if (!rawText) return;
+
+    const mid = localPlayerId + "-" + Date.now() + "-" + Math.random().toString(36).substring(2, 7);
+    const payload = {
+      mid: mid,
+      id: localPlayerId,
+      name: localCallsign || "Explorer",
+      text: rawText.slice(0, 240),
+      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    };
+
+    recentChatIds.add(mid);
+    appendChatMessage(payload, true);
+    input.value = "";
+
+    if (mqttClient && mqttClient.connected) {
+      mqttClient.publish("hattys-universe/v1/chat", JSON.stringify(payload), { qos: 0 });
+    }
+  }
+  window.sendChatMessage = sendChatMessage;
+
+  // Prevent input key/mouse events from propagating to canvas / ship controls
+  const chatInputEl = document.getElementById("chat-input");
+  if (chatInputEl) {
+    chatInputEl.addEventListener("keydown", (e) => {
+      e.stopPropagation();
+      if (e.key === "Enter") {
+        sendChatMessage(e);
+      }
+    });
+    chatInputEl.addEventListener("keyup", (e) => {
+      e.stopPropagation();
+    });
+    chatInputEl.addEventListener("focus", () => {
+      keys.KeyW = false;
+      keys.KeyA = false;
+      keys.KeyS = false;
+      keys.KeyD = false;
+      shiftDown = false;
+      if (typeof AudioEngine !== "undefined" && AudioEngine.stopThruster) {
+        AudioEngine.stopThruster();
+      }
+      if (boostEl) boostEl.classList.remove("active");
+    });
+  }
+
+  const instPanelEl = document.getElementById("instructions-panel");
+  if (instPanelEl) {
+    instPanelEl.addEventListener("mousedown", (e) => e.stopPropagation());
+    instPanelEl.addEventListener("pointerdown", (e) => e.stopPropagation());
+  }
+  const chatPanelEl = document.getElementById("chat-panel");
+  if (chatPanelEl) {
+    chatPanelEl.addEventListener("mousedown", (e) => e.stopPropagation());
+    chatPanelEl.addEventListener("pointerdown", (e) => e.stopPropagation());
   }
 
   let mqttClient = null;
@@ -1857,31 +2786,60 @@
 
         mqttClient.on("connect", () => {
           mqttClient.subscribe("hattys-universe/v1/presence", { qos: 0 });
+          mqttClient.subscribe("hattys-universe/v1/chat", { qos: 0 });
           updateOnlineBadge();
         });
 
         mqttClient.on("message", (topic, message) => {
           try {
             const data = JSON.parse(message.toString());
-            if (!data || data.id === localPlayerId) return;
+            if (!data) return;
 
-            let player = otherPlayers.get(data.id);
-            if (!player) {
-              const mesh = createShipMesh(data.name || "Explorer", 0x38bdf8);
-              mesh.position.set(data.x, data.y, data.z);
-              player = {
-                mesh,
-                targetPos: new THREE.Vector3(data.x, data.y, data.z),
-                targetQuat: new THREE.Quaternion(data.qx, data.qy, data.qz, data.qw),
-                lastSeen: Date.now(),
-                name: data.name
-              };
-              otherPlayers.set(data.id, player);
-              updateOnlineBadge();
-            } else {
-              player.targetPos.set(data.x, data.y, data.z);
-              player.targetQuat.set(data.qx, data.qy, data.qz, data.qw);
-              player.lastSeen = Date.now();
+            if (topic === "hattys-universe/v1/chat") {
+              if (data.mid && recentChatIds.has(data.mid)) return;
+              if (data.mid) {
+                recentChatIds.add(data.mid);
+                if (recentChatIds.size > 200) {
+                  const firstKey = recentChatIds.values().next().value;
+                  recentChatIds.delete(firstKey);
+                }
+              }
+              const isMine = (data.id === localPlayerId);
+              appendChatMessage(data, isMine);
+
+              const chatPanel = document.getElementById("chat-panel");
+              if (!isMine && chatPanel && chatPanel.classList.contains("hidden")) {
+                const unreadDot = document.getElementById("chat-unread-dot");
+                if (unreadDot) unreadDot.classList.remove("hidden");
+              }
+              return;
+            }
+
+            if (topic === "hattys-universe/v1/presence") {
+              if (data.id === localPlayerId) return;
+
+              let player = otherPlayers.get(data.id);
+              if (!player) {
+                const mesh = createShipMesh(data.name || "Explorer", 0x38bdf8);
+                mesh.position.set(data.x, data.y, data.z);
+                player = {
+                  mesh,
+                  targetPos: new THREE.Vector3(data.x, data.y, data.z),
+                  targetQuat: new THREE.Quaternion(data.qx, data.qy, data.qz, data.qw),
+                  lastSeen: Date.now(),
+                  name: data.name
+                };
+                otherPlayers.set(data.id, player);
+                updateOnlineBadge();
+              } else {
+                if (data.name && data.name !== player.name) {
+                  player.name = data.name;
+                  updateShipBadge(player.mesh, data.name);
+                }
+                player.targetPos.set(data.x, data.y, data.z);
+                player.targetQuat.set(data.qx, data.qy, data.qz, data.qw);
+                player.lastSeen = Date.now();
+              }
             }
           } catch (e) {}
         });
@@ -2044,8 +3002,20 @@
   };
 
   window.addEventListener("keydown", e => {
-    if (e.key === "Escape" && holodeckModal && holodeckModal.classList.contains("open")) {
-      closeHolodeck();
+    if (e.key === "Escape") {
+      const nameModal = document.getElementById("name-modal");
+      if (nameModal && !nameModal.classList.contains("hidden")) {
+        closeNameModal();
+        return;
+      }
+      if (holodeckModal && holodeckModal.classList.contains("open")) {
+        closeHolodeck();
+      } else {
+        const instPanel = document.getElementById("instructions-panel");
+        const chatPanel = document.getElementById("chat-panel");
+        if (instPanel && !instPanel.classList.contains("hidden")) toggleInstructions();
+        if (chatPanel && !chatPanel.classList.contains("hidden")) toggleChat();
+      }
     }
   });
 
@@ -2055,6 +3025,7 @@
   let shiftDown = false;
 
   window.addEventListener("keydown", e => {
+    if (document.activeElement && ['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) return;
     if (e.code in keys) keys[e.code] = true;
     if (e.code === "ShiftLeft" || e.code === "ShiftRight") {
       if (!shiftDown) AudioEngine.startThruster();
@@ -2063,6 +3034,7 @@
     }
   });
   window.addEventListener("keyup", e => {
+    if (document.activeElement && ['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) return;
     if (e.code in keys) keys[e.code] = false;
     if (e.code === "ShiftLeft" || e.code === "ShiftRight") {
       shiftDown = false;
@@ -2166,6 +3138,7 @@
 
   function updateRot() { camera.quaternion.setFromEuler(new THREE.Euler(pitch,yaw,0,"YXZ")); }
   function updatePos(dt) {
+    if (document.activeElement && ['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) return;
     const d=new THREE.Vector3();
     if(keys.KeyW)d.z-=1; if(keys.KeyS)d.z+=1;
     if(keys.KeyA)d.x-=1; if(keys.KeyD)d.x+=1;
@@ -2292,6 +3265,15 @@
     tourBtn.classList.add("touring");
     tourLabel.style.opacity = "1";
     showTourLabel(planets[0].userData.label);
+
+    // Auto-start music during guided tour
+    const audio = document.getElementById('bg-music');
+    const musicBtn = document.querySelector('.music-button');
+    if (audio) {
+      audio.play().then(() => {
+        if (musicBtn) musicBtn.textContent = '⏸ Pause Music';
+      }).catch(() => {});
+    }
   }
 
   function endTour() {
@@ -2302,6 +3284,14 @@
     camera.position.copy(preTourPos);
     yaw   = preTourYaw;
     pitch = preTourPitch;
+
+    // Auto-stop music when exiting tour
+    const audio = document.getElementById('bg-music');
+    const musicBtn = document.querySelector('.music-button');
+    if (audio) {
+      audio.pause();
+      if (musicBtn) musicBtn.textContent = '🎵 Play Music';
+    }
   }
 
   window.toggleTour = function() {

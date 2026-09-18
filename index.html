@@ -346,9 +346,9 @@
       .house-ad, .house-ad-label { display: none; }
     }
 
-    /* ── Jump-To Dropdown ── */
+    /* ── Jump-To & Sector Navigator Dropdown ── */
     #jump-wrap {
-      position: absolute; top: 48px; right: 12px;
+      position: absolute; top: 48px; right: 16px;
       pointer-events: auto;
       z-index: 10;
     }
@@ -532,7 +532,12 @@
     #target-search { background: rgba(0,0,0,0.6); border: 1px solid #4488ff; color: #fff; padding: 6px 12px; border-radius: 4px; outline: none; font-family: 'Orbitron', sans-serif; width: 175px; transition: all 0.2s ease; }
     #target-search:focus { box-shadow: 0 0 8px #4488ff; }
     #target-dropdown {
-      position: absolute; top: 100%; left: 0; right: 0; min-width: 260px;
+      position: absolute;
+      top: 100%;
+      right: 0;
+      min-width: 300px;
+      width: max-content;
+      max-width: min(380px, 90vw);
       background: rgba(10, 15, 30, 0.95);
       border: 1px solid #4488ff;
       border-radius: 6px;
@@ -558,27 +563,57 @@
     }
     .target-sector-heading:first-child { border-top: none; }
     .target-item {
-      padding: 7px 12px;
+      padding: 8px 12px;
       cursor: pointer;
       color: #e2e8f0;
       font-size: 12px;
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 14px;
       transition: background 0.15s;
     }
     .target-item:hover {
       background: rgba(68,136,255,0.35);
       color: #38bdf8;
     }
+    .target-item-name {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
     .target-badge {
       font-size: 9px;
-      padding: 2px 6px;
+      padding: 2px 7px;
       border-radius: 4px;
-      background: rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.12);
       color: #94a3b8;
       text-transform: uppercase;
       font-weight: 600;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    @media (max-width: 900px) {
+      #jump-wrap {
+        top: 50px;
+        right: 12px;
+        gap: 6px;
+      }
+      #sector-select {
+        font-size: 10px;
+        padding: 5px 24px 5px 8px;
+        max-width: 150px;
+      }
+      #target-search {
+        width: 140px;
+        font-size: 11px;
+        padding: 5px 8px;
+      }
+      #target-dropdown {
+        min-width: 270px;
+        max-width: min(320px, 85vw);
+      }
     }
 
     /* ══════════════════════════════════════════
@@ -908,7 +943,7 @@
   <div id="jump-wrap" style="display:flex; align-items:center; gap:8px;">
     <div id="online-explorers-badge">🟢 1 Explorer Online</div>
     <select id="sector-select" title="Explore or warp by Galactic Sector" onchange="onSectorSelect(this.value)">
-      <option value="ALL">🌌 All Sectors (57)</option>
+      <option value="ALL">🌌 All Sectors (59)</option>
       <option value="CREATOR">🛠️ Creator Studio</option>
       <option value="BLOCKCHAIN">⛓️ Blockchain Networks</option>
       <option value="AI">🤖 AI & Compute</option>
@@ -1253,9 +1288,9 @@
     if (p && p.userData && p.userData.sectorKey) return p.userData.sectorKey;
     const label = (p && p.userData && p.userData.label) || "";
     if (label.includes("Hatty") || label === "OpenFocus" || label === "CaseBoard" || label === "Quick-Pad" || label === "Local-Cast" || label === "Data-Phone") return "CREATOR";
-    if (label.includes("Cardano") || label.includes("Voi") || label === "TapTools" || label === "Iagon" || label === "Palm Economy" || label === "Strike Finance") return "BLOCKCHAIN";
+    if (label.includes("Cardano") || label.includes("Voi") || label === "TapTools" || label === "Iagon" || label === "Palm Economy" || label === "Strike Finance" || label === "Sapphire Crypto") return "BLOCKCHAIN";
     if (label.includes("AI Hub") || label === "Sentient" || label === "ASI Alliance" || label === "Gensyn" || label === "Nosana" || label === "Neural-Mesh" || label === "UpRock") return "AI";
-    if (label.includes("Education") || label === "NASA" || label === "Code.org" || label === "Khan Academy") return "EDUCATION";
+    if (label.includes("Education") || label === "NASA" || label === "Code.org" || label === "Khan Academy" || label === "Satsman") return "EDUCATION";
     if (label.includes("Privacy") || label === "Brave Browser" || label === "Ghost Protocol" || label === "ThreatSphere") return "PRIVACY";
     if (label === "Focus" || label === "The Arena" || label.includes("Twitter") || label.includes("Audius") || label.includes("Wayvl") || label === "Suno") return "SOCIAL_MEDIA";
     if (label === "Rollercoin" || label === "Pixels" || label === "Chainers" || label === "BestPlay" || label === "Decentraland" || label === "Immutable" || label === "Stellar Assault") return "GAMING";
@@ -1409,6 +1444,8 @@
     makePlanet(6,  0x00ffcc, V(-480,160,-150), "Trippy",                  "", "img/trippy.jpg", "Psychedelic visual distortion canvas and hypnotic interactive optical illusions.", "Local Visuals"),
     makePlanet(6.5, 0x00ff88, V(145,60,120),    "ThreatSphere",            "https://hattyhats.github.io/Hatty-s-Cyber-Threat/", "img/threat_sphere.jpg", "Real-time cyber threat intelligence map and global digital defense monitor by Hatty.", "Cybersecurity"),
     makePlanet(6,   0xaa22ff, V(-135,-50,310),  "Wayvl Millix Music",      "https://www.wavyl.com/", "img/wavyl_music.jpg", "Decentralized audio platform and music streaming network powered by the Millix blockchain.", "Music & Web3"),
+    makePlanet(5.5, 0xffaa00, V(285,75,-170),   "Satsman",                 "https://satsman.com?ref=hattyhats&c=grow-your-army", "img/satsman.png", "Gamified Bitcoin education platform with daily learning missions and satoshi crypto rewards.", "Bitcoin Education"),
+    makePlanet(6,   0x00f0ff, V(175,-65,120),   "Sapphire Crypto",         "https://sapphirecrypto.org/", "img/sapphire_crypto.webp", "Premier crypto intelligence, market analytics, blockchain research, and security insights.", "Crypto Intelligence"),
     makePlanet(20, 0xffcc00, V(0,0,0),         "The Hatty Sun",           "https://earnwithhatty.com/", "hattyhats.jpg", "The blazing core of Hatty's Universe and central gateway to the ecosystem.", "Central Star")
   ];
 

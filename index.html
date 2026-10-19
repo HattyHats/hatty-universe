@@ -311,7 +311,7 @@
       max-height: calc(100vh - 24px);
       width: 280px;
       max-width: calc(100vw - 24px);
-      z-index: 20;
+      z-index: 10005;
       overflow-y: auto;
       overflow-x: hidden;
       scrollbar-width: none;
@@ -836,6 +836,8 @@
 
     #aads-ad-wrap {
       width: 200px;
+      height: 200px;
+      min-height: 200px;
       max-width: 100%;
       pointer-events: auto;
       border-radius: 8px;
@@ -1543,9 +1545,9 @@
 
     <!-- BEGIN AADS AD UNIT 2459139 -->
     <div id="aads-ad-wrap">
-      <div id="frame" style="width: 100%;margin: auto;position: relative; z-index: 99998;">
-        <iframe data-aa='2459139' src='//acceptable.a-ads.com/2459139/?size=Adaptive'
-                style='border:0; padding:0; width:100%; height:auto; overflow:hidden;display: block;margin: auto'></iframe>
+      <div id="frame" style="width: 100%; height: 100%; margin: auto; position: relative; z-index: 99998;">
+        <iframe data-aa='2459139' src='https://acceptable.a-ads.com/2459139/?size=Adaptive'
+                style='border:0; padding:0; width:100%; height:100%; min-height:200px; overflow:hidden; display: block; margin: auto;'></iframe>
       </div>
     </div>
     <!-- END AADS AD UNIT 2459139 -->

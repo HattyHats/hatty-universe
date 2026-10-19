@@ -815,6 +815,11 @@
       right: 110px;
     }
 
+    .sfx-button {
+      right: 220px;
+      user-select: none;
+    }
+
     #joystick-zone {
       position: absolute;
       bottom: 20px;
@@ -829,39 +834,25 @@
       #joystick-zone { display: block; pointer-events: auto; }
     }
 
-    .house-ad {
-      width: 200px; height: 140px;
-      border-radius: 10px; overflow: hidden;
+    #aads-ad-wrap {
+      width: 200px;
+      max-width: 100%;
       pointer-events: auto;
-      transition: box-shadow .2s ease, transform .15s ease;
-      text-decoration: none; display: block;
-      flex-shrink: 0;
-    }
-    .house-ad img { width: 100%; height: 100%; object-fit: cover; display: block; }
-
-    .house-ad-arena { border: 1px solid rgba(102,136,255,.55); box-shadow: 0 0 12px rgba(102,136,255,.3), 0 0 30px rgba(102,136,255,.15); }
-    .house-ad-arena:hover { box-shadow: 0 0 22px rgba(102,136,255,.7), 0 0 55px rgba(102,136,255,.35); transform: translateY(-2px) scale(1.03); }
-
-    .house-ad-bulb  { border: 1px solid rgba(255,215,0,.45); box-shadow: 0 0 12px rgba(255,215,0,.25), 0 0 30px rgba(255,215,0,.10); }
-    .house-ad-bulb:hover  { box-shadow: 0 0 22px rgba(255,215,0,.6), 0 0 55px rgba(255,215,0,.25); transform: translateY(-2px) scale(1.03); }
-
-    .house-ad-slice { border: 1px solid rgba(255,140,0,.45); box-shadow: 0 0 12px rgba(255,140,0,.25), 0 0 30px rgba(255,140,0,.10); }
-    .house-ad-slice:hover { box-shadow: 0 0 22px rgba(255,140,0,.6), 0 0 55px rgba(255,140,0,.25); transform: translateY(-2px) scale(1.03); }
-
-    .house-ad-label {
-      font-size: 9px; color: rgba(255,215,0,.65);
-      letter-spacing: .06em; text-transform: uppercase;
-      pointer-events: none;
-      margin-top: -6px;
+      border-radius: 8px;
+      overflow: hidden;
+      margin-top: 4px;
+      background: rgba(15, 23, 42, 0.45);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
     }
 
     @media (max-height: 820px) {
-      .house-ad { width: 160px; height: 110px; }
+      #aads-ad-wrap { width: 170px; }
       #left-panel { gap: 6px; }
     }
 
-    @media (max-height: 500px) {
-      .house-ad, .house-ad-label { display: none; }
+    @media (max-height: 520px) {
+      #aads-ad-wrap { display: none; }
     }
 
     /* ── Jump-To & Sector Navigator Dropdown ── */
@@ -1113,6 +1104,16 @@
     }
 
     @media (max-width: 900px) {
+      .main-site-button {
+        font-size: 11px;
+        padding: 5px 9px;
+      }
+      .music-button {
+        right: 92px;
+      }
+      .sfx-button {
+        right: 188px;
+      }
       #jump-wrap {
         top: 50px;
         right: 12px;
@@ -1131,6 +1132,61 @@
       #target-dropdown {
         min-width: 270px;
         max-width: min(320px, 85vw);
+      }
+    }
+
+    @media (max-width: 650px) {
+      .main-site-button {
+        font-size: 10px;
+        padding: 4px 7px;
+      }
+      .music-button {
+        right: 78px;
+      }
+      .sfx-button {
+        right: 156px;
+      }
+      #online-explorers-badge {
+        display: none;
+      }
+      #jump-wrap {
+        top: 48px;
+        right: 10px;
+        gap: 4px;
+      }
+      #sector-select {
+        max-width: 110px;
+        font-size: 10px;
+        padding: 4px 18px 4px 6px;
+      }
+      #target-search {
+        width: 110px;
+        font-size: 10px;
+        padding: 4px 6px;
+      }
+      #left-panel {
+        width: 180px;
+        top: 10px;
+        left: 10px;
+      }
+      .left-nav-row {
+        width: 180px;
+        gap: 4px;
+      }
+      .panel-toggle-btn {
+        font-size: 10px;
+        padding: 5px 8px;
+      }
+      #aads-ad-wrap {
+        width: 160px;
+      }
+      #galaxy-radar {
+        bottom: 68px;
+        top: auto;
+        right: 16px;
+        left: auto;
+        width: 85px;
+        height: 85px;
       }
     }
 
@@ -1347,12 +1403,12 @@
     }
     @media (hover: none) and (pointer: coarse) {
       #galaxy-radar {
-        bottom: auto;
-        top: 60px;
-        right: 12px;
+        bottom: 68px;
+        top: auto;
+        right: 16px;
         left: auto;
-        width: 100px;
-        height: 100px;
+        width: 88px;
+        height: 88px;
       }
     }
     #warp-overlay {
@@ -1485,22 +1541,20 @@
       </div>
     </div>
 
-    <a class="house-ad house-ad-arena"
-       href="https://arena.social/?ref=hatty_hats"
-       target="_blank" rel="noopener noreferrer" title="Hatty's Pick – The Arena">
-      <img src="img/arena_gif.gif" alt="Hatty's Pick – The Arena" loading="lazy" />
-    </a>
-    <span class="house-ad-label">Hatty's Pick</span>
-
-    <a class="house-ad house-ad-slice"
-       href="https://addslice.com/?crew=VFFbJ"
-       target="_blank" rel="noopener noreferrer" title="Hatty's Pick – Slice App">
-      <img src="img/slice-app.gif" alt="Hatty's Pick – Try Slice App" loading="lazy" />
-    </a>
-    <span class="house-ad-label">Hatty's Pick</span>
+    <!-- BEGIN AADS AD UNIT 2459139 -->
+    <div id="aads-ad-wrap">
+      <div id="frame" style="width: 100%;margin: auto;position: relative; z-index: 99998;">
+        <iframe data-aa='2459139' src='//acceptable.a-ads.com/2459139/?size=Adaptive'
+                style='border:0; padding:0; width:100%; height:auto; overflow:hidden;display: block;margin: auto'></iframe>
+      </div>
+    </div>
+    <!-- END AADS AD UNIT 2459139 -->
   </div>
 
   <audio id="bg-music" src="freedom_costs_too_much.MP3" loop></audio>
+  <button id="sfx-btn" class="main-site-button sfx-button" onclick="toggleSFX()" title="Toggle Sound Effects">
+    🔊 Sound ON
+  </button>
   <button class="main-site-button music-button" onclick="toggleMusic()">
     🎵 Play Music
   </button>
@@ -1713,6 +1767,27 @@
     ctx: null,
     thrusterOsc: null,
     thrusterGain: null,
+    muted: localStorage.getItem('hattys_sfx_muted') === 'true',
+    toggleMute() {
+      this.muted = !this.muted;
+      try {
+        localStorage.setItem('hattys_sfx_muted', this.muted);
+      } catch (e) {}
+      if (this.muted && this.stopThruster) {
+        this.stopThruster();
+      }
+      this.updateUI();
+      return this.muted;
+    },
+    updateUI() {
+      const btn = document.getElementById('sfx-btn');
+      if (btn) {
+        btn.textContent = this.muted ? '🔇 Sound OFF' : '🔊 Sound ON';
+        btn.setAttribute('title', this.muted ? 'Sound Effects Muted (Click to Unmute)' : 'Sound Effects Active (Click to Mute)');
+        btn.style.borderColor = this.muted ? 'rgba(239, 68, 68, 0.7)' : 'rgba(148, 163, 184, 0.8)';
+        btn.style.color = this.muted ? '#fca5a5' : '#e5e7eb';
+      }
+    },
     init() {
       if (!this.ctx) {
         const AudioCtx = window.AudioContext || window.webkitAudioContext;
@@ -1723,6 +1798,7 @@
       }
     },
     click() {
+      if (this.muted) return;
       try {
         this.init();
         if (!this.ctx) return;
@@ -1740,6 +1816,7 @@
       } catch (e) {}
     },
     ping() {
+      if (this.muted) return;
       try {
         this.init();
         if (!this.ctx) return;
@@ -1757,6 +1834,7 @@
       } catch (e) {}
     },
     warp() {
+      if (this.muted) return;
       try {
         this.init();
         if (!this.ctx) return;
@@ -1776,6 +1854,7 @@
       } catch (e) {}
     },
     startThruster() {
+      if (this.muted) return;
       try {
         this.init();
         if (!this.ctx || this.thrusterOsc) return;
@@ -2010,7 +2089,7 @@
     pAIHub, pEduHub,
     pLearnHatty, pHattyTools, pLearnCardano, pPrivacyGadgets, pCardano, pVoi,
     pDecentraland, pSoundScape,
-    makePlanet(6,  0xff9955, V(46,60,166),   "Hatty's News",            "https://hattyhats.github.io/hattys-news/", "img/hattys-news.jpg", "Latest articles, tutorials, announcements, and alpha from Hatty.", "News"),
+    makePlanet(6,  0xff9955, V(46,60,166),   "Hatty's News",            "https://hattynews.org/", "img/hattys-news.jpg", "Latest articles, tutorials, announcements, and alpha from Hatty.", "News"),
     makePlanet(7,  0xff55aa, V(7,-60,131),   "Hatty's Media",           "https://hattys-media.netlify.app/", "img/hattys-media.jpg", "Multimedia vault containing custom artwork, videos, graphics, and music.", "Media"),
     makePlanet(5.5, 0x00f5ff, V(-20,-50,185), "Hatty's Gif Maker",       "https://hattys-gif-maker.netlify.app/", "img/hattys_gif_maker.jpg", "Pro in-browser GIF suite with 100% client-side WASM processing, animation trimming, filters, and sticker overlay.", "Creator Studio"),
     makePlanet(6,   0xff7700, V(75,45,140),   "Hatty's Media Forge",     "https://hattyhats.github.io/Hatty-s-Media-Forge/", "img/hattys_media_forge.jpg", "Zero-cloud universal media Swiss Army Knife for batch conversions, Discord 25MB compression, background removal, and audio stem isolation.", "Creator Studio"),
@@ -2136,19 +2215,29 @@
   }
 
   function onSectorSelect(secKey) {
+    if (sectorSelect) sectorSelect.blur();
     AudioEngine.click();
     if (secKey && secKey !== "ALL" && SECTORS[secKey]) {
       const sec = SECTORS[secKey];
-      const targetDummy = {
-        position: sec.focalPoint,
-        userData: { label: sec.name, radius: 15 }
-      };
+      const targetDummy = new THREE.Object3D();
+      targetDummy.position.copy(sec.focalPoint);
+      targetDummy.userData = { label: sec.name, radius: 35 };
       triggerWarp(targetDummy);
-      showTourLabel("Warping to " + sec.name + "…");
+      showTourLabel(sec.name);
       setTimeout(() => {
         const tl = document.getElementById("tour-label");
-        if (tl) tl.classList.remove("active");
+        if (tl && !tourActive) tl.style.opacity = "0";
       }, 3500);
+    } else if (secKey === "ALL") {
+      const sun = planets.find(p => p.userData && p.userData.label === "The Hatty Sun");
+      if (sun) {
+        triggerWarp(sun);
+        showTourLabel("Galaxy Overview");
+        setTimeout(() => {
+          const tl = document.getElementById("tour-label");
+          if (tl && !tourActive) tl.style.opacity = "0";
+        }, 3500);
+      }
     }
     updateDropdown();
   }
@@ -3438,9 +3527,14 @@
       const ease = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
       
       const worldPos = new THREE.Vector3();
-      warpTargetPlanet.getWorldPosition(worldPos);
+      if (typeof warpTargetPlanet.getWorldPosition === "function") {
+        warpTargetPlanet.getWorldPosition(worldPos);
+      } else if (warpTargetPlanet.position) {
+        worldPos.copy(warpTargetPlanet.position);
+      }
       const approachDir = new THREE.Vector3(0, 0.15, 1).normalize();
-      const dist = warpTargetPlanet.userData.radius * 4.5;
+      const radius = (warpTargetPlanet.userData && warpTargetPlanet.userData.radius) || 15;
+      const dist = radius * 4.5;
       const destPos = worldPos.clone().add(approachDir.multiplyScalar(dist));
 
       camera.position.lerpVectors(warpStartPos, destPos, ease);
@@ -3519,6 +3613,11 @@
       btn.textContent = '🎵 Play Music';
     }
   };
+
+  window.toggleSFX = function() {
+    AudioEngine.toggleMute();
+  };
+  AudioEngine.updateUI();
 </script>
 </body>
 </html>

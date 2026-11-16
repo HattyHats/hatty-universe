@@ -38,7 +38,7 @@
     #splash {
       position: fixed;
       inset: 0;
-      z-index: 9999;
+      z-index: 9990;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -83,13 +83,16 @@
     #splash-title {
       font-family: 'Orbitron', sans-serif;
       font-weight: 900;
-      font-size: clamp(42px, 9vw, 100px);
+      font-size: clamp(28px, 6.8vw, 88px);
       line-height: 1.05;
       opacity: 0;
       animation: fadeUp 1.0s ease forwards 1.8s;
       display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
       gap: 0.18em;
       align-items: baseline;
+      max-width: 100%;
     }
 
     #splash-hatty {
@@ -298,7 +301,7 @@
     /* ══════════════════════════════════════════
        MAIN UNIVERSE UI
     ══════════════════════════════════════════ */
-    #universe-container { position: relative; width: 100%; height: 100%; }
+    #universe-container { position: relative; width: 100vw; height: 100vh; max-width: 100%; overflow: hidden; }
     canvas { display: block; }
 
     #left-panel {
@@ -311,10 +314,13 @@
       max-height: calc(100vh - 24px);
       width: 280px;
       max-width: calc(100vw - 24px);
-      z-index: 10005;
+      z-index: 9995;
       overflow-y: auto;
       overflow-x: hidden;
       scrollbar-width: none;
+    }
+    body.universe-entered #left-panel {
+      z-index: 200;
     }
     #left-panel::-webkit-scrollbar {
       display: none;
@@ -790,13 +796,24 @@
       box-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
     }
 
+    #top-right-controls {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      z-index: 160;
+      pointer-events: none;
+    }
+
     .main-site-button {
-      position: absolute; top: 12px; right: 12px;
       padding: 6px 12px; border-radius: 999px;
       border: 1px solid rgba(148,163,184,0.8);
       background: rgba(15,23,42,0.9);
       color: #e5e7eb; font-size: 12px; font-weight: 500;
       cursor: pointer; pointer-events: auto;
+      white-space: nowrap;
       box-shadow: 0 0 0 1px rgba(15,23,42,0.9);
       transition: background .15s ease, transform .1s ease, box-shadow .15s ease, border-color .15s ease;
     }
@@ -811,12 +828,7 @@
       box-shadow: 0 0 10px rgba(59,130,246,0.6);
     }
 
-    .music-button {
-      right: 110px;
-    }
-
     .sfx-button {
-      right: 220px;
       user-select: none;
     }
 
@@ -834,34 +846,67 @@
       #joystick-zone { display: block; pointer-events: auto; }
     }
 
-    #aads-ad-wrap {
-      width: 200px;
-      height: 200px;
-      min-height: 200px;
+    #affizy-ad-wrap {
+      width: 280px;
       max-width: 100%;
       pointer-events: auto;
+      margin-top: 4px;
+      flex-shrink: 0;
+      line-height: 0;
+    }
+    #affizy-ad-wrap .affizy-ad {
+      max-width: 100%;
       border-radius: 8px;
       overflow: hidden;
-      margin-top: 4px;
-      background: rgba(15, 23, 42, 0.45);
-      border: 1px solid rgba(148, 163, 184, 0.25);
       box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
     }
+    #affizy-ad-placeholder {
+      width: 100%;
+      aspect-ratio: 480 / 320;
+      border-radius: 8px;
+      border: 1px dashed rgba(56, 189, 248, 0.55);
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.88), rgba(30, 58, 138, 0.6));
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      text-align: center;
+      color: #7dd3fc;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 11px;
+      line-height: 1.35;
+      padding: 10px;
+      box-sizing: border-box;
+      user-select: none;
+    }
+    #affizy-ad-placeholder.hidden {
+      display: none !important;
+    }
+    #affizy-ad-placeholder .affizy-ph-sub {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 10px;
+      color: #94a3b8;
+    }
 
-    @media (max-height: 820px) {
-      #aads-ad-wrap { width: 170px; }
+    @media (max-height: 620px) {
+      #affizy-ad-wrap { width: 210px; }
       #left-panel { gap: 6px; }
     }
 
-    @media (max-height: 520px) {
-      #aads-ad-wrap { display: none; }
+    @media (max-height: 460px) {
+      #affizy-ad-wrap { display: none; }
     }
 
     /* ── Jump-To & Sector Navigator Dropdown ── */
     #jump-wrap {
       position: absolute; top: 48px; right: 16px;
       pointer-events: auto;
-      z-index: 10;
+      z-index: 150;
+    }
+    body.universe-entered #jump-wrap:focus-within {
+      z-index: 250;
     }
     #jump-select {
       appearance: none; -webkit-appearance: none;
@@ -1103,93 +1148,6 @@
       font-weight: 600;
       white-space: nowrap;
       flex-shrink: 0;
-    }
-
-    @media (max-width: 900px) {
-      .main-site-button {
-        font-size: 11px;
-        padding: 5px 9px;
-      }
-      .music-button {
-        right: 92px;
-      }
-      .sfx-button {
-        right: 188px;
-      }
-      #jump-wrap {
-        top: 50px;
-        right: 12px;
-        gap: 6px;
-      }
-      #sector-select {
-        font-size: 10px;
-        padding: 5px 24px 5px 8px;
-        max-width: 150px;
-      }
-      #target-search {
-        width: 140px;
-        font-size: 11px;
-        padding: 5px 8px;
-      }
-      #target-dropdown {
-        min-width: 270px;
-        max-width: min(320px, 85vw);
-      }
-    }
-
-    @media (max-width: 650px) {
-      .main-site-button {
-        font-size: 10px;
-        padding: 4px 7px;
-      }
-      .music-button {
-        right: 78px;
-      }
-      .sfx-button {
-        right: 156px;
-      }
-      #online-explorers-badge {
-        display: none;
-      }
-      #jump-wrap {
-        top: 48px;
-        right: 10px;
-        gap: 4px;
-      }
-      #sector-select {
-        max-width: 110px;
-        font-size: 10px;
-        padding: 4px 18px 4px 6px;
-      }
-      #target-search {
-        width: 110px;
-        font-size: 10px;
-        padding: 4px 6px;
-      }
-      #left-panel {
-        width: 180px;
-        top: 10px;
-        left: 10px;
-      }
-      .left-nav-row {
-        width: 180px;
-        gap: 4px;
-      }
-      .panel-toggle-btn {
-        font-size: 10px;
-        padding: 5px 8px;
-      }
-      #aads-ad-wrap {
-        width: 160px;
-      }
-      #galaxy-radar {
-        bottom: 68px;
-        top: auto;
-        right: 16px;
-        left: auto;
-        width: 85px;
-        height: 85px;
-      }
     }
 
     /* ══════════════════════════════════════════
@@ -1443,6 +1401,116 @@
       backdrop-filter: blur(6px);
       box-shadow: 0 0 10px rgba(56, 189, 248, 0.18);
     }
+
+    @media (max-width: 900px) {
+      #top-right-controls {
+        top: 10px;
+        right: 10px;
+        gap: 6px;
+      }
+      .main-site-button {
+        font-size: 11px;
+        padding: 5px 9px;
+      }
+      #jump-wrap {
+        top: 50px;
+        right: 12px;
+        gap: 6px;
+      }
+      #sector-select {
+        font-size: 10px;
+        padding: 5px 24px 5px 8px;
+        max-width: 150px;
+      }
+      #target-search {
+        width: 140px;
+        font-size: 11px;
+        padding: 5px 8px;
+      }
+      #target-dropdown {
+        min-width: 270px;
+        max-width: min(320px, 85vw);
+      }
+    }
+
+    @media (max-width: 650px) {
+      #splash-title {
+        font-size: clamp(24px, 7vw, 38px);
+      }
+      #splash-pilot-input {
+        width: 145px;
+      }
+      #splash-enter {
+        padding: 12px 26px;
+        letter-spacing: 0.14em;
+      }
+      #top-right-controls {
+        top: 8px;
+        right: 8px;
+        gap: 3px;
+      }
+      .main-site-button {
+        font-size: 9.5px;
+        padding: 4px 5px;
+      }
+      #online-explorers-badge {
+        display: none;
+      }
+      #jump-wrap {
+        top: 44px;
+        right: 8px;
+        gap: 4px;
+      }
+      #sector-select {
+        max-width: 112px;
+        font-size: 10px;
+        padding: 4px 18px 4px 6px;
+      }
+      #target-search {
+        width: 112px;
+        font-size: 10px;
+        padding: 4px 6px;
+      }
+      #left-panel {
+        width: 260px;
+        top: 8px;
+        left: 8px;
+      }
+      .left-nav-row {
+        width: fit-content;
+        max-width: 156px;
+        gap: 4px;
+      }
+      .panel-toggle-btn {
+        font-size: 9.5px;
+        padding: 4px 5px;
+      }
+      #left-panel > .dropdown-panel:not(.hidden) {
+        margin-top: 38px;
+      }
+      #affizy-ad-wrap {
+        width: 180px;
+        margin-top: 38px;
+      }
+      #affizy-ad-placeholder {
+        font-size: 9.5px;
+        padding: 6px;
+      }
+      #affizy-ad-placeholder .affizy-ph-sub {
+        font-size: 8.5px;
+      }
+      #left-panel > .dropdown-panel:not(.hidden) ~ #affizy-ad-wrap {
+        margin-top: 4px;
+      }
+      #galaxy-radar {
+        bottom: 68px;
+        top: auto;
+        right: 16px;
+        left: auto;
+        width: 85px;
+        height: 85px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -1543,34 +1611,53 @@
       </div>
     </div>
 
-    <!-- BEGIN AADS AD UNIT 2459139 -->
-    <div id="aads-ad-wrap">
-      <div id="frame" style="width: 100%; height: 100%; margin: auto; position: relative; z-index: 99998;">
-        <iframe data-aa='2459139' src='https://acceptable.a-ads.com/2459139/?size=Adaptive'
-                style='border:0; padding:0; width:100%; height:100%; min-height:200px; overflow:hidden; display: block; margin: auto;'></iframe>
+    <!-- BEGIN AFFIZY AD ZONE 1160 (480x320) -->
+    <div id="affizy-ad-wrap">
+      <script src="https://affizy.network/delivery.js"></script>
+      <div class="affizy-ad" data-zone="1160"></div>
+      <div id="affizy-ad-placeholder" class="hidden">
+        <span>AFFIZY AD SLOT</span>
+        <span class="affizy-ph-sub">Zone 1160 • 480×320 (3:2) Local Preview</span>
       </div>
     </div>
-    <!-- END AADS AD UNIT 2459139 -->
+    <script>
+      (function () {
+        const ph = document.getElementById("affizy-ad-placeholder");
+        const slot = document.querySelector("#affizy-ad-wrap .affizy-ad");
+        if (!ph || !slot) return;
+        const showPreview = ["localhost", "127.0.0.1", ""].includes(location.hostname) || location.search.includes("adpreview=1");
+        const sync = () => {
+          const hasLiveAd = slot.children.length > 0 && getComputedStyle(slot).display !== "none";
+          ph.classList.toggle("hidden", !showPreview || hasLiveAd);
+        };
+        if (typeof MutationObserver !== "undefined") {
+          new MutationObserver(sync).observe(slot, { childList: true, attributes: true, attributeFilter: ["style"] });
+        }
+        sync();
+      })();
+    </script>
+    <!-- END AFFIZY AD ZONE 1160 -->
   </div>
 
   <audio id="bg-music" src="freedom_costs_too_much.MP3" loop></audio>
-  <button id="sfx-btn" class="main-site-button sfx-button" onclick="toggleSFX()" title="Toggle Sound Effects">
-    🔊 Sound ON
-  </button>
-  <button class="main-site-button music-button" onclick="toggleMusic()">
-    🎵 Play Music
-  </button>
-
-  <button class="main-site-button"
-          onclick="window.open('https://earnwithhatty.com/','_blank')">
-    Main Site
-  </button>
+  <div id="top-right-controls">
+    <button id="sfx-btn" class="main-site-button sfx-button" onclick="toggleSFX()" title="Toggle Sound Effects">
+      🔊 Sound ON
+    </button>
+    <button class="main-site-button music-button" onclick="toggleMusic()">
+      🎵 Play Music
+    </button>
+    <button class="main-site-button"
+            onclick="window.open('https://earnwithhatty.com/','_blank')">
+      Main Site
+    </button>
+  </div>
 
   <!-- Jump-To, Sector Navigator & Multiplayer Status -->
   <div id="jump-wrap" style="display:flex; align-items:center; gap:8px;">
     <div id="online-explorers-badge">🟢 1 Explorer Online</div>
     <select id="sector-select" title="Explore or warp by Galactic Sector" onchange="onSectorSelect(this.value)">
-      <option value="ALL">🌌 All Sectors (66)</option>
+      <option value="ALL">🌌 All Sectors (58)</option>
       <option value="CREATOR">🛠️ Creator Studio</option>
       <option value="BLOCKCHAIN">⛓️ Blockchain Networks</option>
       <option value="AI">🤖 AI & Compute</option>
@@ -1655,9 +1742,13 @@
 <script>
   function enterUniverse() {
     const splashInput = document.getElementById('splash-pilot-input');
-    if (splashInput && splashInput.value.trim() && window.setLocalCallsign) {
-      window.setLocalCallsign(splashInput.value.trim());
+    if (splashInput) {
+      if (splashInput.value.trim() && window.setLocalCallsign) {
+        window.setLocalCallsign(splashInput.value.trim());
+      }
+      splashInput.blur();
     }
+    document.body.classList.add('universe-entered');
     const splash = document.getElementById('splash');
     splash.classList.add('exiting');
     setTimeout(() => { splash.style.display = 'none'; }, 700);
@@ -1743,6 +1834,9 @@
     setReady(); // Don't get stuck if an image fails
   };
   const tl = new THREE.TextureLoader(manager);
+  setTimeout(() => {
+    if (enterBtn && enterBtn.disabled) setReady();
+  }, 4000);
 
   const glowCanvas = document.createElement("canvas"); glowCanvas.width = 256; glowCanvas.height = 256;
   const ctx = glowCanvas.getContext("2d");
@@ -1965,16 +2059,32 @@
   function getPlanetSector(p) {
     if (p && p.userData && p.userData.sectorKey) return p.userData.sectorKey;
     const label = (p && p.userData && p.userData.label) || "";
-    if (label.includes("Hatty") || label === "OpenFocus" || label === "CaseBoard" || label === "Quick-Pad" || label === "Local-Cast" || label === "Data-Phone") return "CREATOR";
-    if (label.includes("Cardano") || label.includes("Voi") || label === "TapTools" || label === "Iagon" || label === "Palm Economy" || label === "Strike Finance" || label === "Sapphire Crypto" || label === "Hosky") return "BLOCKCHAIN";
+    if (label.includes("Hatty") || label === "OpenFocus" || label === "CaseBoard" || label === "Quick-Pad" || label === "Local-Cast") return "CREATOR";
+    if (label.includes("Cardano") || label.includes("Voi") || label === "Iagon" || label === "Palm Economy" || label === "Strike Finance" || label === "Sapphire Crypto" || label === "Hosky" || label === "Token-Tokens") return "BLOCKCHAIN";
     if (label.includes("AI Hub") || label === "Sentient" || label === "ASI Alliance" || label === "Gensyn" || label === "Nosana" || label === "Neural-Mesh" || label === "UpRock" || label === "Autonomi") return "AI";
-    if (label.includes("Education") || label === "NASA" || label === "Code.org" || label === "Khan Academy" || label === "Satsman") return "EDUCATION";
+    if (label === "Satsman") return "EDUCATION";
     if (label.includes("Privacy") || label === "Brave Browser" || label === "Ghost Protocol" || label === "ThreatSphere" || label === "ZKDID") return "PRIVACY";
     if (label === "Focus" || label === "The Arena" || label.includes("Twitter") || label.includes("Audius") || label.includes("Wayvl") || label === "Suno") return "SOCIAL_MEDIA";
     if (label === "Rollercoin" || label === "Pixels" || label === "Chainers" || label === "BestPlay" || label === "Decentraland" || label === "Immutable" || label === "Stellar Assault") return "GAMING";
-    if (label === "Cointiply" || label === "Slice App" || label === "Sweat Wallet" || label === "PublishOX" || label === "CryptoNaut" || label.includes("Faucet") || label === "FaucetPay" || label === "ZBD") return "REWARDS";
-    if (label === "SoundScape" || label === "Trippy") return "LABS";
+    if (label === "Cointiply" || label === "Slice App" || label === "PublishOX" || label === "CryptoNaut" || label.includes("Faucet") || label === "FaucetPay" || label === "ZBD" || label === "Affizy") return "REWARDS";
+    if (label === "Trippy") return "LABS";
     return "CREATOR";
+  }
+
+  function applyCelestialTexture(mesh, mat, texUrl) {
+    if (!texUrl) return;
+    tl.load(texUrl, tex => {
+      tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+      mat.map = tex;
+      if (mat.emissiveMap !== undefined) {
+        mat.emissiveMap = tex;
+        mesh.userData.baseEI = 0.25;
+        if (!mesh.userData.isHovered) {
+          mat.emissiveIntensity = 0.25;
+        }
+      }
+      mat.needsUpdate = true;
+    });
   }
 
   function makePlanet(radius, emissiveHex, pos, label, url, texUrl, desc = "", category = "", glow = true, sectorKey = "") {
@@ -1984,19 +2094,11 @@
           color: 0xffffff, roughness:.3, metalness:.05,
           emissive: new THREE.Color(emissiveHex), emissiveIntensity: .2
         });
-    if (texUrl) tl.load(texUrl, tex => {
-      tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
-      mat.map = tex;
-      if (mat.emissiveMap !== undefined) {
-        mat.emissiveMap = tex;
-        mat.emissiveIntensity = 0.25;
-      }
-      mat.needsUpdate = true;
-    });
     const mesh = new THREE.Mesh(new THREE.SphereGeometry(radius,48,48), mat);
     mesh.position.copy(pos);
     mesh.userData = { label, url, radius, texUrl, desc, category, sectorKey };
     if (!mesh.userData.sectorKey) mesh.userData.sectorKey = getPlanetSector(mesh);
+    applyCelestialTexture(mesh, mat, texUrl);
     scene.add(mesh);
     if (label === "The Hatty Sun") {
       const auraGeo = new THREE.SphereGeometry(radius * 1.25, 32, 32);
@@ -2021,15 +2123,6 @@
           color: 0xffffff, roughness:.3, metalness:.05,
           emissive: new THREE.Color(emissiveHex), emissiveIntensity: .2
         });
-    if (texUrl) tl.load(texUrl, tex => {
-      tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
-      mat.map = tex;
-      if (mat.emissiveMap !== undefined) {
-        mat.emissiveMap = tex;
-        mat.emissiveIntensity = 0.25;
-      }
-      mat.needsUpdate = true;
-    });
     const mesh = new THREE.Mesh(new THREE.SphereGeometry(radius,48,48), mat);
     
     const pivot = new THREE.Object3D();
@@ -2039,6 +2132,7 @@
     mesh.position.set(orbitRadius, 0, 0);
     mesh.userData = { label, url, radius, isMoon: true, pivot, orbitSpeed, parent: parentPlanet, texUrl, desc, category, sectorKey };
     if (!mesh.userData.sectorKey) mesh.userData.sectorKey = getPlanetSector(mesh);
+    applyCelestialTexture(mesh, mat, texUrl);
     pivot.add(mesh);
     
     // Moon Orbital Track Ring
@@ -2076,25 +2170,20 @@
   const pVoi = makePlanet(7,  0xaa55ff, V(111,20,209),   "Voi Planet",              "https://voi.network/", "img/voi-planet.jpg", "High-performance blockchain network designed for micro-transactions, staking, and dApps.", "Blockchain");
   
   const pAIHub = makePlanet(12, 0x8822ff, V(-100, 150, 300), "The AI Hub", "", "img/ai_hub.jpg", "Central sector connecting decentralized AI, compute engines, and neural intelligence networks.", "AI Hub");
-  const pEduHub = makePlanet(11, 0x2288ff, V(250, 100, -200), "Education & Open Source", "", "img/education_hub.jpg", "Cosmic hub dedicated to coding literacy, space science, and open-access learning.", "Education Hub");
 
   const pDecentraland = makePlanet(7,  0xec4899, V(-410,80,70),    "Decentraland",            "https://decentraland.org/", "img/decentraland.jpg", "Pioneering 3D virtual world where users explore, build, and trade virtual estates and digital fashion.", "Metaverse");
-  const pSoundScape = makePlanet(6,  0xdd22ff, V(340,180,220),   "SoundScape",              "", "img/soundscape.jpg", "Interactive ambient audio visualizer and generative synth studio.", "Local Audio");
 
   // Add Planetary Rings
   addPlanetaryRing(pCardano, 13, 22, 0x38bdf8);
   addPlanetaryRing(pAIHub, 16, 28, 0xc084fc);
   addPlanetaryRing(pDecentraland, 10, 18, 0xf472b6);
-  addPlanetaryRing(pSoundScape, 9, 16, 0x22d3ee);
 
   const planets = [
-    pAIHub, pEduHub,
+    pAIHub,
     pLearnHatty, pHattyTools, pLearnCardano, pPrivacyGadgets, pCardano, pVoi,
-    pDecentraland, pSoundScape,
+    pDecentraland,
     makePlanet(6,  0xff9955, V(46,60,166),   "Hatty's News",            "https://hattynews.org/", "img/hattys-news.jpg", "Latest articles, tutorials, announcements, and alpha from Hatty.", "News"),
-    makePlanet(7,  0xff55aa, V(7,-60,131),   "Hatty's Media",           "https://hattys-media.netlify.app/", "img/hattys-media.jpg", "Multimedia vault containing custom artwork, videos, graphics, and music.", "Media"),
-    makePlanet(5.5, 0x00f5ff, V(-20,-50,185), "Hatty's Gif Maker",       "https://hattys-gif-maker.netlify.app/", "img/hattys_gif_maker.jpg", "Pro in-browser GIF suite with 100% client-side WASM processing, animation trimming, filters, and sticker overlay.", "Creator Studio"),
-    makePlanet(6,   0xff7700, V(75,45,140),   "Hatty's Media Forge",     "https://hattyhats.github.io/Hatty-s-Media-Forge/", "img/hattys_media_forge.jpg", "Zero-cloud universal media Swiss Army Knife for batch conversions, Discord 25MB compression, background removal, and audio stem isolation.", "Creator Studio"),
+    makePlanet(5.5, 0x00f5ff, V(-20,-50,185), "Hatty's Gif Maker",       "https://hattygifmaker.org/", "img/hattys_gif_maker.png", "Pro in-browser GIF suite with 100% client-side WASM processing, animation trimming, filters, and sticker overlay.", "Creator Studio"),
     makePlanet(6,  0x44ffcc, V(-39,80,241),   "OpenFocus",               "https://hattyhats.github.io/Open-Focus/", "img/openfucus.jpg", "Minimalist focus timer and task flow web app to keep you productive and distraction-free.", "Productivity"),
     makePlanet(5,  0xff4488, V(-107,-30,270),  "Psycho Satoshi – Audius", "https://audius.co/hatty", "img/audius.webp", "Decentralized music streaming channel showcasing original tracks and cyber audio experiments.", "Music"),
     makePlanet(4,  0xffdd44, V(-181,30,267),  "PublishOX",               "https://www.publish0x.com/@HattyHats", "img/publishox.jpg", "Crypto-powered blogging platform where both authors and readers earn crypto rewards.", "Publishing"),
@@ -2110,11 +2199,9 @@
     makePlanet(5,  0xff3366, V(-85,120,-522), "Suno",                    "https://suno.com/invite/@hattyhats", "img/suno.jpg", "Generative AI music studio turning text prompts and lyrics into radio-ready songs in seconds.", "AI Music"),
     makePlanet(5,  0xdddddd, V(31,40,-578),   "X (Twitter)",             "https://x.com/hatty_hats", "img/x-hatty.jpg", "Hatty's official social feed for quick updates, thoughts, alpha leaks, and discussions.", "Social"),
     makePlanet(5,  0x8855ff, V(160,-60,-579), "Focus",                   "https://focus.xyz/?password=ET9A6HEH", "img/focus.png", "Decentralized Web3 social network built on DeSo blockchain for creator monetization.", "Social"),
-    makePlanet(5,  0xff6600, V(390,-150,-459), "TapTools",                "https://www.taptools.io/", "img/tap-tools.jpg", "Real-time DEX charts, volume radars, and token tracking intelligence for Cardano.", "Analytics"),
     makePlanet(4,  0x00ff99, V(526,-80,-400),  "FaucetPay",               "https://faucetpay.io/?r=31394", "img/faucet-pay.jpg", "Secure micro-wallet and payment processor connecting hundreds of faucet platforms.", "Wallet"),
     makePlanet(5,  0x33eeff, V(592,60,-274),  "Voi Maze",                "https://hattyhats.github.io/voi-maze/", "img/voi-maze.jpg", "Retro labyrinth browser puzzle game integrated with the Voi ecosystem.", "Gaming"),
     makePlanet(6,  0xff9900, V(651,-170,-143),  "CaseBoard",               "https://case-board.netlify.app", "img/case-board.jpg", "Visual crime investigation and mind-mapping corkboard app for connecting clues.", "Productivity"),
-    makePlanet(5,  0x00e5ff, V(-225,45,230),   "Sweat Wallet",            "https://swe.at/c/REPbkMXl0V", "img/sweat_wallet.jpg", "Move-to-earn fitness crypto wallet that rewards your daily walking steps with SWEAT tokens.", "Move-to-Earn"),
     makePlanet(5.5, 0x10b981, V(-260,-40,205), "BestPlay",                "https://bestplay.onelink.me/IZ8a/referral", "img/bestplay.jpg", "Play-to-earn mobile gaming rewards platform where playing games earns real cash and gift cards.", "Play-to-Earn"),
     makePlanet(6,   0x00f5ff, V(160,45,240),    "Voi Shooter",             "https://hattyhats.github.io/Voi-Shooter/", "img/voi_shooter.jpg", "Cyberpunk blockchain defense arcade combat game on the Voi Network.", "Gaming"),
     makePlanet(6,  0x84cc16, V(-380,-30,100),  "Pixels",                  "https://play.pixels.xyz/", "img/pixels.jpg", "Cozy retro pixel-art MMORPG with open-world farming, crafting, land ownership, and community.", "Gaming"),
@@ -2128,6 +2215,8 @@
     makePlanet(5.5, 0x10b981, V(105,85,145),    "ZKDID",                    "https://www.zkd.id/", "img/zkdid.webp", "Zero-knowledge decentralized identity protocol enabling privacy-preserving cryptographic verification and digital sovereignty.", "ZK Privacy"),
     makePlanet(5.5, 0x60a5fa, V(155,-85,185),   "Hosky",                    "https://hosky.io/", "img/hosky.png", "The premier dog token and community meme ecosystem on the Cardano blockchain.", "Meme Token"),
     makePlanet(5.5, 0xf43f5e, V(-40,210,320),   "Autonomi",                 "https://autonomi.com/", "img/autonomi.png", "The network for humanity's data — private, secure, and permanent decentralized data storage.", "Autonomous Cloud"),
+    makePlanet(6,   0x00e5ff, V(-310,60,-310),  "Affizy",                   "https://affizy.com/?ref=7XTB4KY", "img/affizy.png", "Decentralized Web3 advertising network connecting crypto projects with high-traffic publishers, offering 80%+ revenue share and on-chain rewards.", "Web3 Ad Network"),
+    makePlanet(6,   0x00e5ff, V(115,-55,-165),  "Token-Tokens",             "https://token-tokens.org/", "img/token_tokens.png", "Cybernetic real-time cryptocurrency intelligence dashboard featuring live prices, interactive technical charts, candlestick pattern scanner, and market analytics.", "Crypto Analytics"),
     makePlanet(20, 0xffcc00, V(0,0,0),         "The Hatty Sun",           "https://earnwithhatty.com/", "hattyhats.jpg", "The blazing core of Hatty's Universe and central gateway to the ecosystem.", "Central Star")
   ];
 
@@ -2137,7 +2226,6 @@
   makeMoon(pVoi, 3.5, 0x88ff44, 15, 0.5, "Voi Fountain", "https://fountain.voirewards.com/", "img/voi_fountain.jpg", "Community rewards portal and staking faucet for active Voi network participants.", "Faucet");
   makeMoon(pHattyTools, 2.5, 0x00ffff, 11, 0.6, "Quick-Pad", "https://quickpad.org/", "img/quick_pad.jpg", "Fast, minimalist browser notepad for quick thoughts, code snippets, and daily logs.", "Productivity");
   makeMoon(pHattyTools, 3, 0xff00ff, 15, 0.4, "Local-Cast", "https://www.local-cast.org/", "img/local_cast.jpg", "Lightweight peer-to-peer screen and media casting directly in browser without servers.", "Streaming");
-  makeMoon(pHattyTools, 2.8, 0x00ff00, 20, 0.3, "Data-Phone", "https://data-phone-app.onrender.com", "img/data_phone.jpg", "Web-based retro communicator and encrypted data terminal tool.", "Tools");
 
   // Privacy Moons
   makeMoon(pPrivacyGadgets, 2.5, 0xff5500, 10, 0.4, "Brave Browser", "https://brave.com/", "img/brave_browser.jpg", "Fast, privacy-first web browser with built-in ad blocker and BAT crypto rewards.", "Browser");
@@ -2153,11 +2241,6 @@
   makeMoon(pAIHub, 3, 0x00ff00, 42, 0.25, "Nosana", "https://nosana.com/", "img/nosana.jpg", "Crowd-powered GPU compute grid on Solana providing fast and affordable AI inference.", "Compute");
   makeMoon(pAIHub, 3.8, 0x00eeff, 50, 0.35, "Neural-Mesh", "", "img/neural_mesh.jpg", "Interactive neural network topology visualizer and synaptic graph generator tool.", "AI Tool");
   makeMoon(pAIHub, 3.6, 0x00aaff, 58, 0.28, "UpRock", "https://link.uprock.com/i/388cf0aa", "img/uprock.jpg", "Decentralized AI DePIN network that monetizes unused internet bandwidth for real-time data.", "DePIN");
-
-  // Education Hub Moons
-  makeMoon(pEduHub, 4, 0x0055ff, 20, 0.4, "NASA", "https://www.nasa.gov/", "img/nasa.jpg", "Official space agency portal with real-time astronomy imagery and deep space missions.", "Science");
-  makeMoon(pEduHub, 3.5, 0x00ff88, 28, 0.3, "Code.org", "https://code.org/", "img/code_org.jpg", "Global non-profit educational initiative expanding computer science and coding access.", "Coding");
-  makeMoon(pEduHub, 3.8, 0x22ffaa, 36, 0.2, "Khan Academy", "https://www.khanacademy.org/", "img/khan_academy.jpg", "Free world-class personalized learning resources spanning math, science, and computing.", "Education");
 
   // ── Targeting Laser ──
   const laserMat = new THREE.LineBasicMaterial({ color: 0x00ffff, linewidth: 2, transparent: true, opacity: 0 });
@@ -2216,13 +2299,28 @@
     sectorSelect.options[0].textContent = `🌌 All Sectors (${planets.length})`;
   }
 
+  function getLiveSectorCenter(secKey) {
+    const sectorPlanets = planets.filter(p => p.userData && !p.userData.isMoon && (p.userData.sectorKey || getPlanetSector(p)) === secKey);
+    if (!sectorPlanets.length) {
+      return SECTORS[secKey] ? SECTORS[secKey].focalPoint.clone() : new THREE.Vector3();
+    }
+    const center = new THREE.Vector3();
+    const tmp = new THREE.Vector3();
+    sectorPlanets.forEach(p => {
+      p.getWorldPosition(tmp);
+      center.add(tmp);
+    });
+    return center.divideScalar(sectorPlanets.length);
+  }
+
   function onSectorSelect(secKey) {
     if (sectorSelect) sectorSelect.blur();
+    if (typeof resetMovementControls === "function") resetMovementControls();
     AudioEngine.click();
     if (secKey && secKey !== "ALL" && SECTORS[secKey]) {
       const sec = SECTORS[secKey];
       const targetDummy = new THREE.Object3D();
-      targetDummy.position.copy(sec.focalPoint);
+      targetDummy.position.copy(getLiveSectorCenter(secKey));
       targetDummy.userData = { label: sec.name, radius: 35 };
       triggerWarp(targetDummy);
       showTourLabel(sec.name);
@@ -2301,6 +2399,7 @@
           AudioEngine.click();
           searchInput.value = p.userData.label;
           searchDrop.style.display = "none";
+          searchInput.blur();
           engageTarget(p);
           triggerWarp(p);
         };
@@ -2312,7 +2411,10 @@
   }
 
   searchInput.addEventListener("input", updateDropdown);
-  searchInput.addEventListener("focus", updateDropdown);
+  searchInput.addEventListener("focus", () => {
+    if (typeof resetMovementControls === "function") resetMovementControls();
+    updateDropdown();
+  });
   document.addEventListener("click", e => {
     if (e.target !== searchInput && e.target !== searchDrop && e.target !== sectorSelect) {
       searchDrop.style.display = "none";
@@ -2354,6 +2456,9 @@
 
   function triggerWarp(targetPlanet, callback) {
     if (!targetPlanet) return;
+    if (typeof tourActive !== "undefined" && tourActive && typeof stopTourForWarp === "function") {
+      stopTourForWarp();
+    }
     AudioEngine.warp();
     warpTargetPlanet = targetPlanet;
     warpStartPos.copy(camera.position);
@@ -2511,6 +2616,7 @@
   window.randomizePilotName = randomizePilotName;
 
   function openNameModal() {
+    if (typeof resetMovementControls === "function") resetMovementControls();
     if (typeof AudioEngine !== "undefined" && AudioEngine.click) AudioEngine.click();
     const modal = document.getElementById("name-modal");
     const input = document.getElementById("modal-name-input");
@@ -2578,15 +2684,17 @@
     const nCtx = canvas.getContext("2d");
     nCtx.clearRect(0, 0, canvas.width, canvas.height);
     nCtx.fillStyle = "rgba(15, 23, 42, 0.85)";
-    if (typeof nCtx.roundRect === "function") {
-      nCtx.roundRect(10, 10, 236, 44, 10);
-      nCtx.fill();
-    } else {
-      nCtx.fillRect(10, 10, 236, 44);
-    }
     nCtx.strokeStyle = "rgba(56, 189, 248, 0.85)";
     nCtx.lineWidth = 2;
-    nCtx.stroke();
+    if (typeof nCtx.roundRect === "function") {
+      nCtx.beginPath();
+      nCtx.roundRect(10, 10, 236, 44, 10);
+      nCtx.fill();
+      nCtx.stroke();
+    } else {
+      nCtx.fillRect(10, 10, 236, 44);
+      nCtx.strokeRect(10, 10, 236, 44);
+    }
     nCtx.font = "bold 18px 'Share Tech Mono', monospace";
     nCtx.fillStyle = "#38bdf8";
     nCtx.textAlign = "center";
@@ -3043,6 +3151,8 @@
 
   window.openHolodeck = function(planet) {
     if (!planet) return;
+    if (typeof resetMovementControls === "function") resetMovementControls();
+    tooltip.style.opacity = "0";
     currentHoloPlanet = planet;
     const u = planet.userData;
     holoTitle.textContent = u.label || "Celestial World";
@@ -3090,7 +3200,10 @@
 
   window.copyCurrentHolodeckLink = function() {
     if (currentHoloPlanet && currentHoloPlanet.userData.url) {
-      navigator.clipboard.writeText(currentHoloPlanet.userData.url);
+      const url = currentHoloPlanet.userData.url;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).catch(() => {});
+      }
       holoCopyBtn.textContent = "✓ Copied!";
       AudioEngine.click();
       setTimeout(() => {
@@ -3121,6 +3234,20 @@
   // Track shift for boost
   const keys = { KeyW:false, KeyA:false, KeyS:false, KeyD:false };
   let shiftDown = false;
+
+  function resetMovementControls() {
+    keys.KeyW = keys.KeyA = keys.KeyS = keys.KeyD = false;
+    shiftDown = false;
+    if (typeof AudioEngine !== "undefined" && AudioEngine.stopThruster) {
+      AudioEngine.stopThruster();
+    }
+    if (boostEl) boostEl.classList.remove("active");
+  }
+
+  window.addEventListener("blur", resetMovementControls);
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) resetMovementControls();
+  });
 
   window.addEventListener("keydown", e => {
     if (document.activeElement && ['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) return;
@@ -3167,8 +3294,8 @@
   const BOOST_MULTIPLIER = 3.5;
   const lookSpeed = 0.0025;
 
-  let mDown=false, pmx=0, pmy=0;
-  renderer.domElement.addEventListener("mousedown", e=>{mDown=true;pmx=e.clientX;pmy=e.clientY;});
+  let mDown=false, pmx=0, pmy=0, mdX=0, mdY=0;
+  renderer.domElement.addEventListener("mousedown", e=>{mDown=true;pmx=e.clientX;pmy=e.clientY;mdX=e.clientX;mdY=e.clientY;});
   window.addEventListener("mouseup", ()=>mDown=false);
   window.addEventListener("mousemove", e=>{
     if (!mDown) return;
@@ -3189,7 +3316,7 @@
     const ids = Object.keys(touches);
     if (ids.length === 1) {
       const id=ids[0], prev=touches[id];
-      const cur=[...e.changedTouches].find(t=>t.identifier==id);
+      const cur=[...e.changedTouches].find(t=>String(t.identifier)===id);
       if (cur) {
         yaw  -= (cur.clientX-prev.x)*lookSpeed;
         pitch -= (cur.clientY-prev.y)*lookSpeed;
@@ -3270,20 +3397,43 @@
     mouse.set(((e.clientX-r.left)/r.width)*2-1,-((e.clientY-r.top)/r.height)*2+1);
     lastEv=e;
   }
+  function clearHover() {
+    if (hovered) {
+      hovered.userData.isHovered = false;
+      if (hovered.material.emissiveIntensity !== undefined && hovered.userData.baseEI !== undefined) {
+        hovered.material.emissiveIntensity = hovered.userData.baseEI;
+      }
+      hovered = null;
+    }
+    container.style.cursor = "default";
+    tooltip.style.opacity = "0";
+  }
   function doHover(){
+    if (holodeckModal && holodeckModal.classList.contains("open")) {
+      clearHover();
+      return;
+    }
     raycaster.setFromCamera(mouse,camera);
     const h=raycaster.intersectObjects(planets,false);
     if(h.length){
       const p=h[0].object;
       if(hovered!==p){
-        if(hovered) hovered.material.emissiveIntensity=hovered.userData.baseEI;
+        if(hovered) {
+          hovered.userData.isHovered = false;
+          if (hovered.material.emissiveIntensity !== undefined && hovered.userData.baseEI !== undefined) {
+            hovered.material.emissiveIntensity = hovered.userData.baseEI;
+          }
+        }
         hovered=p;
-        if(p.userData.baseEI===undefined) p.userData.baseEI=p.material.emissiveIntensity;
-        p.material.emissiveIntensity=p.userData.baseEI*3.5;
+        p.userData.isHovered = true;
+        if (p.material.emissiveIntensity !== undefined) {
+          if(p.userData.baseEI===undefined) p.userData.baseEI=p.material.emissiveIntensity;
+          p.material.emissiveIntensity=p.userData.baseEI*3.5;
+        }
         container.style.cursor="pointer";
         AudioEngine.ping();
         const u = p.userData;
-        const imgHtml = u.texUrl ? `<img src="${u.texUrl}" class="tt-img" alt="${u.label}">` : '';
+        const imgHtml = u.texUrl ? `<img src="${escapeHtml(u.texUrl)}" class="tt-img" alt="${escapeHtml(u.label)}">` : '';
         const secKey = u.sectorKey || getPlanetSector(p);
         const secInfo = SECTORS[secKey];
         const badgeText = (u.isMoon ? '🛰️ Moon • ' : '🪐 Planet • ') + (secInfo ? secInfo.icon + ' ' : '') + (u.category || 'Ecosystem');
@@ -3293,11 +3443,11 @@
           <div class="tt-header">
             ${imgHtml}
             <div class="tt-title-wrap">
-              <div class="tt-title">${u.label}</div>
-              <div class="tt-badge">${badgeText}</div>
+              <div class="tt-title">${escapeHtml(u.label)}</div>
+              <div class="tt-badge">${escapeHtml(badgeText)}</div>
             </div>
           </div>
-          <div class="tt-desc">${u.desc || 'Explore this world in Hatty\'s Universe.'}</div>
+          <div class="tt-desc">${escapeHtml(u.desc || "Explore this world in Hatty's Universe.")}</div>
           <div class="tt-footer">
             <span>${u.isMoon ? 'Orbiting World' : 'Celestial Body'}</span>
             <span class="tt-action">${actionText}</span>
@@ -3314,16 +3464,19 @@
         if (ty + 180 > window.innerHeight) {
           ty = lastEv.clientY - 180;
         }
+        tx = Math.max(8, Math.min(tx, window.innerWidth - 260));
+        ty = Math.max(8, Math.min(ty, window.innerHeight - 160));
         tooltip.style.left = tx + "px";
         tooltip.style.top = ty + "px";
       }
     } else {
-      if(hovered){hovered.material.emissiveIntensity=hovered.userData.baseEI;hovered=null;}
-      container.style.cursor="default"; tooltip.style.opacity="0";
+      clearHover();
     }
   }
   renderer.domElement.addEventListener("mousemove", e=>{updateMouse(e);doHover();});
+  renderer.domElement.addEventListener("mouseleave", clearHover);
   renderer.domElement.addEventListener("click", e=>{
+    if (Math.hypot(e.clientX - mdX, e.clientY - mdY) > 6) return;
     updateMouse(e); raycaster.setFromCamera(mouse,camera);
     const h=raycaster.intersectObjects(planets,false);
     if(h.length) {
@@ -3335,6 +3488,7 @@
     camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix();
     renderer.setSize(innerWidth,innerHeight);
     composer.setSize(innerWidth,innerHeight);
+    bloomPass.setSize(innerWidth,innerHeight);
   });
 
   // ── Guided Tour ──
@@ -3351,7 +3505,29 @@
   let preTourPos = new THREE.Vector3();
   let preTourYaw = 0, preTourPitch = 0;
 
+  function stopTourMusicAndUI() {
+    tourActive = false;
+    tourBtn.textContent = "🚀 Take a Tour";
+    tourBtn.classList.remove("touring");
+    tourLabel.style.opacity = "0";
+    const audio = document.getElementById('bg-music');
+    const musicBtn = document.querySelector('.music-button');
+    if (audio) {
+      audio.pause();
+      if (musicBtn) musicBtn.textContent = '🎵 Play Music';
+    }
+  }
+
+  function stopTourForWarp() {
+    stopTourMusicAndUI();
+  }
+
   function startTour() {
+    resetMovementControls();
+    isWarping = false;
+    camera.fov = 75;
+    camera.updateProjectionMatrix();
+    warpStarsMat.opacity = 0;
     tourActive = true;
     tourIndex  = 0;
     tourPhase  = "travel";
@@ -3375,21 +3551,10 @@
   }
 
   function endTour() {
-    tourActive = false;
-    tourBtn.textContent = "🚀 Take a Tour";
-    tourBtn.classList.remove("touring");
-    tourLabel.style.opacity = "0";
+    stopTourMusicAndUI();
     camera.position.copy(preTourPos);
     yaw   = preTourYaw;
     pitch = preTourPitch;
-
-    // Auto-stop music when exiting tour
-    const audio = document.getElementById('bg-music');
-    const musicBtn = document.querySelector('.music-button');
-    if (audio) {
-      audio.pause();
-      if (musicBtn) musicBtn.textContent = '🎵 Play Music';
-    }
   }
 
   window.toggleTour = function() {
@@ -3467,7 +3632,7 @@
   const upVector = new THREE.Vector3(0,1,0);
 
   function animate(){
-    const dt=clock.getDelta();
+    const dt = Math.min(clock.getDelta(), 0.1);
 
     if (camera.position.z > 50 && !window.isEnteringUniverse && !window.hasEnteredUniverse) {
       // Automatic slow drift while on splash screen
@@ -3488,7 +3653,7 @@
 
     planets.forEach((p,i)=> {
       if(!p.userData.isMoon) {
-        p.rotation.y+=.12*dt*(i+1);
+        p.rotation.y += (0.18 + (i % 5) * 0.07) * dt;
         const speed = 0.02 + ((i % 5) * 0.005);
         p.position.applyAxisAngle(upVector, speed * dt);
       }
@@ -3589,6 +3754,9 @@
     otherPlayers.forEach((player, id) => {
       if (now - player.lastSeen > 5000) {
         scene.remove(player.mesh);
+        if (player.mesh.userData && player.mesh.userData.badgeTex) {
+          player.mesh.userData.badgeTex.dispose();
+        }
         otherPlayers.delete(id);
         updateOnlineBadge();
       } else {
@@ -3608,11 +3776,12 @@
     const audio = document.getElementById('bg-music');
     const btn = document.querySelector('.music-button');
     if (audio.paused) {
-      audio.play();
-      btn.textContent = '⏸ Pause Music';
+      audio.play().then(() => {
+        if (btn) btn.textContent = '⏸ Pause Music';
+      }).catch(() => {});
     } else {
       audio.pause();
-      btn.textContent = '🎵 Play Music';
+      if (btn) btn.textContent = '🎵 Play Music';
     }
   };
 
@@ -3621,5 +3790,6 @@
   };
   AudioEngine.updateUI();
 </script>
+<script src="https://cdn.apitiny.net/scripts/v2.0/main.js" data-site-id="6afa635372e32d7989c230c8" data-test-mode="false" async></script>
 </body>
 </html>

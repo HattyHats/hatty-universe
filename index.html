@@ -2,8 +2,29 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>HattyHats – Digital Universe (Prototype)</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hatty's Universe — Interactive 3D Digital Galaxy</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="description" content="Explore HattyHats' 3D interactive digital galaxy of Web3, AI, creator tools, gaming, and crypto platforms." />
+  <meta name="theme-color" content="#02030a" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Hatty's Universe" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="application-name" content="Hatty's Universe" />
+  <link rel="canonical" href="https://hattyuniverse.org/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Hatty's Universe" />
+  <meta property="og:title" content="Hatty's Universe — Interactive 3D Digital Galaxy" />
+  <meta property="og:description" content="Explore HattyHats' 3D interactive digital galaxy of Web3, AI, creator tools, gaming, and crypto platforms." />
+  <meta property="og:url" content="https://hattyuniverse.org/" />
+  <meta property="og:image" content="https://hattyuniverse.org/icon-512.png" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Hatty's Universe — Interactive 3D Digital Galaxy" />
+  <meta name="twitter:image" content="https://hattyuniverse.org/icon-512.png" />
+  <link rel="manifest" href="./manifest.json" />
+  <link rel="icon" type="image/png" sizes="64x64" href="./favicon.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png" />
   
   <!-- Async script to support import maps on older browsers (like iPhones) -->
   <script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
@@ -64,9 +85,85 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 16px;
+      gap: 14px;
       text-align: center;
       padding: 0 20px;
+    }
+
+    #splash-logo {
+      width: clamp(82px, 13vw, 120px);
+      height: clamp(82px, 13vw, 120px);
+      border-radius: 26%;
+      object-fit: cover;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 0.35s;
+      border: 1px solid rgba(56, 189, 248, 0.45);
+      box-shadow:
+        0 0 28px rgba(56, 189, 248, 0.38),
+        0 0 60px rgba(139, 92, 246, 0.25);
+    }
+
+    .pwa-install-pill {
+      margin-top: 4px;
+      padding: 8px 18px;
+      border-radius: 999px;
+      border: 1px solid rgba(56, 189, 248, 0.55);
+      background: rgba(15, 23, 42, 0.78);
+      color: #7dd3fc;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 3.55s;
+      transition: all 0.2s ease;
+      box-shadow: 0 0 14px rgba(56, 189, 248, 0.22);
+    }
+    .pwa-install-pill:hover {
+      background: rgba(14, 165, 233, 0.28);
+      border-color: #38bdf8;
+      color: #ffffff;
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.45);
+      transform: translateY(-1px);
+    }
+    body.pwa-installed #splash-install-btn,
+    body.pwa-installed #install-app-btn,
+    body.pwa-installed #inst-install-wrap {
+      display: none !important;
+    }
+
+    #pwa-toast {
+      position: fixed;
+      bottom: 72px;
+      left: 50%;
+      transform: translateX(-50%) translateY(16px);
+      max-width: min(440px, calc(100vw - 32px));
+      padding: 12px 16px;
+      border-radius: 10px;
+      background: rgba(10, 15, 30, 0.96);
+      border: 1px solid rgba(56, 189, 248, 0.65);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.75), 0 0 20px rgba(56, 189, 248, 0.25);
+      color: #e2e8f0;
+      font-size: 12px;
+      line-height: 1.45;
+      text-align: center;
+      z-index: 10002;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.22s ease, transform 0.22s ease;
+    }
+    #pwa-toast.visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateX(-50%) translateY(0);
+    }
+    #pwa-toast strong {
+      display: block;
+      margin-bottom: 3px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 11px;
+      color: #38bdf8;
     }
 
     #splash-welcome {
@@ -1434,15 +1531,29 @@
     }
 
     @media (max-width: 650px) {
+      #splash-content {
+        gap: 9px;
+      }
+      #splash-logo {
+        width: 68px;
+        height: 68px;
+      }
       #splash-title {
         font-size: clamp(24px, 7vw, 38px);
+      }
+      #splash-pilot-box {
+        margin-top: 10px;
       }
       #splash-pilot-input {
         width: 145px;
       }
       #splash-enter {
+        margin-top: 10px;
         padding: 12px 26px;
         letter-spacing: 0.14em;
+      }
+      #install-app-btn {
+        display: none;
       }
       #top-right-controls {
         top: 8px;
@@ -1518,6 +1629,7 @@
 <!-- ══ SPLASH SCREEN ══ -->
 <div id="splash">
   <div id="splash-content">
+    <img id="splash-logo" src="logo.png" alt="Hatty's Universe Logo" width="112" height="112" />
     <div id="splash-welcome">Welcome To:</div>
     <div id="splash-title">
       <span id="splash-hatty">Hatty's</span>
@@ -1535,6 +1647,7 @@
       </div>
     </div>
     <button id="splash-enter" onclick="enterUniverse()" disabled>Loading Assets...</button>
+    <button type="button" id="splash-install-btn" class="pwa-install-pill" onclick="installPWA()">📲 Install Chrome App</button>
   </div>
 </div>
 
@@ -1581,6 +1694,9 @@
             Use ↑↓←→ buttons to fly.<br /><br />
             Click <strong>💬 Chat</strong> to broadcast!
           </span>
+          <div id="inst-install-wrap" style="margin-top:10px;">
+            <button type="button" class="hud-edit-name-btn" style="width:100%;padding:5px 8px;" onclick="installPWA()">📲 Install Chrome App</button>
+          </div>
         </div>
       </div>
     </div>
@@ -1650,6 +1766,9 @@
     <button class="main-site-button"
             onclick="window.open('https://earnwithhatty.com/','_blank')">
       Main Site
+    </button>
+    <button type="button" id="install-app-btn" class="main-site-button" onclick="installPWA()" title="Install Hatty's Universe as a Chrome App">
+      📲 Install App
     </button>
   </div>
 
@@ -3789,6 +3908,84 @@
     AudioEngine.toggleMute();
   };
   AudioEngine.updateUI();
+</script>
+<div id="pwa-toast" role="status" aria-live="polite" onclick="this.classList.remove('visible')"></div>
+<script>
+  (function () {
+    let deferredInstallPrompt = null;
+    let toastTimer = null;
+
+    function showPWAToast(title, message) {
+      const toast = document.getElementById('pwa-toast');
+      if (!toast) return;
+      toast.replaceChildren();
+      const heading = document.createElement('strong');
+      heading.textContent = title;
+      const body = document.createTextNode(message);
+      toast.appendChild(heading);
+      toast.appendChild(body);
+      toast.classList.add('visible');
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove('visible'), 6500);
+    }
+
+    function syncPWAState() {
+      const isStandalone =
+        (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) ||
+        window.navigator.standalone === true;
+      document.body.classList.toggle('pwa-installed', isStandalone);
+    }
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredInstallPrompt = e;
+      syncPWAState();
+    });
+
+    window.addEventListener('appinstalled', () => {
+      deferredInstallPrompt = null;
+      document.body.classList.add('pwa-installed');
+      showPWAToast('App Installed!', "Hatty's Universe has been added as an app on your device.");
+    });
+
+    window.installPWA = async function () {
+      if (deferredInstallPrompt) {
+        const promptEvent = deferredInstallPrompt;
+        deferredInstallPrompt = null;
+        try {
+          await promptEvent.prompt();
+          await promptEvent.userChoice;
+          return;
+        } catch (err) {
+          console.warn('PWA prompt error:', err);
+        }
+      }
+      const ua = navigator.userAgent || '';
+      const isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+      if (isIOS) {
+        showPWAToast(
+          'Install on iOS / iPadOS',
+          'Tap the Share button in Safari and choose "Add to Home Screen" to install Hatty\'s Universe.'
+        );
+      } else {
+        showPWAToast(
+          'Install Chrome App',
+          'Click the Install icon (\u2295) in Chrome\'s address bar, or open Chrome Menu (\u22ee) \u2192 Cast, save, and share \u2192 Install Hatty\'s Universe.'
+        );
+      }
+    };
+
+    if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.protocol === 'http:')) {
+      window.addEventListener('load', () => {
+        syncPWAState();
+        navigator.serviceWorker.register('./sw.js').catch((err) => {
+          console.warn('Service worker registration note:', err);
+        });
+      });
+    } else {
+      syncPWAState();
+    }
+  })();
 </script>
 <script src="https://cdn.apitiny.net/scripts/v2.0/main.js" data-site-id="6afa635372e32d7989c230c8" data-test-mode="false" async></script>
 </body>
